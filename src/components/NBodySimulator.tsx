@@ -1966,9 +1966,29 @@ export default function NBodySimulator() {
           <div className="absolute -top-12 right-0 flex gap-2 z-20">
             <button
               onClick={() => {
-                setViewOffsetX(initialView.offsetX);
-                setViewOffsetY(initialView.offsetY);
-                setViewScale(initialView.scale);
+                // 根据画布尺寸计算居中偏移量
+                const canvas = canvasRef.current;
+                if (canvas) {
+                  const canvasWidth = canvas.width;
+                  const canvasHeight = canvas.height;
+                  // 计算天体中心位置
+                  let centerX = 400; // 默认中心
+                  let centerY = 250;
+                  if (preset === 'solar') {
+                    centerX = 400;
+                    centerY = 300;
+                  }
+                  // 计算偏移量使天体居中
+                  const newOffsetX = canvasWidth / 2 - centerX * initialView.scale;
+                  const newOffsetY = canvasHeight / 2 - centerY * initialView.scale;
+                  setViewOffsetX(newOffsetX);
+                  setViewOffsetY(newOffsetY);
+                  setViewScale(initialView.scale);
+                } else {
+                  setViewOffsetX(initialView.offsetX);
+                  setViewOffsetY(initialView.offsetY);
+                  setViewScale(initialView.scale);
+                }
               }}
               className="px-4 py-2 bg-blue-600/80 hover:bg-blue-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2"
               title="重置视角到初始状态"
