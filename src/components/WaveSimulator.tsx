@@ -46,6 +46,71 @@ export default function WaveSimulator() {
     };
   }, [isClient, isRunning, amplitude, wavelength, frequency, waveType]);
 
+  // 历史记录管理
+  const saveToHistory = () => {
+    const newState = { amplitude, wavelength, frequency, waveType };
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setAmplitude(prevState.amplitude);
+      setWavelength(prevState.wavelength);
+      setFrequency(prevState.frequency);
+      setWaveType(prevState.waveType);
+      setHistoryIndex(prev => prev - 1);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setAmplitude(nextState.amplitude);
+      setWavelength(nextState.wavelength);
+      setFrequency(nextState.frequency);
+      setWaveType(nextState.waveType);
+      setHistoryIndex(prev => prev + 1);
+    }
+  };
+
+  // 更新参数并保存到历史记录
+  const updateAmplitude = (value: number) => {
+    setAmplitude(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateWavelength = (value: number) => {
+    setWavelength(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateFrequency = (value: number) => {
+    setFrequency(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateWaveType = (value: 'transverse' | 'longitudinal') => {
+    setWaveType(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const handleReset = () => {
+    setAmplitude(defaultValues.amplitude);
+    setWavelength(defaultValues.wavelength);
+    setFrequency(defaultValues.frequency);
+    setWaveType(defaultValues.waveType);
+    saveToHistory();
+  };
+
   const animate = () => {
     if (!canvasRef.current) return;
 
@@ -236,7 +301,7 @@ export default function WaveSimulator() {
                 <label className="text-sm text-blue-200/80 mb-2 block">波形类型</label>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setWaveType('transverse')}
+                    onClick={() => updateWaveType('transverse')}
                     className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
                       waveType === 'transverse' 
                         ? 'bg-blue-600 text-white' 
@@ -246,7 +311,7 @@ export default function WaveSimulator() {
                     ↕️ 横波
                   </button>
                   <button
-                    onClick={() => setWaveType('longitudinal')}
+                    onClick={() => updateWaveType('longitudinal')}
                     className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
                       waveType === 'longitudinal' 
                         ? 'bg-blue-600 text-white' 
@@ -267,7 +332,7 @@ export default function WaveSimulator() {
                   min="10"
                   max="100"
                   value={amplitude}
-                  onChange={(e) => setAmplitude(Number(e.target.value))}
+                  onChange={(e) => updateAmplitude(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -281,7 +346,7 @@ export default function WaveSimulator() {
                   min="50"
                   max="200"
                   value={wavelength}
-                  onChange={(e) => setWavelength(Number(e.target.value))}
+                  onChange={(e) => updateWavelength(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -296,7 +361,7 @@ export default function WaveSimulator() {
                   max="3"
                   step="0.5"
                   value={frequency}
-                  onChange={(e) => setFrequency(Number(e.target.value))}
+                  onChange={(e) => updateFrequency(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -308,6 +373,32 @@ export default function WaveSimulator() {
                 className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors"
               >
                 {isRunning ? '⏸️ 暂停' : '▶️ 开始'}
+              </button>
+            </div>
+
+            {/* 撤销/重做/重置 */}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleReset}
+                className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors"
+              >
+                🔄 重置
+              </button>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↩️ 撤回
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↪️ 回撤
               </button>
             </div>
           </div>
