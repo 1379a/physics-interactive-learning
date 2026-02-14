@@ -83,6 +83,7 @@ export default function NBodySimulator() {
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
   const [solarViewMode, setSolarViewMode] = useState<'horizontal' | 'radial'>('horizontal'); // 太阳系视图模式
+  const [initialView, setInitialView] = useState({ scale: 1, offsetX: 0, offsetY: 0 }); // 初始视角参数
 
   // 天体数据（使用更适合演示的参数）
   const [bodies, setBodies] = useState<CelestialBody[]>([
@@ -225,7 +226,8 @@ export default function NBodySimulator() {
   };
 
   // 预设场景
-  const loadPreset = (preset: 'custom' | 'earth-moon' | 'solar') => {
+  const loadPreset = (preset: 'custom' | 'earth-moon' | 'solar', viewMode?: 'horizontal' | 'radial') => {
+    const currentViewMode = viewMode || solarViewMode;
     setPreset(preset);
     setIsAnimating(false);
     resetTrajectories();
@@ -267,6 +269,7 @@ export default function NBodySimulator() {
       setViewOffsetY(0);
       // 重置视图模式到默认
       setSolarViewMode('horizontal');
+      setInitialView({ scale: 1, offsetX: 0, offsetY: 0 });
     } else if (preset === 'earth-moon') {
       // 地月系 - 基于真实物理参数
       const centerX = 400;
@@ -323,6 +326,7 @@ export default function NBodySimulator() {
       setViewScale(1);
       setViewOffsetX(0);
       setViewOffsetY(0);
+      setInitialView({ scale: 1, offsetX: 0, offsetY: 0 });
     } else if (preset === 'solar') {
       // 太阳系视图模式 - 基于真实物理参数
       const centerX = 400;
@@ -505,14 +509,16 @@ export default function NBodySimulator() {
       
       setBodyCount(9);
       
-      if (solarViewMode === 'horizontal') {
+      if (currentViewMode === 'horizontal') {
         setViewScale(0.65);
         setViewOffsetX(-120);
         setViewOffsetY(0);
+        setInitialView({ scale: 0.65, offsetX: -120, offsetY: 0 });
       } else {
         setViewScale(0.5);
         setViewOffsetX(0);
         setViewOffsetY(0);
+        setInitialView({ scale: 0.5, offsetX: 0, offsetY: 0 });
       }
     }
   };
@@ -1487,7 +1493,7 @@ export default function NBodySimulator() {
                     <button
                       onClick={() => {
                         setSolarViewMode('horizontal');
-                        loadPreset('solar');
+                        loadPreset('solar', 'horizontal');
                       }}
                       className={`px-3 py-1 rounded text-xs transition-all ${
                         solarViewMode === 'horizontal'
@@ -1500,7 +1506,7 @@ export default function NBodySimulator() {
                     <button
                       onClick={() => {
                         setSolarViewMode('radial');
-                        loadPreset('solar');
+                        loadPreset('solar', 'radial');
                       }}
                       className={`px-3 py-1 rounded text-xs transition-all ${
                         solarViewMode === 'radial'
@@ -1960,9 +1966,9 @@ export default function NBodySimulator() {
           <div className="absolute -top-12 right-0 flex gap-2 z-20">
             <button
               onClick={() => {
-                setViewOffsetX(0);
-                setViewOffsetY(0);
-                setViewScale(1);
+                setViewOffsetX(initialView.offsetX);
+                setViewOffsetY(initialView.offsetY);
+                setViewScale(initialView.scale);
               }}
               className="px-4 py-2 bg-blue-600/80 hover:bg-blue-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2"
               title="重置视角到初始状态"
