@@ -80,6 +80,11 @@ const ResonanceSimulator = dynamic(() => import('@/components/ResonanceSimulator
   loading: () => <div className="p-8">加载中...</div>
 });
 
+const WaveInterference2DSimulator = dynamic(() => import('@/components/WaveInterference2DSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
 interface Theme {
   name: string;
   id: string;
@@ -137,7 +142,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
   const [simulationSubTab, setSimulationSubTab] = useState<
-    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference' | 'doppler' | 'soundwave' | 'resonance'
+    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference' | 'doppler' | 'soundwave' | 'resonance' | 'interference2d'
   >('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
@@ -504,6 +509,17 @@ export default function Home() {
                   >
                     🎸 共振现象
                   </button>
+                  <button
+                    onClick={() => setSimulationSubTab('interference2d')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'interference2d'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'interference2d' ? { background: getThemeColor() } : {}}
+                  >
+                    🌊 波的二维干涉
+                  </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
                 {simulationSubTab === 'nbody' && <NBodySimulator />}
@@ -516,6 +532,7 @@ export default function Home() {
                 {simulationSubTab === 'doppler' && <DopplerEffectSimulator />}
                 {simulationSubTab === 'soundwave' && <SoundWaveSimulator />}
                 {simulationSubTab === 'resonance' && <ResonanceSimulator />}
+                {simulationSubTab === 'interference2d' && <WaveInterference2DSimulator />}
               </div>
             )}
             {activeTab === 'solver' && <ProblemSolver />}
