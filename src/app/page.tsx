@@ -212,13 +212,14 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">⚛️</div>
               <div>
-                <h1 
+                <h1
                   className="text-2xl font-bold"
                   style={{
-                    background: getThemeGradient(),
+                    backgroundImage: getThemeGradient(),
                     WebkitBackgroundClip: 'text',
                     backgroundClip: 'text',
-                    color: 'transparent'
+                    color: 'transparent',
+                    WebkitTextFillColor: 'transparent'
                   }}
                 >
                   物理学交互式学习平台
