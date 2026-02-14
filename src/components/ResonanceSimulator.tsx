@@ -177,12 +177,13 @@ export default function ResonanceSimulator() {
     }
 
     // 绘制
-    draw(ctx, newDisplacement, drivingForce);
+    draw(canvas, ctx, newDisplacement, drivingForce);
 
     animationRef.current = requestAnimationFrame(animate);
   };
 
   const draw = (
+    canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     currentDisplacement: number,
     currentDrivingForce: number

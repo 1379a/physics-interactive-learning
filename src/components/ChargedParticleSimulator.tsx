@@ -243,7 +243,7 @@ export default function ChargedParticleSimulator() {
       setMass(prevState.mass);
       setHistoryIndex(prev => prev - 1);
       setIsRunning(false);
-      setParticle(null);
+      particleRef.current = null;
     }
   };
 
@@ -257,7 +257,7 @@ export default function ChargedParticleSimulator() {
       setMass(nextState.mass);
       setHistoryIndex(prev => prev + 1);
       setIsRunning(false);
-      setParticle(null);
+      particleRef.current = null;
     }
   };
 
@@ -265,35 +265,35 @@ export default function ChargedParticleSimulator() {
   const updateCharge = (value: number) => {
     setCharge(value);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setTimeout(saveToHistory, 0);
   };
 
   const updateMagneticField = (value: number) => {
     setMagneticField(value);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setTimeout(saveToHistory, 0);
   };
 
   const updateVelocity = (value: number) => {
     setVelocity(value);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setTimeout(saveToHistory, 0);
   };
 
   const updateAngle = (value: number) => {
     setAngle(value);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setTimeout(saveToHistory, 0);
   };
 
   const updateMass = (value: number) => {
     setMass(value);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setTimeout(saveToHistory, 0);
   };
 
@@ -304,7 +304,7 @@ export default function ChargedParticleSimulator() {
     setAngle(defaultValues.angle);
     setMass(defaultValues.mass);
     setIsRunning(false);
-    setParticle(null);
+    particleRef.current = null;
     setRadius(0);
     setPeriod(0);
     saveToHistory();

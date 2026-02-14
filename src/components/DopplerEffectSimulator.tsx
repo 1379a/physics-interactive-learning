@@ -33,16 +33,20 @@ export default function DopplerEffectSimulator() {
   const [observerX, setObserverX] = useState(defaultValues.observerX); // 观察者X坐标 m
   const [isRunning, setIsRunning] = useState(false);
 
-  // 实时数据
+  // 实时数据（用于显示的state）
   const [receivedFrequency, setReceivedFrequency] = useState(0);
   const [dopplerFactor, setDopplerFactor] = useState(0);
   const [sourcePosition, setSourcePosition] = useState(0);
   const [frequencyHistory, setFrequencyHistory] = useState<{ time: number; frequency: number }[]>([]);
   const [positionHistory, setPositionHistory] = useState<{ time: number; position: number }[]>([]);
 
-  // 波前记录
-  const [wavefronts, setWavefronts] = useState<Wavefront[]>([]);
-  const [lastWaveTime, setLastWaveTime] = useState(0);
+  // 动画数据（使用ref避免无限循环）
+  const wavefrontsRef = useRef<Wavefront[]>([]);
+  const lastWaveTimeRef = useRef(0);
+  const sourcePositionRef = useRef(0);
+  const frequencyHistoryRef = useRef<{ time: number; frequency: number }[]>([]);
+  const positionHistoryRef = useRef<{ time: number; position: number }[]>([]);
+  const frameCounterRef = useRef(0);
 
   const canvasWidth = 600;
   const canvasHeight = 400;
@@ -62,7 +66,7 @@ export default function DopplerEffectSimulator() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isRunning, frequency, sourceSpeed, waveSpeed, observerX, wavefronts]);
+  }, [isRunning, frequency, sourceSpeed, waveSpeed, observerX]);
 
   const saveToHistory = () => {
     const newState = { frequency, sourceSpeed, waveSpeed, observerX };
@@ -124,10 +128,15 @@ export default function DopplerEffectSimulator() {
   };
 
   const resetSimulation = () => {
-    setWavefronts([]);
+    wavefrontsRef.current = [];
+    lastWaveTimeRef.current = 0;
+    sourcePositionRef.current = -6;
+    frequencyHistoryRef.current = [];
+    positionHistoryRef.current = [];
     setFrequencyHistory([]);
     setPositionHistory([]);
-    setLastWaveTime(0);
+    setReceivedFrequency(0);
+    setDopplerFactor(0);
     setSourcePosition(-6);
   };
 
@@ -154,29 +163,30 @@ export default function DopplerEffectSimulator() {
     // 清除画布
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 更新波源位置
-    const newSourcePosition = sourcePosition + sourceSpeed * dt;
+    // 更新波源位置（使用ref）
+    const newSourcePosition = sourcePositionRef.current + sourceSpeed * dt;
+    sourcePositionRef.current = newSourcePosition;
 
-    // 生成新波前
-    if (time - lastWaveTime >= 1 / frequency) {
-      setWavefronts(prev => [
-        ...prev,
+    // 生成新波前（使用ref）
+    if (time - lastWaveTimeRef.current >= 1 / frequency) {
+      wavefrontsRef.current = [
+        ...wavefrontsRef.current,
         {
-          x: sourcePosition * scale,
+          x: sourcePositionRef.current * scale,
           y: centerY,
           radius: 0,
           timestamp: time
         }
-      ]);
-      setLastWaveTime(time);
+      ];
+      lastWaveTimeRef.current = time;
     }
 
-    // 更新波前半径
-    const updatedWavefronts = wavefronts.map(wavefront => ({
+    // 更新波前半径（使用ref）
+    const updatedWavefronts = wavefrontsRef.current.map(wavefront => ({
       ...wavefront,
       radius: wavefront.radius + waveSpeed * dt * scale
     }));
-    setWavefronts(updatedWavefronts);
+    wavefrontsRef.current = updatedWavefronts;
 
     // 计算接收到的频率
     const dx = observerX - newSourcePosition;
@@ -187,22 +197,26 @@ export default function DopplerEffectSimulator() {
     const observedFreq = frequency * (v + v0) / (v - vs);
     const factor = observedFreq / frequency;
 
-    setReceivedFrequency(observedFreq);
-    setDopplerFactor(factor);
-    setSourcePosition(newSourcePosition);
+    // 记录历史数据（使用ref）
+    frequencyHistoryRef.current.push({ time, frequency: observedFreq });
+    if (frequencyHistoryRef.current.length > 200) {
+      frequencyHistoryRef.current.shift();
+    }
 
-    // 记录历史数据
-    setFrequencyHistory(prev => {
-      const newHistory = [...prev, { time, frequency: observedFreq }];
-      if (newHistory.length > 200) newHistory.shift();
-      return newHistory;
-    });
+    positionHistoryRef.current.push({ time, position: newSourcePosition });
+    if (positionHistoryRef.current.length > 200) {
+      positionHistoryRef.current.shift();
+    }
 
-    setPositionHistory(prev => {
-      const newHistory = [...prev, { time, position: newSourcePosition }];
-      if (newHistory.length > 200) newHistory.shift();
-      return newHistory;
-    });
+    // 每10帧更新一次UI（避免频繁重渲染）
+    frameCounterRef.current++;
+    if (frameCounterRef.current % 10 === 0) {
+      setReceivedFrequency(observedFreq);
+      setDopplerFactor(factor);
+      setSourcePosition(newSourcePosition);
+      setFrequencyHistory([...frequencyHistoryRef.current]);
+      setPositionHistory([...positionHistoryRef.current]);
+    }
 
     // 绘制
     draw(ctx, newSourcePosition, updatedWavefronts, time);
