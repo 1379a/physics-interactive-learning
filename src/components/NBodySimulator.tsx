@@ -580,28 +580,43 @@ export default function NBodySimulator() {
     setSelectedBody(null);
   };
 
-  // 处理滚轮缩放
-  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
+  // 处理滚轮缩放（通过 ref 阻止默认行为）
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const wheelHandler = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-    // 计算鼠标在当前视图中的世界坐标
-    const worldX = (mouseX - viewOffsetX) / viewScale;
-    const worldY = (mouseY - viewOffsetY) / viewScale;
+      // 计算鼠标在当前视图中的世界坐标
+      const worldX = (mouseX - viewOffsetX) / viewScale;
+      const worldY = (mouseY - viewOffsetY) / viewScale;
 
-    // 更新缩放比例
-    const newScale = e.deltaY < 0
-      ? Math.min(viewScale * 1.1, 3.0)  // 最大放大3倍
-      : Math.max(viewScale * 0.9, 0.2); // 最小缩小到0.2倍
+      // 更新缩放比例
+      const newScale = e.deltaY < 0
+        ? Math.min(viewScale * 1.1, 3.0)  // 最大放大3倍
+        : Math.max(viewScale * 0.9, 0.2); // 最小缩小到0.2倍
 
-    // 调整视图偏移，使缩放中心保持不变
-    setViewOffsetX(mouseX - worldX * newScale);
-    setViewOffsetY(mouseY - worldY * newScale);
+      // 调整视图偏移，使缩放中心保持不变
+      setViewOffsetX(mouseX - worldX * newScale);
+      setViewOffsetY(mouseY - worldY * newScale);
+      setViewScale(newScale);
+    };
+
+    // 添加被动事件监听器以允许 preventDefault
+    canvas.addEventListener('wheel', wheelHandler, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('wheel', wheelHandler);
+    };
+  }, [viewOffsetX, viewOffsetY, viewScale]);
+
+  // 处理滑块缩放
+  const handleSliderZoom = (value: number) => {
+    const newScale = value;
     setViewScale(newScale);
   };
 
@@ -825,6 +840,45 @@ export default function NBodySimulator() {
             </div>
           </div>
 
+          {/* 视图缩放控制 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
+            <h3 className="text-lg font-semibold mb-3 text-blue-300">🔍 视图缩放</h3>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="0.2"
+                max="3"
+                step="0.1"
+                value={viewScale}
+                onChange={(e) => handleSliderZoom(parseFloat(e.target.value))}
+                className="flex-1"
+              />
+              <span className="w-12 text-center font-bold">{viewScale.toFixed(1)}x</span>
+            </div>
+            <div className="flex justify-between text-xs text-blue-300/60 mt-1">
+              <span>缩小</span>
+              <span>放大</span>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => handleSliderZoom(1)}
+                className="flex-1 px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+              >
+                🎯 重置
+              </button>
+              <button
+                onClick={() => {
+                  setViewOffsetX(0);
+                  setViewOffsetY(0);
+                  handleSliderZoom(1);
+                }}
+                className="flex-1 px-2 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+              >
+                📍 居中
+              </button>
+            </div>
+          </div>
+
           {/* 操作说明 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">💡 操作说明</h3>
@@ -832,6 +886,7 @@ export default function NBodySimulator() {
               <li>• 点击天体查看详细信息</li>
               <li>• 拖动天体调整位置</li>
               <li>• 悬停天体显示数据</li>
+              <li>• 使用缩放滑块调整视图大小</li>
               <li>• 滚轮缩放视图（0.2x - 3x）</li>
               <li>• 按住 Shift + 拖动空白处移动视图</li>
               <li>• 选择预设场景快速开始</li>
@@ -852,7 +907,6 @@ export default function NBodySimulator() {
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              onWheel={handleWheel}
               className="w-full cursor-pointer"
               style={{ minHeight: '500px' }}
             />
