@@ -405,7 +405,7 @@ export default function Home() {
 
       {/* 主内容区 */}
       <main className="container mx-auto px-4 py-8">
-        <div className={`bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-500 relative overflow-hidden`}>
+        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-500 relative overflow-hidden`}>
           {/* 毛玻璃循环动画效果 */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-1000 pointer-events-none animate-pulse" />
           
@@ -806,6 +806,16 @@ export default function Home() {
                       inset 0 0 30px rgba(var(--theme-rgb), 0.06);
           border-color: rgba(var(--theme-rgb), 0.5);
           background: rgba(var(--theme-rgb), 0.1);
+        }
+
+        .main-content-card:hover {
+          transform: translateY(-4px) scale(1.005);
+          box-shadow: 0 20px 60px rgba(var(--theme-rgb), 0.3), 
+                      0 0 100px rgba(var(--theme-rgb), 0.15),
+                      0 0 40px rgba(var(--theme-rgb), 0.1),
+                      inset 0 0 60px rgba(var(--theme-rgb), 0.05);
+          border-color: rgba(var(--theme-rgb), 0.4);
+          border-width: 2px;
         }
       `}</style>
     </div>
