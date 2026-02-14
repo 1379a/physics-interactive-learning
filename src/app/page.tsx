@@ -209,7 +209,7 @@ export default function Home() {
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center">
-        <div className="text-2xl">加载中...</div>
+        <div className="text-2xl" suppressHydrationWarning>加载中...</div>
       </div>
     );
   }
