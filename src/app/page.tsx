@@ -280,12 +280,10 @@ export default function Home() {
               {/* 换肤按钮 */}
               <button
                 onClick={() => setShowThemePanel(!showThemePanel)}
-                className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2 relative overflow-hidden group"
+                className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all flex items-center gap-2"
               >
                 <span>🎨</span>
                 <span className="text-sm">换肤</span>
-                {/* 毛玻璃循环动画效果 */}
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
               </button>
             </div>
           </div>
@@ -312,7 +310,7 @@ export default function Home() {
                       <button
                         key={theme.id}
                         onClick={() => setCurrentTheme(theme)}
-                        className={`px-3 py-2 rounded-lg text-sm transition-all relative overflow-hidden group ${
+                        className={`px-3 py-2 rounded-lg text-sm transition-all relative overflow-hidden ${
                           currentTheme.id === theme.id
                             ? 'text-white'
                             : 'bg-white/10 hover:bg-white/20 text-white/80'
@@ -320,8 +318,6 @@ export default function Home() {
                         style={currentTheme.id === theme.id ? { background: getThemeColor() } : {}}
                       >
                         {theme.name}
-                        {/* 毛玻璃循环动画效果 */}
-                        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
                       </button>
                     ))}
                   </div>
@@ -372,7 +368,7 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap relative overflow-hidden ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap relative overflow-hidden ${
                   activeTab === tab.id
                     ? 'text-white shadow-lg'
                     : 'text-white/70 hover:bg-white/5 hover:text-white'
@@ -383,20 +379,8 @@ export default function Home() {
                     : { transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }
                 }
               >
-                <span className={`text-lg ${activeTab === tab.id ? 'animate-pulse-glow' : ''}`}>{tab.icon}</span>
+                <span className="text-lg">{tab.icon}</span>
                 <span className="text-sm font-medium">{tab.label}</span>
-
-                {/* 毛玻璃循环动画效果 */}
-                <div className={`absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse ${
-                  activeTab === tab.id ? 'animate-pulse opacity-20' : ''
-                }`} style={{
-                  animation: activeTab === tab.id ? 'pulse-glass 2s infinite' : ''
-                }} />
-
-                {/* 光效流动动画 */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                </div>
               </button>
             ))}
           </div>
@@ -405,10 +389,7 @@ export default function Home() {
 
       {/* 主内容区 */}
       <main className="container mx-auto px-4 py-8">
-        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-500 relative overflow-hidden`}>
-          {/* 毛玻璃循环动画效果 */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-1000 pointer-events-none animate-pulse" />
-          
+        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-300 relative overflow-hidden`}>
           <div className="relative z-10">
             {activeTab === 'navigator' && <PhysicsConceptNavigator />}
             {activeTab === 'formula' && <FormulaSimulator currentTheme={currentTheme} customColor={customColor} />}
@@ -418,207 +399,135 @@ export default function Home() {
                 <div className="flex gap-2 mb-4 flex-wrap">
                   <button
                     onClick={() => setSimulationSubTab('projectile')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'projectile'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'projectile' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'projectile' ? 'animate-pulse-glow' : ''}`}>🎯 抛体运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🎯 抛体运动</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('nbody')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'nbody'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'nbody' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'nbody' ? 'animate-pulse-glow' : ''}`}>🌌 天体运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🌌 天体运动</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('spring')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'spring'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'spring' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'spring' ? 'animate-pulse-glow' : ''}`}>🔄 弹簧振子</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🔄 弹簧振子</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('gas')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'gas'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'gas' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'gas' ? 'animate-pulse-glow' : ''}`}>🌡️ 理想气体</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🌡️ 理想气体</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('charged')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'charged'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'charged' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'charged' ? 'animate-pulse-glow' : ''}`}>⚡ 电磁运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>⚡ 电磁运动</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('optics')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'optics'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'optics' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'optics' ? 'animate-pulse-glow' : ''}`}>💡 光学折射</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>💡 光学折射</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('wave')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'wave'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'wave' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'wave' ? 'animate-pulse-glow' : ''}`}>🌊 机械波</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🌊 机械波</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('interference')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'interference'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'interference' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'interference' ? 'animate-pulse-glow' : ''}`}>🔮 波的干涉</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🔮 波的干涉</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('doppler')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'doppler'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'doppler' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'doppler' ? 'animate-pulse-glow' : ''}`}>📡 多普勒效应</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>📡 多普勒效应</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('soundwave')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'soundwave'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'soundwave' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'soundwave' ? 'animate-pulse-glow' : ''}`}>🔊 声波传播</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🔊 声波传播</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('resonance')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'resonance'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'resonance' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'resonance' ? 'animate-pulse-glow' : ''}`}>🎸 共振现象</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🎸 共振现象</span>
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('interference2d')}
-                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden ${
                       simulationSubTab === 'interference2d'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
                     style={simulationSubTab === 'interference2d' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'interference2d' ? 'animate-pulse-glow' : ''}`}>🌊 波的二维干涉</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
-                    </div>
+                    <span className={`relative z-10`}>🌊 波的二维干涉</span>
                   </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
@@ -651,41 +560,12 @@ export default function Home() {
 
       {/* 自定义样式 */}
       <style jsx global>{`
-        @keyframes pulse-glass {
-          0%, 100% {
-            opacity: 0.1;
-            backdrop-filter: blur(2px);
-          }
-          50% {
-            opacity: 0.3;
-            backdrop-filter: blur(4px);
-          }
-        }
-
         @keyframes float {
           0%, 100% {
             transform: translateY(0);
           }
           50% {
             transform: translateY(-3px);
-          }
-        }
-
-        @keyframes pulse-glow {
-          0%, 100% {
-            filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-          }
-          50% {
-            filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
-          }
-        }
-
-        @keyframes light-flow {
-          0% {
-            transform: translateX(-100%) skewX(-15deg);
-          }
-          100% {
-            transform: translateX(200%) skewX(-15deg);
           }
         }
 
@@ -698,58 +578,8 @@ export default function Home() {
           }
         }
 
-        @keyframes card-glow {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(var(--theme-rgb), 0.1), 
-                        0 0 40px rgba(var(--theme-rgb), 0.05),
-                        inset 0 0 20px rgba(var(--theme-rgb), 0.02);
-            border-color: rgba(var(--theme-rgb), 0.15);
-          }
-          33% {
-            box-shadow: 0 0 25px rgba(147, 51, 234, 0.15), 
-                        0 0 50px rgba(147, 51, 234, 0.08),
-                        inset 0 0 25px rgba(147, 51, 234, 0.03);
-            border-color: rgba(147, 51, 234, 0.2);
-          }
-          66% {
-            box-shadow: 0 0 25px rgba(var(--theme-rgb), 0.15), 
-                        0 0 50px rgba(var(--theme-rgb), 0.08),
-                        inset 0 0 25px rgba(var(--theme-rgb), 0.03);
-            border-color: rgba(var(--theme-rgb), 0.25);
-          }
-        }
-
-        @keyframes card-gradient {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-
-        @keyframes card-float {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-2px);
-          }
-        }
-
         .animate-float {
           animation: float 2s ease-in-out infinite;
-        }
-
-        .animate-pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        .animate-light-flow {
-          animation: light-flow 1.5s ease-in-out infinite;
         }
 
         .glow-border-bottom {
@@ -784,19 +614,6 @@ export default function Home() {
                       inset 0 0 20px rgba(var(--theme-rgb), 0.05);
           border-color: rgba(var(--theme-rgb), 0.4);
           background: rgba(var(--theme-rgb), 0.1);
-        }
-
-        .card-tech::before {
-          display: none;
-        }
-
-        .card-tech:hover::before {
-          display: none;
-        }
-
-        .card-tech > * {
-          position: relative;
-          z-index: 1;
         }
 
         .card-tech.sim-nav-card:hover {
