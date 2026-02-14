@@ -753,11 +753,16 @@ export default function PhysicsConceptNavigator() {
                 setSelectedBranch(branch.id);
                 setSelectedConcept(null);
               }}
-              className={`w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
+              className={`card-tech branch-card w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
                 selectedBranch === branch.id
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/30'
-                  : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                  ? 'border-2 text-white'
+                  : 'border border-white/10'
               }`}
+              style={
+                selectedBranch === branch.id
+                  ? { borderColor: '#3b82f6', borderWidth: '2px' }
+                  : {}
+              }
             >
               <div className="relative z-10">
                 <div className="flex items-center gap-3">
@@ -768,8 +773,6 @@ export default function PhysicsConceptNavigator() {
                   </div>
                 </div>
               </div>
-              {/* 毛玻璃循环动画效果 */}
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
             </button>
           ))}
         </div>
@@ -851,6 +854,12 @@ export default function PhysicsConceptNavigator() {
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        .card-tech.branch-card {
+          background: transparent !important;
+        }
+      `}</style>
     </div>
   );
 }
