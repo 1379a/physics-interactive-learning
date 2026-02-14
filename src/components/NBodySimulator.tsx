@@ -261,33 +261,55 @@ export default function NBodySimulator() {
       // 重置视图模式到默认
       setSolarViewMode('horizontal');
     } else if (preset === 'earth-moon') {
+      // 地月系 - 基于真实物理参数
+      const centerX = 400;
+      const centerY = 250;
+      
+      // 物理常数（必须与 updatePhysics 中完全一致）
+      const G = 0.5;
+      
+      // 地球质量（模拟单位）
+      const earthMass = 5000;
+      const earthRadius = 25;
+      
+      // 月球参数
+      // 真实地月距离：384,400 km，月球轨道速度：1.022 km/s
+      // 月球质量约为地球的1/81
+      const moonDistance = 150; // 显示距离（像素）
+      const moonVelocity = Math.sqrt(G * earthMass / moonDistance); // 精确圆周轨道速度
+      const moonMass = earthMass / 81; // 真实质量比例
+      
       setBodies([
         {
           id: 'earth',
           name: '地球',
-          mass: 1000,
-          radius: 30,
-          x: 400,
-          y: 250,
+          mass: earthMass,
+          radius: earthRadius,
+          x: centerX,
+          y: centerY,
           vx: 0,
           vy: 0,
-          color: '#2E8B57',
+          color: '#4A90D9',
           showTrajectory: true,
           isFixed: true,
-          realMass: 5.972e24
+          realMass: 5.972e24,
+          realRadius: 6371
         },
         {
           id: 'moon',
           name: '月球',
-          mass: 100,
-          radius: 10,
-          x: 580,
-          y: 250,
+          mass: moonMass,
+          radius: 8,
+          x: centerX + moonDistance,
+          y: centerY,
           vx: 0,
-          vy: 1.8,
+          vy: moonVelocity, // 向上运动，形成逆时针轨道
           color: '#C0C0C0',
           showTrajectory: true,
-          realMass: 7.342e22
+          realMass: 7.342e22,
+          realRadius: 1737,
+          au: 0.00257, // 地月距离（AU）
+          orbitalPeriod: 0.0748 // 月球公转周期（地球年）约27.3天
         }
       ]);
       setBodyCount(2);
@@ -1602,6 +1624,90 @@ export default function NBodySimulator() {
                         >
                           {body.showTrajectory !== false ? '✓ 轨迹' : '✗ 轨迹'}
                         </button>
+                      </div>
+                      
+                      {/* 分隔线 */}
+                      <div className="border-t border-white/10 my-2"></div>
+                      
+                      {/* 位置设置 */}
+                      <div className="text-xs text-blue-300 font-semibold mb-1">📍 位置</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">X:</label>
+                          <input
+                            type="number"
+                            value={Math.round(body.x)}
+                            onChange={(e) => {
+                              updateBodyProperty(body.id, 'x', parseFloat(e.target.value) || 0);
+                              resetTrajectories();
+                            }}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">Y:</label>
+                          <input
+                            type="number"
+                            value={Math.round(body.y)}
+                            onChange={(e) => {
+                              updateBodyProperty(body.id, 'y', parseFloat(e.target.value) || 0);
+                              resetTrajectories();
+                            }}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* 速度设置 */}
+                      <div className="text-xs text-blue-300 font-semibold mb-1 mt-2">🚀 线速度</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">Vx:</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            value={body.vx.toFixed(2)}
+                            onChange={(e) => updateBodyProperty(body.id, 'vx', parseFloat(e.target.value) || 0)}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">Vy:</label>
+                          <input
+                            type="number"
+                            step="0.1"
+                            value={body.vy.toFixed(2)}
+                            onChange={(e) => updateBodyProperty(body.id, 'vy', parseFloat(e.target.value) || 0)}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* 速度大小和方向 */}
+                      <div className="flex items-center gap-2 mt-1">
+                        <label className="text-xs text-blue-300/80 w-16">速率:</label>
+                        <span className="text-xs text-white">
+                          {Math.sqrt(body.vx * body.vx + body.vy * body.vy).toFixed(3)}
+                        </span>
+                        <label className="text-xs text-blue-300/80 ml-2">方向:</label>
+                        <span className="text-xs text-white">
+                          {((Math.atan2(body.vy, body.vx) * 180 / Math.PI + 360) % 360).toFixed(1)}°
+                        </span>
+                      </div>
+                      
+                      {/* 质量设置 */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <label className="text-xs text-blue-300/80 w-16">质量:</label>
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="5000"
+                          step="0.1"
+                          value={body.mass}
+                          onChange={(e) => updateBodyProperty(body.id, 'mass', parseFloat(e.target.value))}
+                          className="flex-1 h-1"
+                        />
+                        <span className="text-xs w-16 text-center">{body.mass.toFixed(1)}</span>
                       </div>
                     </div>
                   )}
