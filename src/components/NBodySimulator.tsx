@@ -33,6 +33,7 @@ interface BodyInfo {
 export default function NBodySimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
+  const trajectoriesRef = useRef<Record<string, TrajectoryPoint[]>>({});
   const [isClient, setIsClient] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
@@ -79,6 +80,9 @@ export default function NBodySimulator() {
     if (preset !== 'custom') return;
 
     try {
+      // 先停止动画，避免状态更新冲突
+      setIsAnimating(false);
+      
       const newBodies = [...bodies];
       if (count > bodies.length) {
         // 添加天体
@@ -113,11 +117,13 @@ export default function NBodySimulator() {
 
   // 重置轨迹
   const resetTrajectories = () => {
+    trajectoriesRef.current = {};
     setTrajectories({});
   };
 
   // 切换天体固定状态（中心天体）
   const toggleBodyFixed = (bodyId: string) => {
+    setIsAnimating(false);
     setBodies(prevBodies =>
       prevBodies.map(body =>
         body.id === bodyId ? { ...body, isFixed: !body.isFixed } : body
@@ -229,25 +235,6 @@ export default function NBodySimulator() {
         ...body
       }));
 
-      // 记录轨迹
-      setTrajectories(prev => {
-        const newTrajectories = { ...prev };
-        newBodies.forEach(body => {
-          if (!body.isFixed) {
-            if (!newTrajectories[body.id]) {
-              newTrajectories[body.id] = [];
-            }
-            // 每隔几个帧记录一次，避免轨迹过于密集
-            newTrajectories[body.id].push({ x: body.x, y: body.y });
-            // 限制轨迹长度
-            if (newTrajectories[body.id].length > 10000) {
-              newTrajectories[body.id] = newTrajectories[body.id].slice(-10000);
-            }
-          }
-        });
-        return newTrajectories;
-      });
-
       // 计算引力
       for (let i = 0; i < newBodies.length; i++) {
         if (newBodies[i].isFixed) continue;
@@ -284,7 +271,25 @@ export default function NBodySimulator() {
 
       return newBodies;
     });
-  }, [simulationSpeed]);
+
+    // 记录轨迹（移到 setBodies 外部，避免状态更新冲突）
+    setTrajectories(prev => {
+      const newTrajectories = { ...prev };
+      bodies.forEach(body => {
+        if (!body.isFixed) {
+          if (!newTrajectories[body.id]) {
+            newTrajectories[body.id] = [];
+          }
+          newTrajectories[body.id].push({ x: body.x, y: body.y });
+          // 限制轨迹长度
+          if (newTrajectories[body.id].length > 10000) {
+            newTrajectories[body.id] = newTrajectories[body.id].slice(-10000);
+          }
+        }
+      });
+      return newTrajectories;
+    });
+  }, [simulationSpeed, bodies]);
 
   // 计算天体信息
   const calculateBodyInfo = (body: CelestialBody) => {
