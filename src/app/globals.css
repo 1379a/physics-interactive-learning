@@ -53,35 +53,45 @@
   --font-serif:
     'Noto Serif SC', 'Songti SC', 'SimSun', ui-serif, Georgia, Cambria,
     'Times New Roman', Times, serif;
-
-  --animate-float: float 2s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
+@layer utilities {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
   }
-  50% {
-    transform: translateY(-3px);
-  }
-}
 
-@keyframes pulse-glow {
-  0%, 100% {
-    filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  @keyframes pulse-glow {
+    0%, 100% {
+      filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+    }
+    50% {
+      filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+    }
   }
-  50% {
-    filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+
+  .animate-float {
+    animation: float 2s ease-in-out infinite;
   }
-}
 
-.animate-float {
-  animation: float 2s ease-in-out infinite;
-}
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  @keyframes pulse-glass {
+    0%, 100% {
+      opacity: 0.1;
+      backdrop-filter: blur(2px);
+    }
+    50% {
+      opacity: 0.3;
+      backdrop-filter: blur(4px);
+    }
+  }
 }
 
 :root {
