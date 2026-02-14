@@ -67,9 +67,9 @@ const themes: Theme[] = [
   {
     name: '黑白简约',
     id: 'monochrome',
-    gradient: 'from-gray-900 via-gray-800 to-gray-900',
-    accentColor: 'gray',
-    textColor: 'gray'
+    gradient: 'from-gray-950 via-white/10 to-gray-950',
+    accentColor: 'zinc',
+    textColor: 'zinc'
   },
   {
     name: '紫罗兰梦幻',
@@ -256,9 +256,16 @@ export default function Home() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`group flex items-center gap-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap relative overflow-hidden ${
                   activeTab === tab.id
-                    ? `bg-${currentTheme.accentColor === 'custom' ? 'blue' : currentTheme.accentColor}-600 text-white shadow-lg`
+                    ? currentTheme.id === 'custom' 
+                      ? 'text-white shadow-lg'
+                      : `bg-${currentTheme.accentColor}-600 text-white shadow-lg`
                     : 'text-white/70 hover:bg-white/5 hover:text-white'
                 }`}
+                style={
+                  activeTab === tab.id && currentTheme.id === 'custom'
+                    ? { background: customColor }
+                    : {}
+                }
               >
                 <span className="text-lg">{tab.icon}</span>
                 <span className="text-sm font-medium">{tab.label}</span>
@@ -290,13 +297,27 @@ export default function Home() {
                 <div className="flex gap-2 mb-4">
                   <button
                     onClick={() => setSimulationSubTab('projectile')}
-                    className={`px-4 py-2 rounded-lg transition-all ${simulationSubTab === 'projectile' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'projectile'
+                        ? currentTheme.id === 'custom'
+                          ? 'text-white'
+                          : `bg-${currentTheme.accentColor}-600 text-white`
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'projectile' && currentTheme.id === 'custom' ? { background: customColor } : {}}
                   >
                     🎯 抛体运动
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('nbody')}
-                    className={`px-4 py-2 rounded-lg transition-all ${simulationSubTab === 'nbody' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'nbody'
+                        ? currentTheme.id === 'custom'
+                          ? 'text-white'
+                          : `bg-${currentTheme.accentColor}-600 text-white`
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'nbody' && currentTheme.id === 'custom' ? { background: customColor } : {}}
                   >
                     🌌 多体运动
                   </button>

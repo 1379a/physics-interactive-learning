@@ -16,6 +16,11 @@ interface CelestialBody {
   realMass?: number; // 真实质量（用于显示）
 }
 
+interface TrajectoryPoint {
+  x: number;
+  y: number;
+}
+
 interface BodyInfo {
   position?: { x: number; y: number };
   velocity?: number;
@@ -36,6 +41,9 @@ export default function NBodySimulator() {
   const [showInfo, setShowInfo] = useState<BodyInfo>({ position: undefined, velocity: undefined, angularVelocity: undefined, period: undefined, mass: undefined, density: undefined });
   const [preset, setPreset] = useState<'custom' | 'earth-moon' | 'solar'>('custom');
   const [scale, setScale] = useState(1);
+  const [simulationSpeed, setSimulationSpeed] = useState(1);
+  const [showTrajectories, setShowTrajectories] = useState(true);
+  const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
 
   // 天体数据（使用更适合演示的参数）
   const [bodies, setBodies] = useState<CelestialBody[]>([
@@ -95,12 +103,19 @@ export default function NBodySimulator() {
     }
     setBodies(newBodies);
     setBodyCount(count);
+    resetTrajectories();
+  };
+
+  // 重置轨迹
+  const resetTrajectories = () => {
+    setTrajectories({});
   };
 
   // 预设场景
   const loadPreset = (preset: 'custom' | 'earth-moon' | 'solar') => {
     setPreset(preset);
     setIsAnimating(false);
+    resetTrajectories();
     
     if (preset === 'earth-moon') {
       setBodies([
@@ -192,12 +207,31 @@ export default function NBodySimulator() {
   // 物理模拟
   const updatePhysics = useCallback(() => {
     const G = 0.5; // 引力常数（调整以适应演示）
-    const dt = 0.1; // 时间步长
+    const dt = 0.1 * simulationSpeed; // 时间步长，受速度控制
 
     setBodies(prevBodies => {
       const newBodies = prevBodies.map(body => ({
         ...body
       }));
+
+      // 记录轨迹
+      setTrajectories(prev => {
+        const newTrajectories = { ...prev };
+        newBodies.forEach(body => {
+          if (!body.isFixed) {
+            if (!newTrajectories[body.id]) {
+              newTrajectories[body.id] = [];
+            }
+            // 每隔几个帧记录一次，避免轨迹过于密集
+            newTrajectories[body.id].push({ x: body.x, y: body.y });
+            // 限制轨迹长度
+            if (newTrajectories[body.id].length > 500) {
+              newTrajectories[body.id] = newTrajectories[body.id].slice(-500);
+            }
+          }
+        });
+        return newTrajectories;
+      });
 
       // 计算引力
       for (let i = 0; i < newBodies.length; i++) {
@@ -235,7 +269,7 @@ export default function NBodySimulator() {
 
       return newBodies;
     });
-  }, []);
+  }, [simulationSpeed]);
 
   // 计算天体信息
   const calculateBodyInfo = (body: CelestialBody) => {
@@ -329,13 +363,37 @@ export default function NBodySimulator() {
       ctx.stroke();
     }
 
-    // 绘制轨道线（仅显示选中天体相对于固定天体的轨道）
+    // 绘制轨迹
+    if (showTrajectories) {
+      Object.entries(trajectories).forEach(([bodyId, points]) => {
+        if (points.length < 2) return;
+        
+        const body = bodies.find(b => b.id === bodyId);
+        if (!body) return;
+
+        ctx.beginPath();
+        ctx.strokeStyle = body.color + '60'; // 半透明
+        ctx.lineWidth = 2;
+        
+        points.forEach((point, index) => {
+          if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+          } else {
+            ctx.lineTo(point.x, point.y);
+          }
+        });
+        
+        ctx.stroke();
+      });
+    }
+
+    // 绘制轨道线（仅显示选中天体相对于固定天体的理想轨道）
     if (selectedBody) {
       const fixedBody = bodies.find(b => b.isFixed);
       const selectedBodyObj = bodies.find(b => b.id === selectedBody);
       if (fixedBody && selectedBodyObj && selectedBody !== fixedBody.id) {
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
+        ctx.strokeStyle = 'rgba(100, 200, 255, 0.2)';
         ctx.setLineDash([5, 5]);
         const distance = Math.sqrt(
           Math.pow(selectedBodyObj.x - fixedBody.x, 2) + 
@@ -392,10 +450,10 @@ export default function NBodySimulator() {
         const infoX = 10;
         const infoY = 10;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(infoX, infoY, 220, 220);
+        ctx.fillRect(infoX, infoY, 220, 240);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(infoX, infoY, 220, 220);
+        ctx.strokeRect(infoX, infoY, 220, 240);
 
         ctx.fillStyle = 'white';
         ctx.font = 'bold 14px Arial';
@@ -416,9 +474,13 @@ export default function NBodySimulator() {
         ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoX + 10, yPos);
         yPos += 20;
         ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoX + 10, yPos);
+        yPos += 20;
+        if (trajectories[body.id]) {
+          ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoX + 10, yPos);
+        }
       }
     }
-  }, [bodies, selectedBody, hoveredBody, isClient]);
+  }, [bodies, selectedBody, hoveredBody, trajectories, showTrajectories, isClient]);
 
   useEffect(() => {
     setIsClient(true);
@@ -476,6 +538,7 @@ export default function NBodySimulator() {
           body.id === selectedBody ? { ...body, x, y } : body
         )
       );
+      resetTrajectories();
     }
   };
 
@@ -554,7 +617,53 @@ export default function NBodySimulator() {
                 }}
                 className="w-full p-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 transition-all"
               >
-                🔄 重置
+                🔄 重置位置
+              </button>
+              <button
+                onClick={resetTrajectories}
+                className="w-full p-2 rounded-lg font-medium bg-purple-600 hover:bg-purple-700 transition-all"
+              >
+                📍 清除轨迹
+              </button>
+            </div>
+          </div>
+
+          {/* 速度控制 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
+            <h3 className="text-lg font-semibold mb-3 text-blue-300">⚡ 运动速度</h3>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="0.1"
+                max="3"
+                step="0.1"
+                value={simulationSpeed}
+                onChange={(e) => setSimulationSpeed(parseFloat(e.target.value))}
+                className="flex-1"
+              />
+              <span className="w-12 text-center font-bold">{simulationSpeed.toFixed(1)}x</span>
+            </div>
+            <div className="flex justify-between text-xs text-blue-300/60 mt-1">
+              <span>慢</span>
+              <span>快</span>
+            </div>
+          </div>
+
+          {/* 轨迹显示控制 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-blue-300">📍 显示轨迹</h3>
+              <button
+                onClick={() => setShowTrajectories(!showTrajectories)}
+                className={`w-12 h-6 rounded-full transition-all ${
+                  showTrajectories ? 'bg-blue-600' : 'bg-white/20'
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 bg-white rounded-full transition-all ${
+                    showTrajectories ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                />
               </button>
             </div>
           </div>
@@ -567,6 +676,7 @@ export default function NBodySimulator() {
               <li>• 拖动天体调整位置</li>
               <li>• 悬停天体显示数据</li>
               <li>• 选择预设场景快速开始</li>
+              <li>• 调整速度控制模拟快慢</li>
             </ul>
           </div>
         </div>
