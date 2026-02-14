@@ -56,7 +56,14 @@ export default function NBodySimulator() {
   const [bodyCount, setBodyCount] = useState(2);
   const [showInfo, setShowInfo] = useState<BodyInfo>({ position: undefined, velocity: undefined, angularVelocity: undefined, period: undefined, mass: undefined, density: undefined });
   const [preset, setPreset] = useState<'custom' | 'earth-moon' | 'solar'>('custom');
-  const [scale, setScale] = useState(1);
+  const [viewScale, setViewScale] = useState(1);
+  const [viewOffsetX, setViewOffsetX] = useState(0);
+  const [viewOffsetY, setViewOffsetY] = useState(0);
+  const [draggingView, setDraggingView] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [simulationSpeed, setSimulationSpeed] = useState(1);
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
@@ -196,7 +203,9 @@ export default function NBodySimulator() {
         }
       ]);
       setBodyCount(2);
-      setScale(1);
+      setViewScale(1);
+      setViewOffsetX(0);
+      setViewOffsetY(0);
     } else if (preset === 'solar') {
       setBodies([
         {
@@ -250,7 +259,9 @@ export default function NBodySimulator() {
         }
       ]);
       setBodyCount(4);
-      setScale(1);
+      setViewScale(1);
+      setViewOffsetX(0);
+      setViewOffsetY(0);
     }
   };
 
@@ -390,9 +401,14 @@ export default function NBodySimulator() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // 应用变换（平移+缩放）
+    ctx.save();
+    ctx.translate(viewOffsetX, viewOffsetY);
+    ctx.scale(viewScale, viewScale);
+
     // 绘制背景
     ctx.fillStyle = 'rgba(0, 0, 20, 0.3)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(-viewOffsetX, -viewOffsetY, canvas.width / viewScale, canvas.height / viewScale);
 
     // 绘制网格
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
@@ -421,7 +437,7 @@ export default function NBodySimulator() {
         if (!body) return;
 
         ctx.beginPath();
-        ctx.strokeStyle = body.color + '60'; // 半透明
+        ctx.strokeStyle = getColorWithAlpha(body.color, 0.4); // 半透明
         ctx.lineWidth = 2;
         
         points.forEach((point, index) => {
@@ -529,7 +545,9 @@ export default function NBodySimulator() {
         }
       }
     }
-  }, [bodies, selectedBody, hoveredBody, trajectories, showTrajectories, isClient]);
+
+    ctx.restore();
+  }, [bodies, selectedBody, hoveredBody, trajectories, showTrajectories, isClient, viewOffsetX, viewOffsetY, viewScale]);
 
   useEffect(() => {
     setIsClient(true);
@@ -544,10 +562,14 @@ export default function NBodySimulator() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    // 转换到世界坐标
+    const worldX = (x - viewOffsetX) / viewScale;
+    const worldY = (y - viewOffsetY) / viewScale;
+
     // 检查是否点击了天体
     for (const body of bodies) {
-      const dx = x - body.x;
-      const dy = y - body.y;
+      const dx = worldX - body.x;
+      const dy = worldY - body.y;
       if (Math.sqrt(dx * dx + dy * dy) < body.radius) {
         setSelectedBody(body.id);
         return;
@@ -556,6 +578,45 @@ export default function NBodySimulator() {
 
     // 如果点击空白处，取消选择
     setSelectedBody(null);
+  };
+
+  // 处理滚轮缩放
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // 计算鼠标在当前视图中的世界坐标
+    const worldX = (mouseX - viewOffsetX) / viewScale;
+    const worldY = (mouseY - viewOffsetY) / viewScale;
+
+    // 更新缩放比例
+    const newScale = e.deltaY < 0
+      ? Math.min(viewScale * 1.1, 3.0)  // 最大放大3倍
+      : Math.max(viewScale * 0.9, 0.2); // 最小缩小到0.2倍
+
+    // 调整视图偏移，使缩放中心保持不变
+    setViewOffsetX(mouseX - worldX * newScale);
+    setViewOffsetY(mouseY - worldY * newScale);
+    setViewScale(newScale);
+  };
+
+  // 处理鼠标按下（用于拖动视图）
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (e.shiftKey) {
+      setDraggingView(true);
+      setDragStartX(e.clientX - viewOffsetX);
+      setDragStartY(e.clientY - viewOffsetY);
+    }
+  };
+
+  // 处理鼠标抬起
+  const handleMouseUp = () => {
+    setDraggingView(false);
   };
 
   // 处理鼠标移动
@@ -567,11 +628,22 @@ export default function NBodySimulator() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    // 如果正在拖动视图
+    if (draggingView) {
+      setViewOffsetX(e.clientX - dragStartX);
+      setViewOffsetY(e.clientY - dragStartY);
+      return;
+    }
+
+    // 转换到世界坐标
+    const worldX = (x - viewOffsetX) / viewScale;
+    const worldY = (y - viewOffsetY) / viewScale;
+
     // 检查是否悬停在天体上
     let hovered: string | null = null;
     for (const body of bodies) {
-      const dx = x - body.x;
-      const dy = y - body.y;
+      const dx = worldX - body.x;
+      const dy = worldY - body.y;
       if (Math.sqrt(dx * dx + dy * dy) < body.radius) {
         hovered = body.id;
         break;
@@ -581,10 +653,10 @@ export default function NBodySimulator() {
     setHoveredBody(hovered);
 
     // 如果正在拖动选中的天体
-    if (selectedBody && e.buttons === 1) {
+    if (selectedBody && e.buttons === 1 && !e.shiftKey) {
       setBodies(prevBodies =>
         prevBodies.map(body =>
-          body.id === selectedBody ? { ...body, x, y } : body
+          body.id === selectedBody ? { ...body, x: worldX, y: worldY } : body
         )
       );
       resetTrajectories();
@@ -760,6 +832,8 @@ export default function NBodySimulator() {
               <li>• 点击天体查看详细信息</li>
               <li>• 拖动天体调整位置</li>
               <li>• 悬停天体显示数据</li>
+              <li>• 滚轮缩放视图（0.2x - 3x）</li>
+              <li>• 按住 Shift + 拖动空白处移动视图</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
               <li>• 设置天体为"固定"作为中心</li>
@@ -775,6 +849,10 @@ export default function NBodySimulator() {
               ref={canvasRef}
               onClick={handleCanvasClick}
               onMouseMove={handleCanvasMouseMove}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onWheel={handleWheel}
               className="w-full cursor-pointer"
               style={{ minHeight: '500px' }}
             />
