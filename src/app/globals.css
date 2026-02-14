@@ -136,3 +136,173 @@
 body {
   @apply font-sans;
 }
+
+/* 全局动画样式 - 供所有组件使用 */
+:root {
+  --theme-rgb: 59, 130, 246;
+  --theme-color: #3b82f6;
+}
+
+@keyframes pulse-glass {
+  0%, 100% {
+    opacity: 0.1;
+    backdrop-filter: blur(2px);
+  }
+  50% {
+    opacity: 0.3;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  }
+}
+
+@keyframes light-flow {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+@keyframes glow-border {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes card-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(var(--theme-rgb), 0.1), 
+                0 0 40px rgba(var(--theme-rgb), 0.05),
+                inset 0 0 20px rgba(var(--theme-rgb), 0.02);
+    border-color: rgba(var(--theme-rgb), 0.15);
+  }
+  33% {
+    box-shadow: 0 0 25px rgba(147, 51, 234, 0.15), 
+                0 0 50px rgba(147, 51, 234, 0.08),
+                inset 0 0 25px rgba(147, 51, 234, 0.03);
+    border-color: rgba(147, 51, 234, 0.2);
+  }
+  66% {
+    box-shadow: 0 0 25px rgba(var(--theme-rgb), 0.15), 
+                0 0 50px rgba(var(--theme-rgb), 0.08),
+                inset 0 0 25px rgba(var(--theme-rgb), 0.03);
+    border-color: rgba(var(--theme-rgb), 0.25);
+  }
+}
+
+@keyframes card-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes card-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-light-flow {
+  animation: light-flow 1.5s ease-in-out infinite;
+}
+
+.glow-border-bottom {
+  position: relative;
+}
+
+.glow-border-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  animation: glow-border 2s ease-in-out infinite;
+}
+
+.card-tech {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  background: rgba(var(--theme-rgb), 0.08);
+  border: 1px solid rgba(var(--theme-rgb), 0.2);
+  box-shadow: 0 4px 12px rgba(var(--theme-rgb), 0.1),
+              0 0 20px rgba(var(--theme-rgb), 0.05);
+}
+
+.card-tech:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 16px 48px rgba(var(--theme-rgb), 0.5), 
+              0 0 80px rgba(var(--theme-rgb), 0.25),
+              inset 0 0 40px rgba(var(--theme-rgb), 0.08);
+  border-color: rgba(var(--theme-rgb), 0.6);
+  background: rgba(var(--theme-rgb), 0.12);
+}
+
+.card-tech::before {
+  display: none;
+}
+
+.card-tech:hover::before {
+  display: none;
+}
+
+.card-tech > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-tech.sim-nav-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 36px rgba(var(--theme-rgb), 0.4), 
+              0 0 60px rgba(var(--theme-rgb), 0.2),
+              inset 0 0 30px rgba(var(--theme-rgb), 0.06);
+  border-color: rgba(var(--theme-rgb), 0.5);
+  background: rgba(var(--theme-rgb), 0.1);
+}
+
+.main-content-card:hover {
+  transform: translateY(-2px) scale(1.002);
+  box-shadow: 0 8px 24px rgba(var(--theme-rgb), 0.15), 
+              0 0 40px rgba(var(--theme-rgb), 0.1),
+              inset 0 0 20px rgba(var(--theme-rgb), 0.03);
+}
