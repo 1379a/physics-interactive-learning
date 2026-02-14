@@ -317,7 +317,7 @@ export default function ChargedParticleSimulator() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">⚡</div>
+        <div className="text-4xl animate-float">⚡</div>
         <div>
           <h2 className="text-2xl font-bold">带电粒子在磁场中的运动</h2>
           <p className="text-sm text-blue-300/80">洛伦兹力与圆周运动</p>

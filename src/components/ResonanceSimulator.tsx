@@ -295,7 +295,7 @@ export default function ResonanceSimulator() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">🎸</div>
+        <div className="text-4xl animate-float">🎸</div>
         <div>
           <h2 className="text-2xl font-bold">共振模拟</h2>
           <p className="text-sm text-blue-300/80">驱动力频率与系统固有频率匹配时的振幅放大</p>

@@ -1242,7 +1242,7 @@ export default function NBodySimulator() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">🌌</div>
+        <div className="text-4xl animate-float">🌌</div>
         <div>
           <h2 className="text-2xl font-bold">多体运动模拟</h2>
           <p className="text-sm text-blue-300/80">天体轨道运动模拟与数据可视化</p>

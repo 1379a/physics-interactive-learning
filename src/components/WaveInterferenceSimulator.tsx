@@ -164,7 +164,7 @@ export default function WaveInterferenceSimulator() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">🔮</div>
+        <div className="text-4xl animate-float">🔮</div>
         <div>
           <h2 className="text-2xl font-bold">波的干涉</h2>
           <p className="text-sm text-blue-300/80">双缝干涉与相干波叠加</p>

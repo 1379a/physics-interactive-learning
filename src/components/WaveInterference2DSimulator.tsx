@@ -279,7 +279,7 @@ export default function WaveInterference2DSimulator() {
   return (
     <div className="p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">🌊</div>
+        <div className="text-4xl animate-float">🌊</div>
         <div>
           <h2 className="text-2xl font-bold">波的二维干涉实验</h2>
           <p className="text-sm text-blue-300/80">观察两个点波源在二维平面上的干涉现象</p>
