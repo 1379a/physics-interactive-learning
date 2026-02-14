@@ -372,6 +372,45 @@ const problemTypes: ProblemType[] = [
       { step: 4, title: '共振幅值', content: '共振时振幅最大，幅值与阻尼有关', formula: 'A_{max} = \\frac{F_0}{c\\omega_0} \\quad (c为阻尼系数)' },
       { step: 5, title: '应用实例', content: '乐器发声（吉他、钢琴）、桥梁共振防护、声学设计' }
     ]
+  },
+  {
+    id: 'ultrasound-infrasound',
+    category: '声学',
+    title: '超声波与次声波',
+    description: '分析超声波和次声波的特性及应用',
+    steps: [
+      { step: 1, title: '定义区分', content: '人耳听觉范围：20 Hz ~ 20000 Hz。次声波：f < 20 Hz；超声波：f > 20000 Hz', formula: 'f_{次声} < 20 \\text{ Hz}, f_{超声} > 20000 \\text{ Hz}' },
+      { step: 2, title: '超声波特性', content: '波长短、方向性好、穿透能力强、能量集中', formula: '\\lambda = \\frac{v}{f}' },
+      { step: 3, title: '次声波特性', content: '波长长、传播距离远、衰减慢、穿透能力强', formula: '\\lambda_{次声} \\gg \\lambda_{可听声}' },
+      { step: 4, title: '超声波应用', content: 'B超医学诊断、工业探伤、声纳探测、超声波清洗、测速', formula: 'v = \\frac{2d}{t} \\quad (测距原理)' },
+      { step: 5, title: '次声波应用', content: '地震监测、火山活动探测、核爆炸监测、自然灾害预警', formula: '\\text{传播距离} \\propto \\frac{1}{f^2}' }
+    ]
+  },
+  {
+    id: 'sound-diffraction',
+    category: '声学',
+    title: '声波的衍射',
+    description: '分析声波绕过障碍物传播的现象',
+    steps: [
+      { step: 1, title: '理解衍射现象', content: '声波遇到障碍物或孔时，能绕过障碍物继续传播的现象', formula: '\\sin\\theta = \\frac{k\\lambda}{a}' },
+      { step: 2, title: '衍射条件', content: '当障碍物或孔的尺寸与声波波长相当或更小时，发生明显衍射', formula: 'a \\leq \\lambda \\text{（明显衍射）}' },
+      { step: 3, title: '声波波长计算', content: '根据频率计算波长，判断是否满足衍射条件', formula: '\\lambda = \\frac{v}{f}' },
+      { step: 4, title: '频率与衍射关系', content: '低频声波波长长，易发生衍射，传播距离远；高频声波波长短，方向性强', formula: '\\lambda_{低频} > \\lambda_{高频}' },
+      { step: 5, title: '应用实例', content: '"闻其声不见其人"（声波衍射）、隔墙有耳、低频声音传得远' }
+    ]
+  },
+  {
+    id: 'standing-wave',
+    category: '声学',
+    title: '驻波问题',
+    description: '分析弦乐器和管乐器中的驻波现象',
+    steps: [
+      { step: 1, title: '理解驻波形成', content: '两列振幅相同、频率相同、传播方向相反的波叠加形成驻波', formula: 'y = 2A\\cos(\\frac{2\\pi x}{\\lambda})\\cos(2\\pi ft)' },
+      { step: 2, title: '波节与波腹', content: '波节：振幅始终为零的点；波腹：振幅最大的点', formula: 'd_{波节} = \\frac{\\lambda}{2}, d_{波腹} = \\frac{\\lambda}{2}' },
+      { step: 3, title: '弦乐器驻波', content: '两端固定，形成驻波，弦长为半波长的整数倍', formula: 'L = n\\frac{\\lambda}{2}, f_n = n\\frac{v}{2L} \\quad (n=1,2,3,...)' },
+      { step: 4, title: '管乐器驻波', content: '开管两端为波腹，闭管闭端为波节', formula: '开管：f_n = n\\frac{v}{2L}, 闭管：f_n = (2n-1)\\frac{v}{4L}' },
+      { step: 5, title: '应用实例', content: '吉他、小提琴（弦乐器）、长笛、单簧管（管乐器）的发声原理' }
+    ]
   }
 ];
 
