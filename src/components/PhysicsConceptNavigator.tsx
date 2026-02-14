@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, memo } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 const BlockMath = dynamic(() => import('react-katex').then(mod => mod.BlockMath), {
@@ -729,29 +729,9 @@ const physicsBranches: Branch[] = [
   }
 ];
 
-export default memo(function PhysicsConceptNavigator() {
+export default function PhysicsConceptNavigator() {
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
-
-  // 使用 useCallback 缓存事件处理函数
-  const handleBranchClick = useCallback((branchId: string) => {
-    setSelectedBranch(branchId);
-    setSelectedConcept(null);
-  }, []);
-
-  const handleConceptClick = useCallback((concept: Concept) => {
-    setSelectedConcept(concept);
-  }, []);
-
-  // 使用 useMemo 缓存当前选中的分支数据
-  const currentBranch = useMemo(() => {
-    return physicsBranches.find(b => b.id === selectedBranch);
-  }, [selectedBranch]);
-
-  // 使用 useMemo 缓存当前分支的概念列表
-  const currentConcepts = useMemo(() => {
-    return currentBranch?.concepts || [];
-  }, [currentBranch]);
 
   return (
     <div className="p-6">
@@ -769,7 +749,10 @@ export default memo(function PhysicsConceptNavigator() {
           {physicsBranches.map((branch) => (
             <button
               key={branch.id}
-              onClick={() => handleBranchClick(branch.id)}
+              onClick={() => {
+                setSelectedBranch(branch.id);
+                setSelectedConcept(null);
+              }}
               className={`card-tech branch-card w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
                 selectedBranch === branch.id
                   ? 'border-2 text-white'
@@ -799,12 +782,14 @@ export default memo(function PhysicsConceptNavigator() {
           {selectedBranch ? (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-300">
-                {currentBranch?.name} 概念
+                {physicsBranches.find(b => b.id === selectedBranch)?.name} 概念
               </h3>
-              {currentConcepts.map((concept) => (
-                <button
-                  key={concept.id}
-                  onClick={() => handleConceptClick(concept)}
+              {physicsBranches
+                .find(b => b.id === selectedBranch)
+                ?.concepts.map((concept) => (
+                  <button
+                    key={concept.id}
+                    onClick={() => setSelectedConcept(concept)}
                     className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${
                       selectedConcept?.id === concept.id
                         ? 'bg-blue-600/30 border border-blue-500/50'
