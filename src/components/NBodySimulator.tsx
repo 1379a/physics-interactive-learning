@@ -777,9 +777,10 @@ export default function NBodySimulator() {
           drawArrow(body.x, body.y, accelEndX, accelEndY, '#ef4444', `a: ${accelMag.toFixed(5)}`, 3);
         }
 
-        // 5. 绘制图例
-        const legendX = 10;
-        const legendY = canvas.height - 130;
+        // 5. 绘制图例（相对于画布视图）
+        // 计算相对于画布视图的位置
+        const legendX = -viewOffsetX + 10;
+        const legendY = -viewOffsetY + canvas.height - 130;
         const legendWidth = 160;
         const legendHeight = 120;
 
@@ -826,7 +827,7 @@ export default function NBodySimulator() {
       }
     }
 
-    // 绘制信息面板
+    // 绘制信息面板（相对于画布视图）
     if (selectedBody || hoveredBody) {
       const bodyId = selectedBody || hoveredBody;
       const body = bodies.find(b => b.id === bodyId);
@@ -834,8 +835,9 @@ export default function NBodySimulator() {
         const info = calculateBodyInfo(body);
         setShowInfo(info);
 
-        const infoX = 10;
-        const infoY = 10;
+        // 计算相对于画布视图的位置
+        const infoX = -viewOffsetX + 10;
+        const infoY = -viewOffsetY + 10;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(infoX, infoY, 240, 240);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
