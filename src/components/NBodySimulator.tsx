@@ -214,7 +214,44 @@ export default function NBodySimulator() {
     setIsAnimating(false);
     resetTrajectories();
     
-    if (preset === 'earth-moon') {
+    if (preset === 'custom') {
+      // 重置为默认自定义配置
+      setBodies([
+        {
+          id: '1',
+          name: '中心天体',
+          mass: 1000,
+          radius: 25,
+          x: 400,
+          y: 250,
+          vx: 0,
+          vy: 0,
+          color: '#FFD700',
+          showTrajectory: true,
+          isFixed: true,
+          realMass: 5.972e24
+        },
+        {
+          id: '2',
+          name: '天体2',
+          mass: 100,
+          radius: 12,
+          x: 550,
+          y: 250,
+          vx: 0,
+          vy: 2,
+          color: '#00BFFF',
+          showTrajectory: true,
+          realMass: 7.342e22
+        }
+      ]);
+      setBodyCount(2);
+      setViewScale(1);
+      setViewOffsetX(0);
+      setViewOffsetY(0);
+      // 重置视图模式到默认
+      setSolarViewMode('horizontal');
+    } else if (preset === 'earth-moon') {
       setBodies([
         {
           id: 'earth',
