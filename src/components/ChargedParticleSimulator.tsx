@@ -16,6 +16,9 @@ export default function ChargedParticleSimulator() {
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
 
+  // 使用 ref 存储粒子状态，避免无限循环
+  const particleRef = useRef<Particle | null>(null);
+
   // 历史记录（用于撤销/重做）
   const [history, setHistory] = useState<{ charge: number; magneticField: number; velocity: number; angle: number; mass: number }[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -37,7 +40,6 @@ export default function ChargedParticleSimulator() {
   const [mass, setMass] = useState(defaultValues.mass); // 粒子质量
   const [isRunning, setIsRunning] = useState(false);
 
-  const [particle, setParticle] = useState<Particle | null>(null);
   const [radius, setRadius] = useState(0);
   const [period, setPeriod] = useState(0);
 
@@ -57,20 +59,20 @@ export default function ChargedParticleSimulator() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isRunning, particle, charge, magneticField, velocity, angle, mass]);
+  }, [isRunning, charge, magneticField, velocity, angle, mass]);
 
   const initParticle = () => {
     const theta = (angle * Math.PI) / 180;
     const speed = velocity;
-    
-    setParticle({
+
+    particleRef.current = {
       x: 100,
       y: canvasHeight / 2,
       vx: speed * Math.cos(theta),
       vy: -speed * Math.sin(theta),
       color: charge > 0 ? '#EF4444' : '#3B82F6',
       trail: []
-    });
+    };
 
     // 计算理论半径和周期
     // R = mv / (qB)
@@ -88,7 +90,7 @@ export default function ChargedParticleSimulator() {
   };
 
   const animate = () => {
-    if (!canvasRef.current || !particle) return;
+    if (!canvasRef.current || !particleRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -126,6 +128,7 @@ export default function ChargedParticleSimulator() {
     const q = charge;
     const m = mass;
     const B = magneticField;
+    const particle = particleRef.current;
 
     // 洛伦兹力 F = q(v × B)
     // 在2D平面中，F_x = qvyB, F_y = -qvxB
@@ -193,14 +196,15 @@ export default function ChargedParticleSimulator() {
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    setParticle({
+    // 更新 ref 中的粒子状态
+    particleRef.current = {
       x: newX,
       y: newY,
       vx: newVx,
       vy: newVy,
       color: particle.color,
       trail: newTrail
-    });
+    };
 
     // 检查是否超出边界
     if (newX < 0 || newX > canvasWidth || newY < 0 || newY > canvasHeight) {
