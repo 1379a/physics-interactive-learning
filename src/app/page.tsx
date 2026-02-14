@@ -157,9 +157,9 @@ export default function Home() {
 
             <div className="flex items-center gap-4">
               {/* 联系方式 */}
-              <div className="text-sm text-white/80 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+              <div className="text-sm text-white/80 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
                 <span className="text-lg">📧</span>
-                <span className="font-mono">3482948306.com</span>
+                <span className="font-mono">联系方式: 3482948306@qq.com</span>
               </div>
 
               {/* 目标用户标签 */}
@@ -336,6 +336,7 @@ export default function Home() {
       <footer className="bg-black/30 border-t border-white/10 py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-sm text-white/60">
           <p>物理学交互式学习平台 - 让物理概念直观易懂</p>
+          <p className="mt-2">联系方式: 3482948306@qq.com</p>
         </div>
       </footer>
 
