@@ -284,8 +284,8 @@ export default function Home() {
               >
                 <span>🎨</span>
                 <span className="text-sm">换肤</span>
-                {/* 毛玻璃循环动画效果 */}
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+                {/* 毛玻璃静态效果 */}
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
               </button>
             </div>
           </div>
@@ -320,8 +320,8 @@ export default function Home() {
                         style={currentTheme.id === theme.id ? { background: getThemeColor() } : {}}
                       >
                         {theme.name}
-                        {/* 毛玻璃循环动画效果 */}
-                        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+                        {/* 毛玻璃静态效果 */}
+                        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
                       </button>
                     ))}
                   </div>
@@ -383,19 +383,15 @@ export default function Home() {
                     : { transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }
                 }
               >
-                <span className={`text-lg ${activeTab === tab.id ? 'animate-pulse-glow' : ''}`}>{tab.icon}</span>
+                <span className="text-lg">{tab.icon}</span>
                 <span className="text-sm font-medium">{tab.label}</span>
 
-                {/* 毛玻璃循环动画效果 */}
-                <div className={`absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse ${
-                  activeTab === tab.id ? 'animate-pulse opacity-20' : ''
-                }`} style={{
-                  animation: activeTab === tab.id ? 'pulse-glass 2s infinite' : ''
-                }} />
+                {/* 毛玻璃静态效果 */}
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-20 pointer-events-none" />
 
-                {/* 光效流动动画 */}
+                {/* 光效静态效果 */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                 </div>
               </button>
             ))}
@@ -405,10 +401,10 @@ export default function Home() {
 
       {/* 主内容区 */}
       <main className="container mx-auto px-4 py-8">
-        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-500 relative overflow-hidden`}>
-          {/* 毛玻璃循环动画效果 */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-1000 pointer-events-none animate-pulse" />
-          
+        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 relative overflow-hidden`}>
+          {/* 毛玻璃静态效果 */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-300 ease-out pointer-events-none" />
+
           <div className="relative z-10">
             {activeTab === 'navigator' && <PhysicsConceptNavigator />}
             {activeTab === 'formula' && <FormulaSimulator currentTheme={currentTheme} customColor={customColor} />}
@@ -425,12 +421,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'projectile' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'projectile' ? 'animate-pulse-glow' : ''}`}>🎯 抛体运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🎯 抛体运动</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -442,12 +438,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'nbody' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'nbody' ? 'animate-pulse-glow' : ''}`}>🌌 天体运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🌌 天体运动</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -459,12 +455,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'spring' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'spring' ? 'animate-pulse-glow' : ''}`}>🔄 弹簧振子</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🔄 弹簧振子</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -476,12 +472,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'gas' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'gas' ? 'animate-pulse-glow' : ''}`}>🌡️ 理想气体</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🌡️ 理想气体</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -493,12 +489,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'charged' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'charged' ? 'animate-pulse-glow' : ''}`}>⚡ 电磁运动</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">⚡ 电磁运动</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -510,12 +506,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'optics' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'optics' ? 'animate-pulse-glow' : ''}`}>💡 光学折射</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">💡 光学折射</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -527,12 +523,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'wave' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'wave' ? 'animate-pulse-glow' : ''}`}>🌊 机械波</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🌊 机械波</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -544,12 +540,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'interference' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'interference' ? 'animate-pulse-glow' : ''}`}>🔮 波的干涉</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🔮 波的干涉</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -561,12 +557,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'doppler' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'doppler' ? 'animate-pulse-glow' : ''}`}>📡 多普勒效应</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">📡 多普勒效应</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -578,12 +574,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'soundwave' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'soundwave' ? 'animate-pulse-glow' : ''}`}>🔊 声波传播</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🔊 声波传播</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -595,12 +591,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'resonance' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'resonance' ? 'animate-pulse-glow' : ''}`}>🎸 共振现象</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🎸 共振现象</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                   <button
@@ -612,12 +608,12 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'interference2d' ? { background: getThemeColor() } : {}}
                   >
-                    <span className={`relative z-10 ${simulationSubTab === 'interference2d' ? 'animate-pulse-glow' : ''}`}>🌊 波的二维干涉</span>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                    {/* 光效流动动画 */}
+                    <span className="relative z-10">🌊 波的二维干涉</span>
+                    {/* 毛玻璃静态效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-30 pointer-events-none" />
+                    {/* 光效静态效果 */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100" />
                     </div>
                   </button>
                 </div>
@@ -806,6 +802,13 @@ export default function Home() {
                       inset 0 0 15px rgba(var(--theme-rgb), 0.04);
           border-color: rgba(var(--theme-rgb), 0.35);
           background: rgba(var(--theme-rgb), 0.08);
+        }
+
+        .main-content-card {
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                      border-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .main-content-card:hover {
