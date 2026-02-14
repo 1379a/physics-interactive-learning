@@ -809,11 +809,10 @@ export default function Home() {
         }
 
         .main-content-card:hover {
-          transform: translateY(-4px) scale(1.005);
-          box-shadow: 0 4px 12px rgba(var(--theme-rgb), 0.05), 
-                      0 0 20px rgba(var(--theme-rgb), 0.03),
-                      inset 0 0 15px rgba(var(--theme-rgb), 0.01);
-          border-color: rgba(var(--theme-rgb), 0.2);
+          transform: translateY(-2px) scale(1.002);
+          box-shadow: 0 8px 24px rgba(var(--theme-rgb), 0.15), 
+                      0 0 40px rgba(var(--theme-rgb), 0.1),
+                      inset 0 0 20px rgba(var(--theme-rgb), 0.03);
         }
       `}</style>
     </div>
