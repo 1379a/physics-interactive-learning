@@ -412,9 +412,9 @@ export default function Home() {
 
       {/* 主内容区 */}
       <main className="container mx-auto px-4 py-8">
-        <div className={`main-content-card bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-all duration-500 relative overflow-hidden`}>
-          {/* 毛玻璃循环动画效果 */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-1000 pointer-events-none animate-pulse" />
+        <div className={`main-content-card bg-black/30 lg:backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl min-h-[calc(100vh-220px)] hover:border-white/20 transition-colors duration-300 relative overflow-hidden`}>
+          {/* 毛玻璃效果 - 仅桌面端 */}
+          <div className="hidden lg:block absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
           
           <div className="relative z-10">
             {activeTab === 'navigator' && <PhysicsConceptNavigator />}
