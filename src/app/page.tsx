@@ -185,6 +185,23 @@ export default function Home() {
     return colors[currentTheme.accentColor] || colors['blue'];
   };
 
+  // 将十六进制颜色转换为 RGB 格式
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+
+  // 获取主题颜色的 RGB 值
+  const getThemeRgb = () => {
+    const color = getThemeColor();
+    const rgb = hexToRgb(color);
+    return rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : '59, 130, 246';
+  };
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -222,6 +239,8 @@ export default function Home() {
       className={`min-h-screen text-white ${useGradient ? `bg-gradient-to-br ${currentTheme.gradient}` : 'bg-slate-900'}`}
       style={{
         '--custom-color': customColor,
+        '--theme-rgb': getThemeRgb(),
+        '--theme-color': getThemeColor(),
         background: useGradient ? '' : customColor ? `linear-gradient(135deg, #1a1a2e 0%, ${customColor}33 50%, #1a1a2e 100%)` : ''
       } as React.CSSProperties}
     >
@@ -681,10 +700,10 @@ export default function Home() {
 
         @keyframes card-glow {
           0%, 100% {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), 
-                        0 0 40px rgba(59, 130, 246, 0.05),
-                        inset 0 0 20px rgba(59, 130, 246, 0.02);
-            border-color: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 20px rgba(var(--theme-rgb), 0.1), 
+                        0 0 40px rgba(var(--theme-rgb), 0.05),
+                        inset 0 0 20px rgba(var(--theme-rgb), 0.02);
+            border-color: rgba(var(--theme-rgb), 0.15);
           }
           33% {
             box-shadow: 0 0 25px rgba(147, 51, 234, 0.15), 
@@ -693,10 +712,10 @@ export default function Home() {
             border-color: rgba(147, 51, 234, 0.2);
           }
           66% {
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.15), 
-                        0 0 50px rgba(59, 130, 246, 0.08),
-                        inset 0 0 25px rgba(59, 130, 246, 0.03);
-            border-color: rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 25px rgba(var(--theme-rgb), 0.15), 
+                        0 0 50px rgba(var(--theme-rgb), 0.08),
+                        inset 0 0 25px rgba(var(--theme-rgb), 0.03);
+            border-color: rgba(var(--theme-rgb), 0.25);
           }
         }
 
@@ -756,15 +775,15 @@ export default function Home() {
           animation: 
             card-glow 4s ease-in-out infinite,
             card-float 3s ease-in-out infinite;
-          border: 1px solid rgba(59, 130, 246, 0.2);
+          border: 1px solid rgba(var(--theme-rgb), 0.2);
         }
 
         .card-tech:hover {
           transform: translateY(-12px);
-          box-shadow: 0 16px 48px rgba(59, 130, 246, 0.5), 
-                      0 0 80px rgba(59, 130, 246, 0.25),
-                      inset 0 0 40px rgba(59, 130, 246, 0.08);
-          border-color: rgba(59, 130, 246, 0.6);
+          box-shadow: 0 16px 48px rgba(var(--theme-rgb), 0.5), 
+                      0 0 80px rgba(var(--theme-rgb), 0.25),
+                      inset 0 0 40px rgba(var(--theme-rgb), 0.08);
+          border-color: rgba(var(--theme-rgb), 0.6);
           animation: 
             card-glow 2s ease-in-out infinite,
             card-float 1.5s ease-in-out infinite;
@@ -777,7 +796,7 @@ export default function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
+          background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
           background-size: 200% 200%;
           opacity: 0.6;
           animation: card-gradient 6s ease infinite;
