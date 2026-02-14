@@ -39,6 +39,32 @@ const QuizSection = dynamic(() => import('@/components/QuizSection'), {
   loading: () => <div className="p-8">加载中...</div>
 });
 
+// 新增物理模拟组件
+const IdealGasSimulator = dynamic(() => import('@/components/IdealGasSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const ChargedParticleSimulator = dynamic(() => import('@/components/ChargedParticleSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const OpticsRefractionSimulator = dynamic(() => import('@/components/OpticsRefractionSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const WaveSimulator = dynamic(() => import('@/components/WaveSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const WaveInterferenceSimulator = dynamic(() => import('@/components/WaveInterferenceSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
 interface Theme {
   name: string;
   id: string;
@@ -95,7 +121,9 @@ const themes: Theme[] = [
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
-  const [simulationSubTab, setSimulationSubTab] = useState<'projectile' | 'nbody' | 'spring'>('projectile');
+  const [simulationSubTab, setSimulationSubTab] = useState<
+    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference'
+  >('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
   const [showThemePanel, setShowThemePanel] = useState(false);
@@ -369,10 +397,70 @@ export default function Home() {
                   >
                     🔄 弹簧振子
                   </button>
+                  <button
+                    onClick={() => setSimulationSubTab('gas')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'gas'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'gas' ? { background: getThemeColor() } : {}}
+                  >
+                    🌡️ 理想气体
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('charged')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'charged'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'charged' ? { background: getThemeColor() } : {}}
+                  >
+                    ⚡ 电磁运动
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('optics')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'optics'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'optics' ? { background: getThemeColor() } : {}}
+                  >
+                    💡 光学折射
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('wave')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'wave'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'wave' ? { background: getThemeColor() } : {}}
+                  >
+                    🌊 机械波
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('interference')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'interference'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'interference' ? { background: getThemeColor() } : {}}
+                  >
+                    🔮 波的干涉
+                  </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
                 {simulationSubTab === 'nbody' && <NBodySimulator />}
                 {simulationSubTab === 'spring' && <SpringOscillator currentTheme={currentTheme} customColor={customColor} />}
+                {simulationSubTab === 'gas' && <IdealGasSimulator />}
+                {simulationSubTab === 'charged' && <ChargedParticleSimulator />}
+                {simulationSubTab === 'optics' && <OpticsRefractionSimulator />}
+                {simulationSubTab === 'wave' && <WaveSimulator />}
+                {simulationSubTab === 'interference' && <WaveInterferenceSimulator />}
               </div>
             )}
             {activeTab === 'solver' && <ProblemSolver />}
