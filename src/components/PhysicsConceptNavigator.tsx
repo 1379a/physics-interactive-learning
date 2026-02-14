@@ -807,7 +807,10 @@ export default function PhysicsConceptNavigator() {
             </>
           ) : (
             <div className="text-center text-blue-300/60 py-8">
-              <div className="text-4xl mb-2">👈</div>
+              <div className="text-4xl mb-2">
+                <span className="lg:hidden">👆</span>
+                <span className="hidden lg:inline">👈</span>
+              </div>
               <p>选择一个物理分支开始探索</p>
             </div>
           )}
@@ -848,7 +851,10 @@ export default function PhysicsConceptNavigator() {
             </div>
           ) : (
             <div className="text-center text-blue-300/60 py-8">
-              <div className="text-4xl mb-2">👆</div>
+              <div className="text-4xl mb-2">
+                <span className="lg:hidden">👆</span>
+                <span className="hidden lg:inline">👈</span>
+              </div>
               <p>选择一个概念查看详情</p>
             </div>
           )}
