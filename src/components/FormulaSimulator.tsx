@@ -578,6 +578,220 @@ const formulas: Formula[] = [
     ],
     calculate: (v) => (v.screenDistance * v.wavelength * 1e-9) / v.slitDistance,
     resultUnit: 'm'
+  },
+  {
+    id: 'sound-speed',
+    name: '空气中声速',
+    description: '温度对空气中声速的影响',
+    latex: 'v = 331 + 0.6t',
+    variables: [
+      {
+        name: 'temperature',
+        symbol: 't',
+        min: -40,
+        max: 100,
+        default: 20,
+        unit: '℃',
+        description: '温度'
+      }
+    ],
+    calculate: (v) => 331 + 0.6 * v.temperature,
+    resultUnit: 'm/s'
+  },
+  {
+    id: 'sound-level',
+    name: '声强级',
+    description: '声强与声强级的关系',
+    latex: 'L = 10\\log_{10}\\frac{I}{I_0}',
+    variables: [
+      {
+        name: 'intensity',
+        symbol: 'I',
+        min: 1e-12,
+        max: 1e-6,
+        default: 1e-10,
+        unit: 'W/m²',
+        description: '声强'
+      }
+    ],
+    calculate: (v) => 10 * Math.log10(v.intensity / 1e-12),
+    resultUnit: 'dB'
+  },
+  {
+    id: 'doppler',
+    name: '多普勒效应',
+    description: '波源接近观察者时的频率变化',
+    latex: "f' = f \\cdot \\frac{v}{v - v_s}",
+    variables: [
+      {
+        name: 'source-freq',
+        symbol: 'f',
+        min: 100,
+        max: 20000,
+        default: 440,
+        unit: 'Hz',
+        description: '波源频率'
+      },
+      {
+        name: 'sound-speed',
+        symbol: 'v',
+        min: 300,
+        max: 400,
+        default: 340,
+        unit: 'm/s',
+        description: '声速'
+      },
+      {
+        name: 'source-speed',
+        symbol: 'vₛ',
+        min: 0,
+        max: 100,
+        default: 20,
+        unit: 'm/s',
+        description: '波源速度'
+      }
+    ],
+    calculate: (v) => v.sourceFreq * v.soundSpeed / (v.soundSpeed - v.sourceSpeed),
+    resultUnit: 'Hz'
+  },
+  {
+    id: 'standing-wave-string',
+    name: '弦的驻波',
+    description: '弦上驻波的频率与长度关系',
+    latex: 'f = \\frac{nv}{2L}',
+    variables: [
+      {
+        name: 'harmonic',
+        symbol: 'n',
+        min: 1,
+        max: 10,
+        default: 1,
+        unit: '',
+        description: '谐波次数'
+      },
+      {
+        name: 'wave-speed',
+        symbol: 'v',
+        min: 100,
+        max: 1000,
+        default: 300,
+        unit: 'm/s',
+        description: '波速'
+      },
+      {
+        name: 'length',
+        symbol: 'L',
+        min: 0.1,
+        max: 2,
+        default: 0.65,
+        unit: 'm',
+        description: '弦长'
+      }
+    ],
+    calculate: (v) => v.harmonic * v.waveSpeed / (2 * v.length),
+    resultUnit: 'Hz'
+  },
+  {
+    id: 'echo-time',
+    name: '回声时间',
+    description: '声音反射回来的时间',
+    latex: 't = \\frac{2d}{v}',
+    variables: [
+      {
+        name: 'distance',
+        symbol: 'd',
+        min: 10,
+        max: 1000,
+        default: 170,
+        unit: 'm',
+        description: '距离'
+      },
+      {
+        name: 'sound-speed',
+        symbol: 'v',
+        min: 300,
+        max: 400,
+        default: 340,
+        unit: 'm/s',
+        description: '声速'
+      }
+    ],
+    calculate: (v) => 2 * v.distance / v.soundSpeed,
+    resultUnit: 's'
+  },
+  {
+    id: 'pipe-resonance-open',
+    name: '开管共振频率',
+    description: '开管乐器的基本频率',
+    latex: 'f = \\frac{nv}{2L}',
+    variables: [
+      {
+        name: 'harmonic',
+        symbol: 'n',
+        min: 1,
+        max: 5,
+        default: 1,
+        unit: '',
+        description: '谐波次数'
+      },
+      {
+        name: 'sound-speed',
+        symbol: 'v',
+        min: 300,
+        max: 400,
+        default: 340,
+        unit: 'm/s',
+        description: '声速'
+      },
+      {
+        name: 'length',
+        symbol: 'L',
+        min: 0.1,
+        max: 3,
+        default: 0.5,
+        unit: 'm',
+        description: '管长'
+      }
+    ],
+    calculate: (v) => v.harmonic * v.soundSpeed / (2 * v.length),
+    resultUnit: 'Hz'
+  },
+  {
+    id: 'pipe-resonance-closed',
+    name: '闭管共振频率',
+    description: '闭管乐器的基本频率',
+    latex: 'f = \\frac{(2n-1)v}{4L}',
+    variables: [
+      {
+        name: 'harmonic',
+        symbol: 'n',
+        min: 1,
+        max: 5,
+        default: 1,
+        unit: '',
+        description: '谐波次数'
+      },
+      {
+        name: 'sound-speed',
+        symbol: 'v',
+        min: 300,
+        max: 400,
+        default: 340,
+        unit: 'm/s',
+        description: '声速'
+      },
+      {
+        name: 'length',
+        symbol: 'L',
+        min: 0.1,
+        max: 3,
+        default: 0.5,
+        unit: 'm',
+        description: '管长'
+      }
+    ],
+    calculate: (v) => (2 * v.harmonic - 1) * v.soundSpeed / (4 * v.length),
+    resultUnit: 'Hz'
   }
 ];
 

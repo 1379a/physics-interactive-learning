@@ -320,6 +320,58 @@ const problemTypes: ProblemType[] = [
       { step: 4, title: '计算释放能量', content: '根据质能方程计算释放的能量', formula: '\\Delta E = \\Delta m c^2' },
       { step: 5, title: '应用实例', content: '235U + 1n → 141Ba + 92Kr + 3·1n + 能量' }
     ]
+  },
+  {
+    id: 'sound-wave',
+    category: '声学',
+    title: '声波传播问题',
+    description: '分析声波的传播、反射和干涉',
+    steps: [
+      { step: 1, title: '识别声波类型', content: '确定是声波的传播、反射、折射还是干涉问题' },
+      { step: 2, title: '应用波速公式', content: '使用声速、波长和频率的关系公式', formula: 'v = \\lambda f = \\frac{\\lambda}{T}' },
+      { step: 3, title: '声速与温度关系', content: '空气中声速随温度变化', formula: 'v = 331 + 0.6t \\quad (t为摄氏温度)' },
+      { step: 4, title: '声波反射', content: '回声时间计算', formula: 't = \\frac{2d}{v} \\quad (d为障碍物距离)' },
+      { step: 5, title: '声波干涉', content: '两列声波叠加形成干涉，加强或减弱条件', formula: '\\Delta r = n\\lambda \\text{（加强）}, \\Delta r = (n+\\frac{1}{2})\\lambda \\text{（减弱）}' }
+    ]
+  },
+  {
+    id: 'doppler-effect',
+    category: '声学',
+    title: '多普勒效应问题',
+    description: '分析波源和观察者相对运动时的频率变化',
+    steps: [
+      { step: 1, title: '理解多普勒效应', content: '当波源和观察者相对运动时，观察者接收到的频率会发生变化' },
+      { step: 2, title: '确定运动方向', content: '判断波源和观察者是接近还是远离' },
+      { step: 3, title: '应用多普勒公式', content: '根据运动情况选择合适的公式', formula: "f' = f \\cdot \\frac{v \\pm v_o}{v \\mp v_s}" },
+      { step: 4, title: '公式符号选择', content: '观察者接近用+，远离用-；波源接近用-，远离用+', formula: 'v₀为观察者速度，vₛ为波源速度，v为声速' },
+      { step: 5, title: '计算实例', content: '汽车以20m/s速度驶向行人，发出440Hz的喇叭声，声速340m/s，行人接收到的频率：f撇 = 440 * (340+0)/(340-20) = 467.5 Hz' }
+    ]
+  },
+  {
+    id: 'sound-intensity',
+    category: '声学',
+    title: '声强与声强级',
+    description: '计算声强级和声强叠加',
+    steps: [
+      { step: 1, title: '理解声强定义', content: '声强是单位时间内通过垂直于声波传播方向的单位面积的声能', formula: 'I = \\frac{P}{S}' },
+      { step: 2, title: '声强级公式', content: '声强级与声强的对数关系', formula: 'L = 10\\log_{10}\\frac{I}{I_0} \\quad (单位：分贝dB)' },
+      { step: 3, title: '基准声强', content: '基准声强I₀ = 10⁻¹² W/m²，是人耳能听到的最弱声音' },
+      { step: 4, title: '声强叠加', content: '两个声源同时发声，总声强等于各声强之和', formula: 'I_{total} = I_1 + I_2' },
+      { step: 5, title: '声强级叠加', content: '声强级不直接相加，需先换算成声强再叠加', formula: 'L_{total} = 10\\log_{10}\\frac{I_1 + I_2}{I_0}' }
+    ]
+  },
+  {
+    id: 'resonance',
+    category: '声学',
+    title: '共振问题',
+    description: '分析系统共振现象及其应用',
+    steps: [
+      { step: 1, title: '识别共振条件', content: '当驱动力频率等于系统固有频率时发生共振', formula: 'f_{驱动} = f_{固有}' },
+      { step: 2, title: '固有频率计算', content: '不同系统的固有频率计算公式不同', formula: 'f_0 = \\frac{1}{2\\pi}\\sqrt{\\frac{k}{m}} \\quad (弹簧振子)' },
+      { step: 3, title: '驻波共振', content: '管乐器和弦乐器的共振原理', formula: '开管：f = \\frac{nv}{2L}, 闭管：f = \\frac{(2n-1)v}{4L}' },
+      { step: 4, title: '共振幅值', content: '共振时振幅最大，幅值与阻尼有关', formula: 'A_{max} = \\frac{F_0}{c\\omega_0} \\quad (c为阻尼系数)' },
+      { step: 5, title: '应用实例', content: '乐器发声（吉他、钢琴）、桥梁共振防护、声学设计' }
+    ]
   }
 ];
 
@@ -331,7 +383,12 @@ const constants = [
   { name: '万有引力常数', symbol: 'G', value: '6.674×10⁻¹¹', unit: 'N·m²/kg²' },
   { name: '库仑常数', symbol: 'k', value: '8.988×10⁹', unit: 'N·m²/C²' },
   { name: '真空磁导率', symbol: 'μ₀', value: '4π×10⁻⁷', unit: 'H/m' },
-  { name: '玻尔兹曼常数', symbol: 'k', value: '1.381×10⁻²³', unit: 'J/K' }
+  { name: '玻尔兹曼常数', symbol: 'k', value: '1.381×10⁻²³', unit: 'J/K' },
+  { name: '0℃声速（空气）', symbol: 'v₀', value: '331', unit: 'm/s' },
+  { name: '20℃声速（空气）', symbol: 'v', value: '343', unit: 'm/s' },
+  { name: '基准声强', symbol: 'I₀', value: '10⁻¹²', unit: 'W/m²' },
+  { name: '人耳听觉下限', symbol: 'f_min', value: '20', unit: 'Hz' },
+  { name: '人耳听觉上限', symbol: 'f_max', value: '20000', unit: 'Hz' }
 ];
 
 // 宇宙速度

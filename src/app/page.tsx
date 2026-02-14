@@ -70,6 +70,16 @@ const DopplerEffectSimulator = dynamic(() => import('@/components/DopplerEffectS
   loading: () => <div className="p-8">加载中...</div>
 });
 
+const SoundWaveSimulator = dynamic(() => import('@/components/SoundWaveSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const ResonanceSimulator = dynamic(() => import('@/components/ResonanceSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
 interface Theme {
   name: string;
   id: string;
@@ -127,7 +137,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
   const [simulationSubTab, setSimulationSubTab] = useState<
-    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference' | 'doppler'
+    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference' | 'doppler' | 'soundwave' | 'resonance'
   >('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
@@ -472,6 +482,28 @@ export default function Home() {
                   >
                     📡 多普勒效应
                   </button>
+                  <button
+                    onClick={() => setSimulationSubTab('soundwave')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'soundwave'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'soundwave' ? { background: getThemeColor() } : {}}
+                  >
+                    🔊 声波传播
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('resonance')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'resonance'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'resonance' ? { background: getThemeColor() } : {}}
+                  >
+                    🎸 共振现象
+                  </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
                 {simulationSubTab === 'nbody' && <NBodySimulator />}
@@ -482,6 +514,8 @@ export default function Home() {
                 {simulationSubTab === 'wave' && <WaveSimulator />}
                 {simulationSubTab === 'interference' && <WaveInterferenceSimulator />}
                 {simulationSubTab === 'doppler' && <DopplerEffectSimulator />}
+                {simulationSubTab === 'soundwave' && <SoundWaveSimulator />}
+                {simulationSubTab === 'resonance' && <ResonanceSimulator />}
               </div>
             )}
             {activeTab === 'solver' && <ProblemSolver />}
