@@ -14,7 +14,12 @@ const FormulaSimulator = dynamic(() => import('@/components/FormulaSimulator'), 
   loading: () => <div className="p-8">加载中...</div>
 });
 
-const ProjectileMotion = dynamic(() => import('@/components/ProjectileMotion'), {
+const ProjectileSimulator = dynamic(() => import('@/components/ProjectileSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
+const NBodySimulator = dynamic(() => import('@/components/NBodySimulator'), {
   ssr: false,
   loading: () => <div className="p-8">加载中...</div>
 });
@@ -85,6 +90,7 @@ const themes: Theme[] = [
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
+  const [simulationSubTab, setSimulationSubTab] = useState<'projectile' | 'nbody'>('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
   const [showThemePanel, setShowThemePanel] = useState(false);
@@ -278,7 +284,27 @@ export default function Home() {
           <div className="relative z-10">
             {activeTab === 'navigator' && <PhysicsConceptNavigator />}
             {activeTab === 'formula' && <FormulaSimulator />}
-            {activeTab === 'simulation' && <ProjectileMotion />}
+            {activeTab === 'simulation' && (
+              <div>
+                {/* 物理模拟子标签 */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setSimulationSubTab('projectile')}
+                    className={`px-4 py-2 rounded-lg transition-all ${simulationSubTab === 'projectile' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                  >
+                    🎯 抛体运动
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('nbody')}
+                    className={`px-4 py-2 rounded-lg transition-all ${simulationSubTab === 'nbody' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                  >
+                    🌌 多体运动
+                  </button>
+                </div>
+                {simulationSubTab === 'projectile' && <ProjectileSimulator />}
+                {simulationSubTab === 'nbody' && <NBodySimulator />}
+              </div>
+            )}
             {activeTab === 'solver' && <ProblemSolver />}
             {activeTab === 'quiz' && <QuizSection />}
           </div>

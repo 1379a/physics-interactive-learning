@@ -422,14 +422,18 @@ export default function FormulaSimulator() {
             <button
               key={formula.id}
               onClick={() => setSelectedFormula(formula)}
-              className={`w-full p-4 rounded-xl text-left transition-all ${
+              className={`w-full p-4 rounded-xl text-left transition-all relative overflow-hidden ${
                 selectedFormula.id === formula.id
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/30'
                   : 'bg-white/5 hover:bg-white/10 border border-white/10'
               }`}
             >
-              <div className="font-semibold mb-1">{formula.name}</div>
-              <div className="text-xs opacity-80 line-clamp-1">{formula.description}</div>
+              {/* 毛玻璃动画效果 */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              <div className="relative z-10">
+                <div className="font-semibold mb-1">{formula.name}</div>
+                <div className="text-xs opacity-80 line-clamp-1">{formula.description}</div>
+              </div>
             </button>
           ))}
         </div>
@@ -477,9 +481,10 @@ export default function FormulaSimulator() {
 
             <button
               onClick={resetValues}
-              className="w-full mt-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm"
+              className="w-full mt-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm relative overflow-hidden group"
             >
-              🔄 重置为默认值
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              <span className="relative z-10">🔄 重置为默认值</span>
             </button>
           </div>
         </div>
