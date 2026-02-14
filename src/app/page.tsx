@@ -760,11 +760,11 @@ export default function Home() {
         }
 
         .card-tech:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4), 
-                      0 0 60px rgba(59, 130, 246, 0.2),
-                      inset 0 0 30px rgba(59, 130, 246, 0.05);
-          border-color: rgba(59, 130, 246, 0.5);
+          transform: translateY(-12px);
+          box-shadow: 0 16px 48px rgba(59, 130, 246, 0.5), 
+                      0 0 80px rgba(59, 130, 246, 0.25),
+                      inset 0 0 40px rgba(59, 130, 246, 0.08);
+          border-color: rgba(59, 130, 246, 0.6);
           animation: 
             card-glow 2s ease-in-out infinite,
             card-float 1.5s ease-in-out infinite;
