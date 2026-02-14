@@ -833,6 +833,11 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
     const newResult = selectedFormula.calculate(values);
     setResult(newResult);
 
+    // 只有当结果是有限值时才添加到历史记录
+    if (!Number.isFinite(newResult)) {
+      return;
+    }
+
     const now = Date.now();
     setHistory(prev => {
       const newHistory = [...prev, { time: now, value: newResult }];
@@ -998,13 +1003,14 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
     setHistory([]);
   };
 
-  // 计算统计信息
-  const stats = history.length > 0 ? {
-    current: history[history.length - 1].value,
-    max: Math.max(...history.map(h => h.value)),
-    min: Math.min(...history.map(h => h.value)),
-    avg: history.reduce((sum, h) => sum + h.value, 0) / history.length,
-    count: history.length
+  // 计算统计信息（过滤掉非有限值）
+  const validHistory = history.filter(h => Number.isFinite(h.value));
+  const stats = validHistory.length > 0 ? {
+    current: validHistory[validHistory.length - 1].value,
+    max: Math.max(...validHistory.map(h => h.value)),
+    min: Math.min(...validHistory.map(h => h.value)),
+    avg: validHistory.reduce((sum, h) => sum + h.value, 0) / validHistory.length,
+    count: validHistory.length
   } : null;
 
   return (

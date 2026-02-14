@@ -299,109 +299,114 @@ export default function NBodySimulator() {
       const centerX = 400;
       const centerY = 300;
       
-      // 引力常数（模拟用）
+      // 物理常数（必须与 updatePhysics 中完全一致）
       const G = 0.5;
+      const dt = 0.1; // 时间步长（与 updatePhysics 中 simulationSpeed=1 时一致）
+      
       // 太阳质量（模拟单位）
-      const sunMass = 10000;
-      const sunRadius = 30;
+      const sunMass = 20000;
+      const sunRadius = 28;
       
-      // 真实太阳系数据（AU单位，用于计算比例）
-      // 轨道半径：水星0.387, 金星0.723, 地球1.0, 火星1.524, 木星5.2, 土星9.58, 天王星19.22, 海王星30.05
-      // 为了在画布上合理显示，使用对数缩放压缩外层行星轨道
-      // 基础单位：1 AU = 50 像素（内行星），外行星使用压缩比例
-      
+      // 轨道距离计算函数
+      // 真实太阳系轨道半径（AU）：水星0.387, 金星0.723, 地球1.0, 火星1.524, 木星5.2, 土星9.58, 天王星19.22, 海王星30.05
+      // 使用对数压缩让所有行星都能在画布上显示
       const calculateDisplayDistance = (au: number) => {
-        // 内行星（<= 2 AU）使用线性缩放，外行星使用压缩缩放
-        if (au <= 2) {
-          return au * 60; // 1 AU = 60 像素
+        if (au <= 1.6) {
+          // 内行星：线性缩放
+          return au * 70 + 30; // 最小距离保证在水星轨道可见
         } else {
-          // 对数压缩：让外行星也能显示在合理范围内
-          return 120 + Math.log2(au) * 80;
+          // 外行星：对数压缩
+          return 140 + Math.log10(au) * 120;
         }
       };
       
       // 根据开普勒定律计算圆周运动速度：v = √(GM/r)
-      // 模拟中速度需要适当缩放以便观察
+      // 这个速度恰好能让行星做圆周运动
       const calculateOrbitalVelocity = (displayDistance: number) => {
-        // 理论速度
-        const theoreticalV = Math.sqrt(G * sunMass / displayDistance);
-        // 为了更好的视觉效果，适当调整速度比例
-        return theoreticalV * 0.8;
+        return Math.sqrt(G * sunMass / displayDistance);
       };
       
-      // 行星数据配置（基于真实比例）
+      // 行星数据配置（基于真实天文数据）
       const planetConfigs = [
         { 
           id: 'mercury', name: '水星', 
           au: 0.387, 
-          mass: 0.055,  // 相对地球质量
-          radius: 5, 
-          color: '#B5B5B5',
+          massRatio: 0.00017,  // 相对太阳质量（真实比例）
+          radius: 4, 
+          color: '#A0A0A0',
           realMass: 3.285e23,
-          realRadius: 2440
+          realRadius: 2440,
+          periodYears: 0.24 // 公转周期（地球年）
         },
         { 
           id: 'venus', name: '金星', 
           au: 0.723, 
-          mass: 0.815,
-          radius: 9, 
+          massRatio: 0.0000025,
+          radius: 7, 
           color: '#E6C87A',
           realMass: 4.867e24,
-          realRadius: 6052
+          realRadius: 6052,
+          periodYears: 0.615
         },
         { 
           id: 'earth', name: '地球', 
           au: 1.0, 
-          mass: 1.0,
-          radius: 10, 
-          color: '#6B93D6',
+          massRatio: 0.000003,
+          radius: 8, 
+          color: '#4A90D9',
           realMass: 5.972e24,
-          realRadius: 6371
+          realRadius: 6371,
+          periodYears: 1.0
         },
         { 
           id: 'mars', name: '火星', 
           au: 1.524, 
-          mass: 0.107,
-          radius: 7, 
-          color: '#CD5C5C',
+          massRatio: 0.00000032,
+          radius: 5, 
+          color: '#C1440E',
           realMass: 6.39e23,
-          realRadius: 3390
+          realRadius: 3390,
+          periodYears: 1.88
         },
         { 
           id: 'jupiter', name: '木星', 
           au: 5.203, 
-          mass: 317.8,
-          radius: 22, 
-          color: '#D4A574',
+          massRatio: 0.00095,
+          radius: 18, 
+          color: '#D8CA9D',
           realMass: 1.898e27,
-          realRadius: 69911
+          realRadius: 69911,
+          periodYears: 11.86
         },
         { 
           id: 'saturn', name: '土星', 
           au: 9.537, 
-          mass: 95.16,
-          radius: 18, 
+          massRatio: 0.00029,
+          radius: 15, 
           color: '#F4D59E',
           realMass: 5.683e26,
-          realRadius: 58232
+          realRadius: 58232,
+          periodYears: 29.46
         },
         { 
           id: 'uranus', name: '天王星', 
           au: 19.19, 
-          mass: 14.54,
-          radius: 13, 
+          massRatio: 0.000044,
+          radius: 10, 
           color: '#A5D6E7',
           realMass: 8.681e25,
-          realRadius: 25362
+          realRadius: 25362,
+          periodYears: 84.01
         },
         { 
           id: 'neptune', name: '海王星', 
           au: 30.07, 
-          mass: 17.15,
-          radius: 12, 
-          color: '#4B70DD',
+          massRatio: 0.000051,
+          radius: 10, 
+          color: '#5B5DDF',
           realMass: 1.024e26,
-          realRadius: 24622
+          realRadius: 24622,
+          periodYears: 164.8
         }
       ];
 
@@ -410,21 +415,24 @@ export default function NBodySimulator() {
         const displayDistance = calculateDisplayDistance(config.au);
         const velocity = calculateOrbitalVelocity(displayDistance);
         
+        // 行星质量设为非常小（避免相互扰动），但要有足够惯性
+        const planetMass = config.massRatio * sunMass * 0.1 + 0.1; // 最小0.1保证惯性
+        
         let x, y, vx, vy;
         
         if (solarViewMode === 'horizontal') {
           // 水平视图模式：所有行星在水平线上，从右侧开始运动
+          // 初始位置在太阳右侧，速度向上（逆时针运动）
           x = centerX + displayDistance;
           y = centerY;
           vx = 0;
-          vy = velocity; // 向上运动，形成逆时针轨道
+          vy = velocity; // 向上运动
         } else {
-          // 环形鸟瞰模式：行星按真实角度分布（根据公转周期）
-          // 使用真实的角度分布，让行星在不同位置
-          const angle = (index * Math.PI * 0.7) + Math.PI / 4; // 间隔分布
+          // 环形鸟瞰模式：行星按角度均匀分布
+          const angle = (index * Math.PI * 0.4) + Math.PI / 6;
           x = centerX + Math.cos(angle) * displayDistance;
           y = centerY + Math.sin(angle) * displayDistance;
-          // 速度方向垂直于位置矢量（逆时针）
+          // 速度方向垂直于位置矢量（逆时针圆周运动）
           vx = -Math.sin(angle) * velocity;
           vy = Math.cos(angle) * velocity;
         }
@@ -432,7 +440,7 @@ export default function NBodySimulator() {
         return {
           id: config.id,
           name: config.name,
-          mass: config.mass * 10, // 缩放质量用于模拟
+          mass: planetMass,
           radius: config.radius,
           x,
           y,
@@ -442,8 +450,8 @@ export default function NBodySimulator() {
           showTrajectory: true,
           realMass: config.realMass,
           realRadius: config.realRadius,
-          au: config.au, // 保存AU信息用于显示
-          orbitalPeriod: Math.pow(config.au, 1.5) // 开普勒第三定律：T² ∝ a³
+          au: config.au,
+          orbitalPeriod: config.periodYears
         };
       });
 
@@ -469,12 +477,11 @@ export default function NBodySimulator() {
       setBodyCount(9);
       
       if (solarViewMode === 'horizontal') {
-        setViewScale(0.7);
-        setViewOffsetX(-100);
+        setViewScale(0.65);
+        setViewOffsetX(-120);
         setViewOffsetY(0);
       } else {
-        // 环形模式需要更大的缩放和居中
-        setViewScale(0.55);
+        setViewScale(0.5);
         setViewOffsetX(0);
         setViewOffsetY(0);
       }
@@ -701,10 +708,10 @@ export default function NBodySimulator() {
         // 计算各行星的显示轨道距离（与loadPreset中的计算一致）
         const auValues = [0.387, 0.723, 1.0, 1.524, 5.203, 9.537, 19.19, 30.07];
         const orbitDistances = auValues.map(au => {
-          if (au <= 2) {
-            return au * 60;
+          if (au <= 1.6) {
+            return au * 70 + 30;
           } else {
-            return 120 + Math.log2(au) * 80;
+            return 140 + Math.log10(au) * 120;
           }
         });
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.15)';
