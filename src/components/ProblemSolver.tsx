@@ -658,6 +658,7 @@ const conversionCategories: Record<string, {
 export default function ProblemSolver() {
   const [activeTab, setActiveTab] = useState<'steps' | 'conversion' | 'constants' | 'materials'>('steps');
   const [selectedProblem, setSelectedProblem] = useState<ProblemType>(problemTypes[0]);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // 单位转换状态
   const [category, setCategory] = useState<keyof typeof conversionCategories>('length');
@@ -667,6 +668,28 @@ export default function ProblemSolver() {
 
   // 常用物理量标签
   const [materialTab, setMaterialTab] = useState<'liquid' | 'solid' | 'gas' | 'celestial'>('liquid');
+
+  // 根据搜索关键词过滤题目
+  const filteredProblems = problemTypes.filter(problem => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      problem.title.toLowerCase().includes(query) ||
+      problem.category.toLowerCase().includes(query) ||
+      problem.description.toLowerCase().includes(query)
+    );
+  });
+
+  // 高亮匹配文本
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return text;
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return parts.map((part, index) => 
+      part.toLowerCase() === query.toLowerCase() 
+        ? <span key={index} className="bg-yellow-500/40 text-white font-bold">{part}</span>
+        : part
+    );
+  };
 
   // 计算转换结果
   const convert = (value: number) => {
@@ -733,18 +756,62 @@ export default function ProblemSolver() {
           {activeTab === 'steps' && (
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
               <h3 className="text-lg font-semibold mb-4 text-blue-300">题型分类</h3>
-              <div className="space-y-2">
-                {problemTypes.map((problem) => (
-                  <button key={problem.id} onClick={() => setSelectedProblem(problem)} className={`w-full p-3 rounded-lg text-left transition-all ${selectedProblem.id === problem.id ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium">{problem.title}</div>
-                        <div className="text-xs text-blue-300/70 mt-1">{problem.description}</div>
-                      </div>
-                      <span className="text-xs bg-blue-600/30 px-2 py-1 rounded">{problem.category}</span>
-                    </div>
+              
+              {/* 搜索框 */}
+              <div className="relative mb-4">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="搜索题目、类别或描述..."
+                  className="w-full p-3 pl-10 pr-4 rounded-lg bg-black/30 border border-white/10 text-white placeholder-blue-300/50 focus:border-blue-500 focus:outline-none text-sm"
+                />
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-300/50 hover:text-blue-300"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
-                ))}
+                )}
+              </div>
+
+              {/* 搜索结果统计 */}
+              {searchQuery && (
+                <div className="text-xs text-blue-300/60 mb-3">
+                  找到 {filteredProblems.length} 个结果
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {filteredProblems.length > 0 ? (
+                  filteredProblems.map((problem) => (
+                    <button 
+                      key={problem.id} 
+                      onClick={() => setSelectedProblem(problem)} 
+                      className={`w-full p-3 rounded-lg text-left transition-all ${selectedProblem.id === problem.id ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 pr-2">
+                          <div className="font-medium">{highlightText(problem.title, searchQuery)}</div>
+                          <div className="text-xs text-blue-300/70 mt-1">{highlightText(problem.description, searchQuery)}</div>
+                        </div>
+                        <span className="text-xs bg-blue-600/30 px-2 py-1 rounded whitespace-nowrap">{highlightText(problem.category, searchQuery)}</span>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-blue-300/50">
+                    <div className="text-4xl mb-2">🔍</div>
+                    <p className="text-sm">没有找到匹配的题目</p>
+                    <p className="text-xs mt-1">尝试使用不同的关键词</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
