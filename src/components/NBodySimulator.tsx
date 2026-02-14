@@ -1016,6 +1016,7 @@ export default function NBodySimulator() {
               <li>• 开启拖动模式：双击画布或切换按钮</li>
               <li>• 拖动模式下：拖动空白处移动视图</li>
               <li>• 手机端：直接触摸拖动画布</li>
+              <li>• 点击右下角"视角重置"按钮恢复初始视角</li>
               <li>• 按住 Shift + 拖动空白处移动视图</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
@@ -1027,7 +1028,21 @@ export default function NBodySimulator() {
 
         {/* 模拟画布 */}
         <div className="lg:col-span-3">
-          <div className="bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all">
+          <div className="bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
+            {/* 视角重置浮动按钮 */}
+            <button
+              onClick={() => {
+                setViewOffsetX(0);
+                setViewOffsetY(0);
+                setViewScale(1);
+              }}
+              className="absolute bottom-4 right-4 px-4 py-2 bg-blue-600/90 hover:bg-blue-700/90 text-white rounded-lg shadow-lg backdrop-blur-sm transition-all flex items-center gap-2 z-10"
+              title="重置视角到初始状态"
+            >
+              <span className="text-lg">🔄</span>
+              <span className="text-sm font-medium">视角重置</span>
+            </button>
+
             <canvas
               ref={canvasRef}
               onClick={handleCanvasClick}
