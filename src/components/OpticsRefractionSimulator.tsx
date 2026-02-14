@@ -13,10 +13,21 @@ export default function OpticsRefractionSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isClient, setIsClient] = useState(false);
 
+  // 历史记录（用于撤销/重做）
+  const [history, setHistory] = useState<{ n1: number; n2: number; incidentAngle: number }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // 默认值
+  const defaultValues = {
+    n1: 1.0,
+    n2: 1.5,
+    incidentAngle: 30
+  };
+
   // 物理参数
-  const [n1, setN1] = useState(1.0); // 入射介质折射率
-  const [n2, setN2] = useState(1.5); // 折射介质折射率
-  const [incidentAngle, setIncidentAngle] = useState(30); // 入射角度
+  const [n1, setN1] = useState(defaultValues.n1); // 入射介质折射率
+  const [n2, setN2] = useState(defaultValues.n2); // 折射介质折射率
+  const [incidentAngle, setIncidentAngle] = useState(defaultValues.incidentAngle); // 入射角度
 
   const canvasWidth = 600;
   const canvasHeight = 400;
@@ -25,6 +36,7 @@ export default function OpticsRefractionSimulator() {
 
   useEffect(() => {
     setIsClient(true);
+    saveToHistory();
   }, []);
 
   useEffect(() => {
@@ -218,6 +230,63 @@ export default function OpticsRefractionSimulator() {
     ctx.fillText(label, labelX, labelY);
   };
 
+  // 历史记录管理
+  const saveToHistory = () => {
+    const newState = { n1, n2, incidentAngle };
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setN1(prevState.n1);
+      setN2(prevState.n2);
+      setIncidentAngle(prevState.incidentAngle);
+      setHistoryIndex(prev => prev - 1);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setN1(nextState.n1);
+      setN2(nextState.n2);
+      setIncidentAngle(nextState.incidentAngle);
+      setHistoryIndex(prev => prev + 1);
+    }
+  };
+
+  // 更新参数并保存到历史记录
+  const updateN1 = (value: number) => {
+    setN1(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateN2 = (value: number) => {
+    setN2(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateIncidentAngle = (value: number) => {
+    setIncidentAngle(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const handleReset = () => {
+    setN1(defaultValues.n1);
+    setN2(defaultValues.n2);
+    setIncidentAngle(defaultValues.incidentAngle);
+    saveToHistory();
+  };
+
   if (!isClient) {
     return <div className="p-8">加载中...</div>;
   }
@@ -294,7 +363,7 @@ export default function OpticsRefractionSimulator() {
                   max="2.5"
                   step="0.05"
                   value={n1}
-                  onChange={(e) => setN1(Number(e.target.value))}
+                  onChange={(e) => updateN1(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -313,7 +382,7 @@ export default function OpticsRefractionSimulator() {
                   max="2.5"
                   step="0.05"
                   value={n2}
-                  onChange={(e) => setN2(Number(e.target.value))}
+                  onChange={(e) => updateN2(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -331,7 +400,7 @@ export default function OpticsRefractionSimulator() {
                   min="0"
                   max="90"
                   value={incidentAngle}
-                  onChange={(e) => setIncidentAngle(Number(e.target.value))}
+                  onChange={(e) => updateIncidentAngle(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -360,6 +429,32 @@ export default function OpticsRefractionSimulator() {
               >
                 ✨ 玻璃 → 空气（全反射）
               </button>
+            </div>
+
+            {/* 撤销/重做/重置 */}
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={handleReset}
+                className="w-full py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors text-sm"
+              >
+                🔄 重置为默认值
+              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                  className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors text-sm"
+                >
+                  ↩️ 撤回
+                </button>
+                <button
+                  onClick={handleRedo}
+                  disabled={historyIndex >= history.length - 1}
+                  className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors text-sm"
+                >
+                  ↪️ 回撤
+                </button>
+              </div>
             </div>
           </div>
 

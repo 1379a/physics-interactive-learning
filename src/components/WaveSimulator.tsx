@@ -7,11 +7,23 @@ export default function WaveSimulator() {
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
 
+  // 历史记录（用于撤销/重做）
+  const [history, setHistory] = useState<{ amplitude: number; wavelength: number; frequency: number; waveType: 'transverse' | 'longitudinal' }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // 默认值
+  const defaultValues = {
+    amplitude: 50,
+    wavelength: 100,
+    frequency: 1,
+    waveType: 'transverse' as const
+  };
+
   // 物理参数
-  const [amplitude, setAmplitude] = useState(50); // 振幅
-  const [wavelength, setWavelength] = useState(100); // 波长
-  const [frequency, setFrequency] = useState(1); // 频率
-  const [waveType, setWaveType] = useState<'transverse' | 'longitudinal'>('transverse');
+  const [amplitude, setAmplitude] = useState(defaultValues.amplitude); // 振幅
+  const [wavelength, setWavelength] = useState(defaultValues.wavelength); // 波长
+  const [frequency, setFrequency] = useState(defaultValues.frequency); // 频率
+  const [waveType, setWaveType] = useState<'transverse' | 'longitudinal'>(defaultValues.waveType);
   const [isRunning, setIsRunning] = useState(true);
   const [phase, setPhase] = useState(0);
 
@@ -20,6 +32,7 @@ export default function WaveSimulator() {
 
   useEffect(() => {
     setIsClient(true);
+    saveToHistory();
   }, []);
 
   useEffect(() => {

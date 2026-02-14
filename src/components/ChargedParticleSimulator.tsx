@@ -16,12 +16,25 @@ export default function ChargedParticleSimulator() {
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
 
+  // 历史记录（用于撤销/重做）
+  const [history, setHistory] = useState<{ charge: number; magneticField: number; velocity: number; angle: number; mass: number }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // 默认值
+  const defaultValues = {
+    charge: 1,
+    magneticField: 2,
+    velocity: 5,
+    angle: 90,
+    mass: 1
+  };
+
   // 物理参数
-  const [charge, setCharge] = useState(1); // 电荷 +1/-1
-  const [magneticField, setMagneticField] = useState(2); // 磁感应强度 T
-  const [velocity, setVelocity] = useState(5); // 初速度
-  const [angle, setAngle] = useState(90); // 入射角度
-  const [mass, setMass] = useState(1); // 粒子质量
+  const [charge, setCharge] = useState(defaultValues.charge); // 电荷 +1/-1
+  const [magneticField, setMagneticField] = useState(defaultValues.magneticField); // 磁感应强度 T
+  const [velocity, setVelocity] = useState(defaultValues.velocity); // 初速度
+  const [angle, setAngle] = useState(defaultValues.angle); // 入射角度
+  const [mass, setMass] = useState(defaultValues.mass); // 粒子质量
   const [isRunning, setIsRunning] = useState(false);
 
   const [particle, setParticle] = useState<Particle | null>(null);
@@ -33,6 +46,7 @@ export default function ChargedParticleSimulator() {
 
   useEffect(() => {
     setIsClient(true);
+    saveToHistory();
   }, []);
 
   useEffect(() => {
@@ -201,11 +215,95 @@ export default function ChargedParticleSimulator() {
     setIsRunning(true);
   };
 
+  // 历史记录管理
+  const saveToHistory = () => {
+    const newState = { charge, magneticField, velocity, angle, mass };
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setCharge(prevState.charge);
+      setMagneticField(prevState.magneticField);
+      setVelocity(prevState.velocity);
+      setAngle(prevState.angle);
+      setMass(prevState.mass);
+      setHistoryIndex(prev => prev - 1);
+      setIsRunning(false);
+      setParticle(null);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setCharge(nextState.charge);
+      setMagneticField(nextState.magneticField);
+      setVelocity(nextState.velocity);
+      setAngle(nextState.angle);
+      setMass(nextState.mass);
+      setHistoryIndex(prev => prev + 1);
+      setIsRunning(false);
+      setParticle(null);
+    }
+  };
+
+  // 更新参数并保存到历史记录
+  const updateCharge = (value: number) => {
+    setCharge(value);
+    setIsRunning(false);
+    setParticle(null);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateMagneticField = (value: number) => {
+    setMagneticField(value);
+    setIsRunning(false);
+    setParticle(null);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateVelocity = (value: number) => {
+    setVelocity(value);
+    setIsRunning(false);
+    setParticle(null);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateAngle = (value: number) => {
+    setAngle(value);
+    setIsRunning(false);
+    setParticle(null);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateMass = (value: number) => {
+    setMass(value);
+    setIsRunning(false);
+    setParticle(null);
+    setTimeout(saveToHistory, 0);
+  };
+
   const handleReset = () => {
+    setCharge(defaultValues.charge);
+    setMagneticField(defaultValues.magneticField);
+    setVelocity(defaultValues.velocity);
+    setAngle(defaultValues.angle);
+    setMass(defaultValues.mass);
     setIsRunning(false);
     setParticle(null);
     setRadius(0);
     setPeriod(0);
+    saveToHistory();
   };
 
   if (!isClient) {
@@ -260,7 +358,7 @@ export default function ChargedParticleSimulator() {
                 </label>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setCharge(1)}
+                    onClick={() => updateCharge(1)}
                     className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
                       charge > 0 ? 'bg-red-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                     }`}
@@ -268,7 +366,7 @@ export default function ChargedParticleSimulator() {
                     + 正电荷
                   </button>
                   <button
-                    onClick={() => setCharge(-1)}
+                    onClick={() => updateCharge(-1)}
                     className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
                       charge < 0 ? 'bg-blue-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                     }`}
@@ -288,7 +386,7 @@ export default function ChargedParticleSimulator() {
                   max="5"
                   step="0.5"
                   value={magneticField}
-                  onChange={(e) => setMagneticField(Number(e.target.value))}
+                  onChange={(e) => updateMagneticField(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -306,7 +404,7 @@ export default function ChargedParticleSimulator() {
                   min="1"
                   max="10"
                   value={velocity}
-                  onChange={(e) => setVelocity(Number(e.target.value))}
+                  onChange={(e) => updateVelocity(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -324,7 +422,7 @@ export default function ChargedParticleSimulator() {
                   min="0"
                   max="180"
                   value={angle}
-                  onChange={(e) => setAngle(Number(e.target.value))}
+                  onChange={(e) => updateAngle(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -343,7 +441,7 @@ export default function ChargedParticleSimulator() {
                   max="3"
                   step="0.5"
                   value={mass}
-                  onChange={(e) => setMass(Number(e.target.value))}
+                  onChange={(e) => updateMass(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -365,7 +463,25 @@ export default function ChargedParticleSimulator() {
                 onClick={handleReset}
                 className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors"
               >
-                🔄 重置
+                🔄 重置为默认
+              </button>
+            </div>
+
+            {/* 撤销/重做 */}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↩️ 撤回
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↪️ 回撤
               </button>
             </div>
           </div>

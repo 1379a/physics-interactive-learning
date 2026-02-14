@@ -16,10 +16,21 @@ export default function IdealGasSimulator() {
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
 
+  // 历史记录（用于撤销/重做）
+  const [history, setHistory] = useState<{ temperature: number; volume: number; moleculeCount: number }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // 默认值
+  const defaultValues = {
+    temperature: 300,
+    volume: 50,
+    moleculeCount: 100
+  };
+
   // 物理参数
-  const [temperature, setTemperature] = useState(300); // 温度 K
-  const [volume, setVolume] = useState(50); // 容器大小 %
-  const [moleculeCount, setMoleculeCount] = useState(100); // 分子数量
+  const [temperature, setTemperature] = useState(defaultValues.temperature); // 温度 K
+  const [volume, setVolume] = useState(defaultValues.volume); // 容器大小 %
+  const [moleculeCount, setMoleculeCount] = useState(defaultValues.moleculeCount); // 分子数量
   const [pressure, setPressure] = useState(0); // 计算出的压力
   const [isRunning, setIsRunning] = useState(true);
 
@@ -27,9 +38,11 @@ export default function IdealGasSimulator() {
   const containerWidth = 600;
   const containerHeight = 400;
 
+  // 初始化时保存初始状态
   useEffect(() => {
     setIsClient(true);
     initMolecules();
+    saveToHistory();
   }, []);
 
   useEffect(() => {
@@ -147,8 +160,70 @@ export default function IdealGasSimulator() {
     animationRef.current = requestAnimationFrame(animate);
   };
 
-  const handleReset = () => {
+  // 历史记录管理
+  const saveToHistory = () => {
+    const newState = {
+      temperature,
+      volume,
+      moleculeCount
+    };
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newState);
+      // 限制历史记录长度
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setTemperature(prevState.temperature);
+      setVolume(prevState.volume);
+      setMoleculeCount(prevState.moleculeCount);
+      setHistoryIndex(prev => prev - 1);
+      initMolecules();
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setTemperature(nextState.temperature);
+      setVolume(nextState.volume);
+      setMoleculeCount(nextState.moleculeCount);
+      setHistoryIndex(prev => prev + 1);
+      initMolecules();
+    }
+  };
+
+  // 更新参数并保存到历史记录
+  const updateTemperature = (value: number) => {
+    setTemperature(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateVolume = (value: number) => {
+    setVolume(value);
+    setTimeout(saveToHistory, 0);
+  };
+
+  const updateMoleculeCount = (value: number) => {
+    setMoleculeCount(value);
     initMolecules();
+    setTimeout(saveToHistory, 0);
+  };
+
+  const handleReset = () => {
+    setTemperature(defaultValues.temperature);
+    setVolume(defaultValues.volume);
+    setMoleculeCount(defaultValues.moleculeCount);
+    initMolecules();
+    saveToHistory();
   };
 
   if (!isClient) {
@@ -206,7 +281,7 @@ export default function IdealGasSimulator() {
                   min="100"
                   max="600"
                   value={temperature}
-                  onChange={(e) => setTemperature(Number(e.target.value))}
+                  onChange={(e) => updateTemperature(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -224,7 +299,25 @@ export default function IdealGasSimulator() {
                   min="30"
                   max="100"
                   value={volume}
-                  onChange={(e) => setVolume(Number(e.target.value))}
+                  onChange={(e) => updateVolume(Number(e.target.value))}
+                  className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-blue-300/60 mt-1">
+                  <span>30%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm text-blue-200/80 mb-2 block">
+                  容器体积: {volume}%
+                </label>
+                <input
+                  type="range"
+                  min="30"
+                  max="100"
+                  value={volume}
+                  onChange={(e) => updateVolume(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -242,7 +335,7 @@ export default function IdealGasSimulator() {
                   min="20"
                   max="200"
                   value={moleculeCount}
-                  onChange={(e) => setMoleculeCount(Number(e.target.value))}
+                  onChange={(e) => updateMoleculeCount(Number(e.target.value))}
                   className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
@@ -264,6 +357,24 @@ export default function IdealGasSimulator() {
                 className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-medium transition-colors"
               >
                 🔄 重置
+              </button>
+            </div>
+
+            {/* 撤销/重做 */}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                className="flex-1 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↩️ 撤回
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+              >
+                ↪️ 回撤
               </button>
             </div>
           </div>
