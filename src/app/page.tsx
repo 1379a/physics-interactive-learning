@@ -778,12 +778,12 @@ export default function Home() {
         }
 
         .card-tech:hover {
-          transform: translateY(-12px);
-          box-shadow: 0 16px 48px rgba(var(--theme-rgb), 0.5), 
-                      0 0 80px rgba(var(--theme-rgb), 0.25),
-                      inset 0 0 40px rgba(var(--theme-rgb), 0.08);
-          border-color: rgba(var(--theme-rgb), 0.6);
-          background: rgba(var(--theme-rgb), 0.12);
+          transform: translateY(-6px);
+          box-shadow: 0 8px 24px rgba(var(--theme-rgb), 0.3),
+                      0 0 40px rgba(var(--theme-rgb), 0.15),
+                      inset 0 0 20px rgba(var(--theme-rgb), 0.05);
+          border-color: rgba(var(--theme-rgb), 0.4);
+          background: rgba(var(--theme-rgb), 0.1);
         }
 
         .card-tech::before {
@@ -800,21 +800,21 @@ export default function Home() {
         }
 
         .card-tech.sim-nav-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 12px 36px rgba(var(--theme-rgb), 0.4), 
-                      0 0 60px rgba(var(--theme-rgb), 0.2),
-                      inset 0 0 30px rgba(var(--theme-rgb), 0.06);
-          border-color: rgba(var(--theme-rgb), 0.5);
-          background: rgba(var(--theme-rgb), 0.1);
+          transform: translateY(-4px);
+          box-shadow: 0 6px 18px rgba(var(--theme-rgb), 0.25),
+                      0 0 30px rgba(var(--theme-rgb), 0.12),
+                      inset 0 0 15px rgba(var(--theme-rgb), 0.04);
+          border-color: rgba(var(--theme-rgb), 0.35);
+          background: rgba(var(--theme-rgb), 0.08);
         }
 
         .main-content-card:hover {
-          transform: translateY(-4px) scale(1.005);
-          box-shadow: 0 20px 60px rgba(var(--theme-rgb), 0.3), 
-                      0 0 100px rgba(var(--theme-rgb), 0.15),
-                      0 0 40px rgba(var(--theme-rgb), 0.1),
-                      inset 0 0 60px rgba(var(--theme-rgb), 0.05);
-          border-color: rgba(var(--theme-rgb), 0.4);
+          transform: translateY(-2px) scale(1.002);
+          box-shadow: 0 10px 30px rgba(var(--theme-rgb), 0.2),
+                      0 0 50px rgba(var(--theme-rgb), 0.1),
+                      0 0 20px rgba(var(--theme-rgb), 0.07),
+                      inset 0 0 30px rgba(var(--theme-rgb), 0.03);
+          border-color: rgba(var(--theme-rgb), 0.3);
           border-width: 2px;
         }
       `}</style>
