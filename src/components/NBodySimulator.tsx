@@ -12,6 +12,7 @@ interface CelestialBody {
   vx: number;
   vy: number;
   color: string;
+  trajectoryColor?: string; // 轨迹颜色（如果不设置则使用天体颜色）
   isFixed?: boolean;
   realMass?: number; // 真实质量（用于显示）
 }
@@ -99,6 +100,9 @@ export default function NBodySimulator() {
     }
   ]);
 
+  // 天体编辑状态
+  const [editingBody, setEditingBody] = useState<string | null>(null);
+
   // 调整天体数量
   const adjustBodyCount = (count: number) => {
     if (preset !== 'custom') return;
@@ -185,6 +189,18 @@ export default function NBodySimulator() {
       return prevBodies;
     });
     resetTrajectories();
+  };
+
+  // 更新天体属性
+  const updateBodyProperty = (bodyId: string, property: keyof CelestialBody, value: any) => {
+    setBodies(prevBodies =>
+      prevBodies.map(body =>
+        body.id === bodyId ? { ...body, [property]: value } : body
+      )
+    );
+    if (property === 'color' || property === 'trajectoryColor') {
+      resetTrajectories(); // 颜色改变时重置轨迹
+    }
   };
 
   // 预设场景
@@ -475,7 +491,9 @@ export default function NBodySimulator() {
         if (!body) return;
 
         ctx.beginPath();
-        ctx.strokeStyle = getColorWithAlpha(body.color, 0.4); // 半透明
+        // 使用轨迹颜色，如果没有设置则使用天体颜色
+        const trajectoryColor = body.trajectoryColor || body.color;
+        ctx.strokeStyle = getColorWithAlpha(trajectoryColor, 0.4); // 半透明
         ctx.lineWidth = 2;
         
         points.forEach((point, index) => {
@@ -1079,29 +1097,96 @@ export default function NBodySimulator() {
           {/* 天体列表和中心天体设置 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">🌟 天体设置</h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="space-y-3 max-h-80 overflow-y-auto">
               {bodies.map((body) => (
                 <div
                   key={body.id}
-                  className="flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
+                  className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
                 >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: body.color }}
-                    />
-                    <span className="text-sm">{body.name}</span>
+                  {/* 天体基本信息行 */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: body.color }}
+                      />
+                      <span className="text-sm font-medium">{body.name}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setEditingBody(body.id === editingBody ? null : body.id)}
+                        className={`px-2 py-1 rounded text-xs transition-all ${
+                          body.id === editingBody
+                            ? 'bg-blue-600/80 text-white'
+                            : 'bg-white/10 hover:bg-white/20'
+                        }`}
+                      >
+                        {body.id === editingBody ? '✓ 完成' : '✏️ 编辑'}
+                      </button>
+                      <button
+                        onClick={() => toggleBodyFixed(body.id)}
+                        className={`px-2 py-1 rounded text-xs transition-all ${
+                          body.isFixed
+                            ? 'bg-yellow-600/80 text-white'
+                            : 'bg-white/10 hover:bg-white/20'
+                        }`}
+                      >
+                        {body.isFixed ? '🔒 固定' : '🚀 自由'}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => toggleBodyFixed(body.id)}
-                    className={`px-2 py-1 rounded text-xs transition-all ${
-                      body.isFixed
-                        ? 'bg-yellow-600/80 text-white'
-                        : 'bg-white/10 hover:bg-white/20'
-                    }`}
-                  >
-                    {body.isFixed ? '🔒 固定' : '🚀 自由'}
-                  </button>
+
+                  {/* 编辑控件 */}
+                  {body.id === editingBody && (
+                    <div className="space-y-2 pl-2 border-l-2 border-white/10">
+                      {/* 天体大小 */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">大小:</label>
+                        <input
+                          type="range"
+                          min="5"
+                          max="50"
+                          value={body.radius}
+                          onChange={(e) => updateBodyProperty(body.id, 'radius', parseFloat(e.target.value))}
+                          className="flex-1 h-1"
+                        />
+                        <span className="text-xs w-8 text-center">{Math.round(body.radius)}</span>
+                      </div>
+
+                      {/* 天体颜色 */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">颜色:</label>
+                        <input
+                          type="color"
+                          value={body.color.startsWith('hsl') ? '#ffffff' : body.color}
+                          onChange={(e) => {
+                            updateBodyProperty(body.id, 'color', e.target.value);
+                          }}
+                          className="w-8 h-6 rounded cursor-pointer"
+                        />
+                        <span className="text-xs text-blue-300/60">{body.color}</span>
+                      </div>
+
+                      {/* 轨迹颜色 */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">轨迹:</label>
+                        <input
+                          type="color"
+                          value={body.trajectoryColor || (body.color.startsWith('hsl') ? '#ffffff' : body.color)}
+                          onChange={(e) => {
+                            updateBodyProperty(body.id, 'trajectoryColor', e.target.value);
+                          }}
+                          className="w-8 h-6 rounded cursor-pointer"
+                        />
+                        <button
+                          onClick={() => updateBodyProperty(body.id, 'trajectoryColor', undefined)}
+                          className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-all"
+                        >
+                          重置
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
