@@ -30,6 +30,21 @@ interface BodyInfo {
   density?: number;
 }
 
+// 将颜色转换为带透明度的格式
+const getColorWithAlpha = (color: string, alpha: number): string => {
+  if (color.startsWith('hsl')) {
+    // 将 hsl(120, 70%, 60%) 转换为 hsla(120, 70%, 60%, 0.5)
+    return color.replace('hsl', 'hsla').replace(')', `, ${alpha})`);
+  } else if (color.startsWith('#')) {
+    // 将十六进制颜色转换为带alpha的格式
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return color;
+};
+
 export default function NBodySimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -125,9 +140,18 @@ export default function NBodySimulator() {
   const toggleBodyFixed = (bodyId: string) => {
     setIsAnimating(false);
     setBodies(prevBodies =>
-      prevBodies.map(body =>
-        body.id === bodyId ? { ...body, isFixed: !body.isFixed } : body
-      )
+      prevBodies.map(body => {
+        if (body.id === bodyId) {
+          const newIsFixed = !body.isFixed;
+          // 如果原来是固定的（中心天体），现在变为自由运动，则改名
+          if (body.isFixed && !newIsFixed) {
+            return { ...body, isFixed: newIsFixed, name: '天体1234567' };
+          }
+          // 如果原来是自由的，现在变为固定的，保持名字不变
+          return { ...body, isFixed: newIsFixed };
+        }
+        return body;
+      })
     );
     resetTrajectories();
   };
@@ -429,7 +453,7 @@ export default function NBodySimulator() {
     bodies.forEach(body => {
       // 绘制光晕
       const gradient = ctx.createRadialGradient(body.x, body.y, 0, body.x, body.y, body.radius * 2);
-      gradient.addColorStop(0, body.color + '80');
+      gradient.addColorStop(0, getColorWithAlpha(body.color, 0.5));
       gradient.addColorStop(1, 'transparent');
       ctx.beginPath();
       ctx.arc(body.x, body.y, body.radius * 2, 0, Math.PI * 2);
