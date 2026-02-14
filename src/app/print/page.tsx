@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { quizQuestions } from '@/components/QuizSection';
 
 export default function PrintPage() {
+  const [printDate, setPrintDate] = useState<string>('');
+
   useEffect(() => {
+    setPrintDate(new Date().toLocaleDateString('zh-CN'));
     // 自动打印
     window.print();
   }, []);
@@ -26,7 +29,7 @@ export default function PrintPage() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">高中物理真题题库</h1>
           <p className="text-gray-600">
-            共 {quizQuestions.length} 道题目 · 打印时间：{new Date().toLocaleDateString('zh-CN')}
+            共 {quizQuestions.length} 道题目 · 打印时间：{printDate || '加载中...'}
           </p>
         </div>
 
@@ -136,7 +139,7 @@ export default function PrintPage() {
         {/* 页脚 */}
         <div className="mt-8 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
           <p>高中物理学习平台 · 题库打印版</p>
-          <p className="mt-1">打印时间：{new Date().toLocaleString('zh-CN')}</p>
+          <p className="mt-1">打印时间：{printDate || '加载中...'}</p>
         </div>
       </div>
 

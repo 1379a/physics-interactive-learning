@@ -12,6 +12,8 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('全部');
   const [selectedYear, setSelectedYear] = useState<string>('全部');
   const [showAnswers, setShowAnswers] = useState<boolean>(true);
+  const [isClient, setIsClient] = useState(false);
+  const [printDate, setPrintDate] = useState<string>('');
 
   // 获取所有分类
   const categories = ['全部', ...Array.from(new Set(quizQuestions.map(q => q.category)))];
@@ -46,8 +48,8 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
   };
 
   useEffect(() => {
-    // 自动打印
-    // window.print();
+    setIsClient(true);
+    setPrintDate(new Date().toLocaleDateString('zh-CN'));
   }, []);
 
   return (
@@ -141,7 +143,7 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
             筛选条件：{selectedCategory} · {selectedDifficulty === '全部' ? '全部难度' : getDifficultyInfo(selectedDifficulty).label} · {selectedYear === '全部' ? '全部年份' : selectedYear + '年'}
           </p>
           <p className="print:text-sm print:text-gray-600 text-gray-500 mt-1">
-            共 {filteredQuestions.length} 道题目 · 打印时间：{new Date().toLocaleDateString('zh-CN')}
+            共 {filteredQuestions.length} 道题目 · 打印时间：{printDate || '加载中...'}
           </p>
         </div>
 
@@ -255,7 +257,7 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
         {/* 打印页脚 */}
         <div className="print:mt-8 print:pt-4 print:border-t print:text-center mt-8 pt-4 border-t border-gray-200 text-center text-sm text-gray-500 print:page-break-before">
           <p>高中物理学习平台 · 题库打印版</p>
-          <p className="mt-1">打印时间：{new Date().toLocaleString('zh-CN')}</p>
+          <p className="mt-1">打印时间：{printDate || '加载中...'}</p>
         </div>
       </div>
 

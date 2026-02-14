@@ -243,6 +243,7 @@ export default function Home() {
         '--theme-color': getThemeColor(),
         background: useGradient ? '' : customColor ? `linear-gradient(135deg, #1a1a2e 0%, ${customColor}33 50%, #1a1a2e 100%)` : ''
       } as React.CSSProperties}
+      suppressHydrationWarning
     >
       {/* 头部导航 */}
       <header className={`bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50`}>
