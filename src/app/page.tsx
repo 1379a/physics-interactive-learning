@@ -204,6 +204,12 @@ export default function Home() {
 
   useEffect(() => {
     setIsClient(true);
+    // 禁止浏览器自动恢复滚动位置
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    // 确保页面从顶部开始
+    window.scrollTo(0, 0);
   }, []);
 
   if (!isClient) {
