@@ -245,7 +245,7 @@ export default function IdealGasSimulator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <canvas 
               ref={canvasRef} 
               width={containerWidth} 
@@ -255,15 +255,15 @@ export default function IdealGasSimulator() {
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-red-400">{temperature.toFixed(0)}</div>
               <div className="text-sm text-blue-300/80">温度 (K)</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-green-400">{pressure.toFixed(2)}</div>
               <div className="text-sm text-blue-300/80">压力 (atm)</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-blue-400">{moleculeCount}</div>
               <div className="text-sm text-blue-300/80">分子数</div>
             </div>
@@ -271,7 +271,7 @@ export default function IdealGasSimulator() {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h3 className="font-semibold mb-4 text-blue-300">控制面板</h3>
             
             <div className="space-y-4">
@@ -382,7 +382,7 @@ export default function IdealGasSimulator() {
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h4 className="font-semibold mb-3 text-blue-300">💡 知识要点</h4>
             <div className="space-y-2 text-sm text-blue-100/80">
               <p><strong>理想气体状态方程：</strong></p>
@@ -393,7 +393,7 @@ export default function IdealGasSimulator() {
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h4 className="font-semibold mb-3 text-blue-300">📊 实时计算</h4>
             <div className="space-y-2 text-sm text-blue-100/80">
               <div className="flex justify-between">

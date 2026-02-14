@@ -308,7 +308,7 @@ export default function DopplerEffectSimulator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <canvas
               ref={canvasRef}
               width={canvasWidth}
@@ -318,22 +318,22 @@ export default function DopplerEffectSimulator() {
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-yellow-400">{receivedFrequency.toFixed(2)}</div>
               <div className="text-sm text-blue-300/80">接收频率 (Hz)</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-green-400">{dopplerFactor.toFixed(2)}</div>
               <div className="text-sm text-blue-300/80">多普勒因子</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-center card-tech">
               <div className="text-3xl font-bold text-blue-400">{sourcePosition.toFixed(2)}</div>
               <div className="text-sm text-blue-300/80">波源位置 (m)</div>
             </div>
           </div>
 
           {/* 接收频率图表 */}
-          <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10">
+          <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10 card-tech">
             <h3 className="text-sm font-semibold text-blue-300 mb-2">接收频率随时间变化</h3>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
@@ -352,7 +352,7 @@ export default function DopplerEffectSimulator() {
           </div>
 
           {/* 波源位置图表 */}
-          <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10">
+          <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10 card-tech">
             <h3 className="text-sm font-semibold text-blue-300 mb-2">波源位置随时间变化</h3>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
@@ -372,7 +372,7 @@ export default function DopplerEffectSimulator() {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h3 className="font-semibold mb-4 text-blue-300">控制面板</h3>
 
             <div className="space-y-4">
@@ -482,7 +482,7 @@ export default function DopplerEffectSimulator() {
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h4 className="font-semibold mb-3 text-blue-300">💡 知识要点</h4>
             <div className="space-y-2 text-sm text-blue-100/80">
               <p><strong>多普勒效应公式：</strong></p>
@@ -497,7 +497,7 @@ export default function DopplerEffectSimulator() {
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 card-tech">
             <h4 className="font-semibold mb-3 text-blue-300">📊 图例说明</h4>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
