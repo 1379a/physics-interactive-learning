@@ -1051,7 +1051,7 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
 
         {/* 中间：公式展示和变量控制 */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="card-tech rounded-xl p-5 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-5 border border-white/10">
             <div className="text-center mb-4">
               <div className="text-lg mb-2">{selectedFormula.name}</div>
               <div className="text-sm" style={{ color: `${getThemeColor('text')}CC`, marginBottom: '1rem' }}>{selectedFormula.description}</div>
@@ -1121,7 +1121,7 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
           </div>
 
           {/* 图表类型切换 */}
-          <div className="card-tech rounded-xl p-4 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
             <div className="flex justify-between items-center mb-3">
               <div className="text-sm font-semibold" style={{ color: getThemeColor('text') }}>结果变化趋势</div>
               <div className="flex gap-1">
@@ -1159,7 +1159,7 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
 
           {/* 统计信息 */}
           {showStats && stats && (
-            <div className="card-tech rounded-xl p-4 border border-white/10">
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="flex justify-between items-center mb-3">
                 <div className="text-sm font-semibold" style={{ color: getThemeColor('text') }}>统计信息</div>
                 <button
@@ -1193,7 +1193,7 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
             </div>
           )}
 
-          <div className="card-tech rounded-xl p-5 border border-white/10">
+          <div className="bg-white/5 rounded-xl p-5 border border-white/10">
             <div className="text-sm font-semibold mb-3" style={{ color: getThemeColor('text') }}>数值说明</div>
             <div className="space-y-2 text-sm">
               {selectedFormula.variables.map((variable) => (
