@@ -822,9 +822,9 @@ export default function PhysicsConceptNavigator() {
                 <p className="text-sm text-blue-300/80">{selectedConcept.description}</p>
               </div>
 
-              <div className="bg-black/30 rounded-lg p-4">
+              <div className="bg-black/30 rounded-lg p-4 overflow-x-auto">
                 <div className="text-xs text-blue-400 mb-2">核心公式</div>
-                <div className="text-center text-lg">
+                <div className="text-center text-lg min-w-fit">
                   <BlockMath math={selectedConcept.formula} />
                 </div>
               </div>

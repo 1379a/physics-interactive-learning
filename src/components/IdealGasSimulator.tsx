@@ -185,22 +185,26 @@ export default function IdealGasSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setTemperature(prevState.temperature);
-      setVolume(prevState.volume);
-      setMoleculeCount(prevState.moleculeCount);
-      setHistoryIndex(prev => prev - 1);
-      initMolecules();
+      if (prevState) {
+        setTemperature(prevState.temperature);
+        setVolume(prevState.volume);
+        setMoleculeCount(prevState.moleculeCount);
+        setHistoryIndex(prev => prev - 1);
+        initMolecules();
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setTemperature(nextState.temperature);
-      setVolume(nextState.volume);
-      setMoleculeCount(nextState.moleculeCount);
-      setHistoryIndex(prev => prev + 1);
-      initMolecules();
+      if (nextState) {
+        setTemperature(nextState.temperature);
+        setVolume(nextState.volume);
+        setMoleculeCount(nextState.moleculeCount);
+        setHistoryIndex(prev => prev + 1);
+        initMolecules();
+      }
     }
   };
 
@@ -290,24 +294,6 @@ export default function IdealGasSimulator() {
                 <div className="flex justify-between text-xs text-blue-300/60 mt-1">
                   <span>100K</span>
                   <span>600K</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm text-blue-200/80 mb-2 block">
-                  容器体积: {volume}%
-                </label>
-                <input
-                  type="range"
-                  min="30"
-                  max="100"
-                  value={volume}
-                  onChange={(e) => updateVolume(Number(e.target.value))}
-                  className="w-full h-2 bg-blue-900 rounded-lg appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-blue-300/60 mt-1">
-                  <span>30%</span>
-                  <span>100%</span>
                 </div>
               </div>
 

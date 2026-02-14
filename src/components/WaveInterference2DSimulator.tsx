@@ -73,28 +73,32 @@ export default function WaveInterference2DSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setFrequency(prevState.frequency);
-      setAmplitude(prevState.amplitude);
-      setWaveSpeed(prevState.waveSpeed);
-      setSourceDistance(prevState.sourceDistance);
-      setDisplayMode(prevState.displayMode);
-      setHistoryIndex(prev => prev - 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (prevState) {
+        setFrequency(prevState.frequency);
+        setAmplitude(prevState.amplitude);
+        setWaveSpeed(prevState.waveSpeed);
+        setSourceDistance(prevState.sourceDistance);
+        setDisplayMode(prevState.displayMode);
+        setHistoryIndex(prev => prev - 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setFrequency(nextState.frequency);
-      setAmplitude(nextState.amplitude);
-      setWaveSpeed(nextState.waveSpeed);
-      setSourceDistance(nextState.sourceDistance);
-      setDisplayMode(nextState.displayMode);
-      setHistoryIndex(prev => prev + 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (nextState) {
+        setFrequency(nextState.frequency);
+        setAmplitude(nextState.amplitude);
+        setWaveSpeed(nextState.waveSpeed);
+        setSourceDistance(nextState.sourceDistance);
+        setDisplayMode(nextState.displayMode);
+        setHistoryIndex(prev => prev + 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 

@@ -88,26 +88,30 @@ export default function SoundWaveSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setFrequency(prevState.frequency);
-      setAmplitude(prevState.amplitude);
-      setSpeed(prevState.speed);
-      setParticleCount(prevState.particleCount);
-      setHistoryIndex(prev => prev - 1);
-      setIsRunning(false);
-      setTimeout(() => initializeParticles(), 0);
+      if (prevState) {
+        setFrequency(prevState.frequency);
+        setAmplitude(prevState.amplitude);
+        setSpeed(prevState.speed);
+        setParticleCount(prevState.particleCount);
+        setHistoryIndex(prev => prev - 1);
+        setIsRunning(false);
+        setTimeout(() => initializeParticles(), 0);
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setFrequency(nextState.frequency);
-      setAmplitude(nextState.amplitude);
-      setSpeed(nextState.speed);
-      setParticleCount(nextState.particleCount);
-      setHistoryIndex(prev => prev + 1);
-      setIsRunning(false);
-      setTimeout(() => initializeParticles(), 0);
+      if (nextState) {
+        setFrequency(nextState.frequency);
+        setAmplitude(nextState.amplitude);
+        setSpeed(nextState.speed);
+        setParticleCount(nextState.particleCount);
+        setHistoryIndex(prev => prev + 1);
+        setIsRunning(false);
+        setTimeout(() => initializeParticles(), 0);
+      }
     }
   };
 

@@ -74,26 +74,30 @@ export default function ResonanceSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setNaturalFreq(prevState.naturalFreq);
-      setDrivingFreq(prevState.drivingFreq);
-      setDamping(prevState.damping);
-      setMass(prevState.mass);
-      setHistoryIndex(prev => prev - 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (prevState) {
+        setNaturalFreq(prevState.naturalFreq);
+        setDrivingFreq(prevState.drivingFreq);
+        setDamping(prevState.damping);
+        setMass(prevState.mass);
+        setHistoryIndex(prev => prev - 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setNaturalFreq(nextState.naturalFreq);
-      setDrivingFreq(nextState.drivingFreq);
-      setDamping(nextState.damping);
-      setMass(nextState.mass);
-      setHistoryIndex(prev => prev + 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (nextState) {
+        setNaturalFreq(nextState.naturalFreq);
+        setDrivingFreq(nextState.drivingFreq);
+        setDamping(nextState.damping);
+        setMass(nextState.mass);
+        setHistoryIndex(prev => prev + 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 

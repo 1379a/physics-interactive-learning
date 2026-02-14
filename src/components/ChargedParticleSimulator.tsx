@@ -236,28 +236,32 @@ export default function ChargedParticleSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setCharge(prevState.charge);
-      setMagneticField(prevState.magneticField);
-      setVelocity(prevState.velocity);
-      setAngle(prevState.angle);
-      setMass(prevState.mass);
-      setHistoryIndex(prev => prev - 1);
-      setIsRunning(false);
-      particleRef.current = null;
+      if (prevState) {
+        setCharge(prevState.charge);
+        setMagneticField(prevState.magneticField);
+        setVelocity(prevState.velocity);
+        setAngle(prevState.angle);
+        setMass(prevState.mass);
+        setHistoryIndex(prev => prev - 1);
+        setIsRunning(false);
+        particleRef.current = null;
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setCharge(nextState.charge);
-      setMagneticField(nextState.magneticField);
-      setVelocity(nextState.velocity);
-      setAngle(nextState.angle);
-      setMass(nextState.mass);
-      setHistoryIndex(prev => prev + 1);
-      setIsRunning(false);
-      particleRef.current = null;
+      if (nextState) {
+        setCharge(nextState.charge);
+        setMagneticField(nextState.magneticField);
+        setVelocity(nextState.velocity);
+        setAngle(nextState.angle);
+        setMass(nextState.mass);
+        setHistoryIndex(prev => prev + 1);
+        setIsRunning(false);
+        particleRef.current = null;
+      }
     }
   };
 

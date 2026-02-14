@@ -63,22 +63,26 @@ export default function WaveSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setAmplitude(prevState.amplitude);
-      setWavelength(prevState.wavelength);
-      setFrequency(prevState.frequency);
-      setWaveType(prevState.waveType);
-      setHistoryIndex(prev => prev - 1);
+      if (prevState) {
+        setAmplitude(prevState.amplitude);
+        setWavelength(prevState.wavelength);
+        setFrequency(prevState.frequency);
+        setWaveType(prevState.waveType);
+        setHistoryIndex(prev => prev - 1);
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setAmplitude(nextState.amplitude);
-      setWavelength(nextState.wavelength);
-      setFrequency(nextState.frequency);
-      setWaveType(nextState.waveType);
-      setHistoryIndex(prev => prev + 1);
+      if (nextState) {
+        setAmplitude(nextState.amplitude);
+        setWavelength(nextState.wavelength);
+        setFrequency(nextState.frequency);
+        setWaveType(nextState.waveType);
+        setHistoryIndex(prev => prev + 1);
+      }
     }
   };
 

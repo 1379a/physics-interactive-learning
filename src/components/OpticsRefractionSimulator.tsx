@@ -247,20 +247,24 @@ export default function OpticsRefractionSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setN1(prevState.n1);
-      setN2(prevState.n2);
-      setIncidentAngle(prevState.incidentAngle);
-      setHistoryIndex(prev => prev - 1);
+      if (prevState) {
+        setN1(prevState.n1);
+        setN2(prevState.n2);
+        setIncidentAngle(prevState.incidentAngle);
+        setHistoryIndex(prev => prev - 1);
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setN1(nextState.n1);
-      setN2(nextState.n2);
-      setIncidentAngle(nextState.incidentAngle);
-      setHistoryIndex(prev => prev + 1);
+      if (nextState) {
+        setN1(nextState.n1);
+        setN2(nextState.n2);
+        setIncidentAngle(nextState.incidentAngle);
+        setHistoryIndex(prev => prev + 1);
+      }
     }
   };
 

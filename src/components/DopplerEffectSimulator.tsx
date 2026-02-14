@@ -89,26 +89,30 @@ export default function DopplerEffectSimulator() {
   const handleUndo = () => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setFrequency(prevState.frequency);
-      setSourceSpeed(prevState.sourceSpeed);
-      setWaveSpeed(prevState.waveSpeed);
-      setObserverX(prevState.observerX);
-      setHistoryIndex(prev => prev - 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (prevState) {
+        setFrequency(prevState.frequency);
+        setSourceSpeed(prevState.sourceSpeed);
+        setWaveSpeed(prevState.waveSpeed);
+        setObserverX(prevState.observerX);
+        setHistoryIndex(prev => prev - 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 
   const handleRedo = () => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setFrequency(nextState.frequency);
-      setSourceSpeed(nextState.sourceSpeed);
-      setWaveSpeed(nextState.waveSpeed);
-      setObserverX(nextState.observerX);
-      setHistoryIndex(prev => prev + 1);
-      setIsRunning(false);
-      resetSimulation();
+      if (nextState) {
+        setFrequency(nextState.frequency);
+        setSourceSpeed(nextState.sourceSpeed);
+        setWaveSpeed(nextState.waveSpeed);
+        setObserverX(nextState.observerX);
+        setHistoryIndex(prev => prev + 1);
+        setIsRunning(false);
+        resetSimulation();
+      }
     }
   };
 

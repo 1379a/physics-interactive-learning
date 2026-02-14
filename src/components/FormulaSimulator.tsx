@@ -1055,8 +1055,10 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
             <div className="text-center mb-4">
               <div className="text-lg mb-2">{selectedFormula.name}</div>
               <div className="text-sm" style={{ color: `${getThemeColor('text')}CC`, marginBottom: '1rem' }}>{selectedFormula.description}</div>
-              <div className="bg-black/30 rounded-lg p-4">
-                <BlockMath math={selectedFormula.latex} />
+              <div className="bg-black/30 rounded-lg p-4 overflow-x-auto">
+                <div className="min-w-fit">
+                  <BlockMath math={selectedFormula.latex} />
+                </div>
               </div>
             </div>
 
