@@ -51,6 +51,7 @@ export default function NBodySimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const trajectoriesRef = useRef<Record<string, TrajectoryPoint[]>>({});
+  const bodiesRef = useRef<CelestialBody[]>([]); // 使用 ref 存储最新的 bodies，避免依赖循环
   const [isClient, setIsClient] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
@@ -103,6 +104,11 @@ export default function NBodySimulator() {
       realMass: 7.342e22
     }
   ]);
+
+  // 同步更新 bodiesRef
+  useEffect(() => {
+    bodiesRef.current = bodies;
+  }, [bodies]);
 
   // 天体编辑状态
   const [editingBody, setEditingBody] = useState<string | null>(null);
@@ -422,7 +428,7 @@ export default function NBodySimulator() {
     // 记录轨迹（移到 setBodies 外部，避免状态更新冲突）
     setTrajectories(prev => {
       const newTrajectories = { ...prev };
-      bodies.forEach(body => {
+      bodiesRef.current.forEach(body => {
         if (!body.isFixed && body.showTrajectory !== false) {
           if (!newTrajectories[body.id]) {
             newTrajectories[body.id] = [];
@@ -436,49 +442,49 @@ export default function NBodySimulator() {
       });
       return newTrajectories;
     });
-  }, [simulationSpeed, bodies]);
+  }, [simulationSpeed]);
 
   // 计算天体信息
   const calculateBodyInfo = (body: CelestialBody) => {
     const velocity = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
-    
+
     // 计算万有引力（所有其他天体对该天体的引力总和）
     let totalGravitationalForce = 0;
     const G = 0.5; // 引力常数（与模拟中使用的一致）
-    
-    for (const other of bodies) {
+
+    for (const other of bodiesRef.current) {
       if (other.id === body.id) continue;
-      
+
       const dx = other.x - body.x;
       const dy = other.y - body.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      
+
       if (distance > 0) {
         // 万有引力公式：F = G * m1 * m2 / r^2
         const force = (G * body.mass * other.mass) / (distance * distance);
         totalGravitationalForce += force;
       }
     }
-    
+
     // 计算角速度和周期（相对于固定天体）
-    const fixedBody = bodies.find(b => b.isFixed);
+    const fixedBody = bodiesRef.current.find(b => b.isFixed);
     let angularVelocity = 0;
     let period = 0;
-    
+
     if (fixedBody && body.id !== fixedBody.id) {
       const dx = body.x - fixedBody.x;
       const dy = body.y - fixedBody.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      
+
       // 角速度 = v / r
       angularVelocity = velocity / distance;
-      
+
       // 周期 = 2π / ω
       if (angularVelocity > 0) {
         period = (2 * Math.PI) / angularVelocity;
       }
     }
-    
+
     // 估算密度 (假设球体，使用显示半径)
     const volume = (4 / 3) * Math.PI * Math.pow(body.radius, 3);
     const density = body.mass / volume;
