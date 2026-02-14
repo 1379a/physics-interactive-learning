@@ -851,15 +851,19 @@ export default function ProblemSolver() {
                     <button 
                       key={problem.id} 
                       onClick={() => setSelectedProblem(problem)} 
-                      className={`w-full p-3 rounded-lg text-left transition-all ${selectedProblem.id === problem.id ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
+                      className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${selectedProblem.id === problem.id ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 pr-2">
-                          <div className="font-medium">{highlightText(problem.title, searchQuery)}</div>
-                          <div className="text-xs text-blue-300/70 mt-1">{highlightText(problem.description, searchQuery)}</div>
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 pr-2">
+                            <div className="font-medium">{highlightText(problem.title, searchQuery)}</div>
+                            <div className="text-xs text-blue-300/70 mt-1">{highlightText(problem.description, searchQuery)}</div>
+                          </div>
+                          <span className="text-xs bg-blue-600/30 px-2 py-1 rounded whitespace-nowrap">{highlightText(problem.category, searchQuery)}</span>
                         </div>
-                        <span className="text-xs bg-blue-600/30 px-2 py-1 rounded whitespace-nowrap">{highlightText(problem.category, searchQuery)}</span>
                       </div>
+                      {/* 毛玻璃循环动画效果 */}
+                      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
                     </button>
                   ))
                 ) : (
@@ -881,10 +885,14 @@ export default function ProblemSolver() {
                   <button
                     key={key}
                     onClick={() => setCategory(key as keyof typeof conversionCategories)}
-                    className={`w-full p-3 rounded-lg text-left transition-all ${category === key ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
+                    className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${category === key ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
                   >
-                    <span className="font-medium">{data.name}</span>
-                    <span className="text-xs text-blue-300/70 ml-2">({data.units.length} 种单位)</span>
+                    <div className="relative z-10">
+                      <span className="font-medium">{data.name}</span>
+                      <span className="text-xs text-blue-300/70 ml-2">({data.units.length} 种单位)</span>
+                    </div>
+                    {/* 毛玻璃循环动画效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
                   </button>
                 ))}
               </div>

@@ -1072,9 +1072,11 @@ export default function QuizSection() {
                       setSelectedAnswer(null);
                       setShowExplanation(answeredQuestions.includes(index));
                     }}
-                    className={`w-10 h-10 rounded-lg ${bgColor} hover:opacity-80 transition-all flex items-center justify-center text-sm font-semibold`}
+                    className={`w-10 h-10 rounded-lg ${bgColor} hover:opacity-80 transition-all flex items-center justify-center text-sm font-semibold relative overflow-hidden group`}
                   >
-                    {index + 1}
+                    <span className="relative z-10">{index + 1}</span>
+                    {/* 毛玻璃循环动画效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
                   </button>
                 );
               })}

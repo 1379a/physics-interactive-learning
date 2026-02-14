@@ -753,19 +753,23 @@ export default function PhysicsConceptNavigator() {
                 setSelectedBranch(branch.id);
                 setSelectedConcept(null);
               }}
-              className={`w-full p-4 rounded-xl text-left transition-all ${
+              className={`w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
                 selectedBranch === branch.id
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/30'
                   : 'bg-white/5 hover:bg-white/10 border border-white/10'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{branch.icon}</span>
-                <div>
-                  <div className="font-semibold">{branch.name}</div>
-                  <div className="text-xs opacity-80">{branch.concepts.length} 个核心概念</div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{branch.icon}</span>
+                  <div>
+                    <div className="font-semibold">{branch.name}</div>
+                    <div className="text-xs opacity-80">{branch.concepts.length} 个核心概念</div>
+                  </div>
                 </div>
               </div>
+              {/* 毛玻璃循环动画效果 */}
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
             </button>
           ))}
         </div>
@@ -783,14 +787,18 @@ export default function PhysicsConceptNavigator() {
                   <button
                     key={concept.id}
                     onClick={() => setSelectedConcept(concept)}
-                    className={`w-full p-3 rounded-lg text-left transition-all ${
+                    className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${
                       selectedConcept?.id === concept.id
                         ? 'bg-blue-600/30 border border-blue-500/50'
                         : 'bg-white/5 hover:bg-white/10 border border-white/10'
                     }`}
                   >
-                    <div className="font-medium mb-1">{concept.name}</div>
-                    <div className="text-xs text-blue-300/70 line-clamp-2">{concept.description}</div>
+                    <div className="relative z-10">
+                      <div className="font-medium mb-1">{concept.name}</div>
+                      <div className="text-xs text-blue-300/70 line-clamp-2">{concept.description}</div>
+                    </div>
+                    {/* 毛玻璃循环动画效果 */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
                   </button>
                 ))}
             </>
