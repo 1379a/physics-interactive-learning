@@ -364,7 +364,7 @@ export default function Home() {
                     : { transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }
                 }
               >
-                <span className={`text-lg ${activeTab === tab.id ? 'animate-float animate-pulse-glow' : ''}`}>{tab.icon}</span>
+                <span className={`text-lg animate-float ${activeTab === tab.id ? 'animate-pulse-glow' : ''}`}>{tab.icon}</span>
                 <span className="text-sm font-medium">{tab.label}</span>
 
                 {/* 毛玻璃循环动画效果 */}

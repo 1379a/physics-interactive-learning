@@ -352,8 +352,8 @@ export default function SpringOscillator({ currentTheme, customColor }: SpringOs
   return (
     <div className="p-6 space-y-6">
       {/* 标题 */}
-      <div className="flex items-center gap-3 group">
-        <div className="text-4xl group-hover:animate-float group-hover:animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>🔄</div>
+      <div className="flex items-center gap-3">
+        <div className="text-4xl">🔄</div>
         <div>
           <h2 className="text-2xl font-bold">弹簧振子模拟</h2>
           <p className="text-sm text-blue-300/80">观察简谐运动的规律和能量转化</p>
