@@ -102,6 +102,42 @@ const quizQuestions: Question[] = [
     correctAnswer: 1,
     explanation: '理想气体在等温过程中，温度T保持不变。根据理想气体状态方程 PV = nRT，当T恒定时，P与V成反比。',
     relatedConcepts: ['理想气体状态方程', '等温过程', '玻意耳定律']
+  },
+  {
+    id: 'rods-1',
+    category: '力学',
+    question: '在刚体平衡问题中，固定杆（固定支点）可以产生',
+    options: ['任意方向的反作用力', '仅垂直于杆的反作用力', '仅沿杆方向的力', '没有反作用力'],
+    correctAnswer: 0,
+    explanation: '固定杆（固定支点）可以产生任意方向的反作用力和力矩，约束物体在支点处的全部运动自由度。',
+    relatedConcepts: ['固定杆', '约束反力', '刚体平衡']
+  },
+  {
+    id: 'rods-2',
+    category: '力学',
+    question: '活动杆（活动支点）只能产生',
+    options: ['任意方向的反作用力', '垂直于杆方向的反作用力', '沿杆方向的力', '力矩'],
+    correctAnswer: 1,
+    explanation: '活动杆（活动支点）只能产生垂直于杆方向的反作用力，不能产生沿杆方向的力和力矩，因此允许杆绕支点转动。',
+    relatedConcepts: ['活动杆', '约束反力', '转动自由度']
+  },
+  {
+    id: 'rods-3',
+    category: '力学',
+    question: '一个均质杆一端固定在固定杆支点，另一端受到垂直于杆的力F作用。若杆长为L，固定端处的反力矩为',
+    options: ['0', 'FL', 'F/L', 'F×g'],
+    correctAnswer: 1,
+    explanation: '对固定端取矩，力F产生的力矩为 M = F×L（力的大小乘以力臂）。固定杆可以提供大小相等、方向相反的反力矩使杆平衡。',
+    relatedConcepts: ['固定杆', '力矩', '平衡条件']
+  },
+  {
+    id: 'rods-4',
+    category: '力学',
+    question: '刚体处于平衡状态的必要条件是',
+    options: ['合力为零', '合力矩为零', '合力和合力矩都为零', '速度为零'],
+    correctAnswer: 2,
+    explanation: '刚体平衡的必要条件是合力为零（ΣF = 0）和合力矩为零（ΣM = 0）同时满足。只有合力为零时，刚体不会平移；只有合力矩为零时，刚体不会转动。',
+    relatedConcepts: ['刚体平衡', '平衡条件', '力平衡', '力矩平衡']
   }
 ];
 
