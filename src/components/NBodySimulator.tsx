@@ -13,6 +13,7 @@ interface CelestialBody {
   vy: number;
   color: string;
   trajectoryColor?: string; // 轨迹颜色（如果不设置则使用天体颜色）
+  showTrajectory?: boolean; // 是否显示轨迹（默认显示）
   isFixed?: boolean;
   realMass?: number; // 真实质量（用于显示）
 }
@@ -83,6 +84,7 @@ export default function NBodySimulator() {
       vx: 0,
       vy: 0,
       color: '#FFD700',
+      showTrajectory: true,
       isFixed: true,
       realMass: 5.972e24
     },
@@ -96,6 +98,7 @@ export default function NBodySimulator() {
       vx: 0,
       vy: 2,
       color: '#00BFFF',
+      showTrajectory: true,
       realMass: 7.342e22
     }
   ]);
@@ -127,6 +130,7 @@ export default function NBodySimulator() {
             vx: -Math.sin(angle) * 1.5,
             vy: Math.cos(angle) * 1.5,
             color: `hsl(${(i * 60) % 360}, 70%, 60%)`,
+            showTrajectory: true,
             isFixed: false,
             realMass: (50 + Math.random() * 100) * 1e22
           });
@@ -221,6 +225,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0,
           color: '#2E8B57',
+          showTrajectory: true,
           isFixed: true,
           realMass: 5.972e24
         },
@@ -234,6 +239,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 1.8,
           color: '#C0C0C0',
+          showTrajectory: true,
           realMass: 7.342e22
         }
       ]);
@@ -253,6 +259,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0,
           color: '#FFA500',
+          showTrajectory: true,
           isFixed: true,
           realMass: 1.989e30
         },
@@ -266,6 +273,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 2.5,
           color: '#A9A9A9',
+          showTrajectory: true,
           realMass: 3.285e23
         },
         {
@@ -278,6 +286,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 1.9,
           color: '#FFC0CB',
+          showTrajectory: true,
           realMass: 4.867e24
         },
         {
@@ -290,6 +299,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 1.6,
           color: '#2E8B57',
+          showTrajectory: true,
           realMass: 5.972e24
         },
         {
@@ -302,6 +312,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 1.3,
           color: '#CD5C5C',
+          showTrajectory: true,
           realMass: 6.39e23
         },
         {
@@ -314,6 +325,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0.7,
           color: '#DEB887',
+          showTrajectory: true,
           realMass: 1.898e27
         },
         {
@@ -326,6 +338,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0.52,
           color: '#F4A460',
+          showTrajectory: true,
           realMass: 5.683e26
         },
         {
@@ -338,6 +351,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0.37,
           color: '#ADD8E6',
+          showTrajectory: true,
           realMass: 8.681e25
         },
         {
@@ -350,6 +364,7 @@ export default function NBodySimulator() {
           vx: 0,
           vy: 0.29,
           color: '#4169E1',
+          showTrajectory: true,
           realMass: 1.024e26
         }
       ]);
@@ -411,7 +426,7 @@ export default function NBodySimulator() {
     setTrajectories(prev => {
       const newTrajectories = { ...prev };
       bodies.forEach(body => {
-        if (!body.isFixed) {
+        if (!body.isFixed && body.showTrajectory !== false) {
           if (!newTrajectories[body.id]) {
             newTrajectories[body.id] = [];
           }
@@ -549,6 +564,9 @@ export default function NBodySimulator() {
         
         const body = bodies.find(b => b.id === bodyId);
         if (!body) return;
+        
+        // 检查该天体是否显示轨迹
+        if (body.showTrajectory === false) return;
 
         ctx.beginPath();
         // 使用轨迹颜色，如果没有设置则使用天体颜色
@@ -1202,6 +1220,18 @@ export default function NBodySimulator() {
                   {/* 编辑控件 */}
                   {body.id === editingBody && (
                     <div className="space-y-2 pl-2 border-l-2 border-white/10">
+                      {/* 天体名称 */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">名称:</label>
+                        <input
+                          type="text"
+                          value={body.name}
+                          onChange={(e) => updateBodyProperty(body.id, 'name', e.target.value)}
+                          className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          maxLength={10}
+                        />
+                      </div>
+
                       {/* 天体大小 */}
                       <div className="flex items-center gap-2">
                         <label className="text-xs text-blue-300/80 w-16">大小:</label>
@@ -1246,6 +1276,21 @@ export default function NBodySimulator() {
                           className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-all"
                         >
                           重置
+                        </button>
+                      </div>
+
+                      {/* 显示轨迹开关 */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">显示:</label>
+                        <button
+                          onClick={() => updateBodyProperty(body.id, 'showTrajectory', body.showTrajectory !== false)}
+                          className={`flex-1 px-2 py-1 rounded text-xs transition-all ${
+                            body.showTrajectory !== false
+                              ? 'bg-green-600/80 text-white'
+                              : 'bg-white/10 hover:bg-white/20'
+                          }`}
+                        >
+                          {body.showTrajectory !== false ? '✓ 轨迹' : '✗ 轨迹'}
                         </button>
                       </div>
                     </div>
