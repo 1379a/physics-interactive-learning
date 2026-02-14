@@ -59,6 +59,7 @@ export default function NBodySimulator() {
   const [viewScale, setViewScale] = useState(1);
   const [viewOffsetX, setViewOffsetX] = useState(0);
   const [viewOffsetY, setViewOffsetY] = useState(0);
+  const [canvasDragMode, setCanvasDragMode] = useState(false); // 画布拖动模式
   const [draggingView, setDraggingView] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragStartY, setDragStartY] = useState(0);
@@ -620,13 +621,92 @@ export default function NBodySimulator() {
     setViewScale(newScale);
   };
 
-  // 处理鼠标按下（用于拖动视图）
+  // 处理双击切换画布拖动模式
+  const handleCanvasDoubleClick = () => {
+    setCanvasDragMode(prev => !prev);
+  };
+
+  // 处理鼠标按下（用于拖动视图或天体）
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (e.shiftKey) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // 转换到世界坐标
+    const worldX = (x - viewOffsetX) / viewScale;
+    const worldY = (y - viewOffsetY) / viewScale;
+
+    // 检查是否点击了天体
+    let clickedOnBody = false;
+    for (const body of bodies) {
+      const dx = worldX - body.x;
+      const dy = worldY - body.y;
+      if (Math.sqrt(dx * dx + dy * dy) < body.radius) {
+        clickedOnBody = true;
+        break;
+      }
+    }
+
+    // 如果在画布拖动模式（双击激活）或按住 Shift，并且没有点击天体，则拖动视图
+    if ((canvasDragMode || e.shiftKey) && !clickedOnBody) {
       setDraggingView(true);
       setDragStartX(e.clientX - viewOffsetX);
       setDragStartY(e.clientY - viewOffsetY);
     }
+  };
+
+  // 处理触摸开始（手机端拖动画布）
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const canvas = canvasRef.current;
+    if (!canvas || !touch) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    // 转换到世界坐标
+    const worldX = (x - viewOffsetX) / viewScale;
+    const worldY = (y - viewOffsetY) / viewScale;
+
+    // 检查是否触摸到了天体
+    let touchedBody = false;
+    for (const body of bodies) {
+      const dx = worldX - body.x;
+      const dy = worldY - body.y;
+      if (Math.sqrt(dx * dx + dy * dy) < body.radius) {
+        touchedBody = true;
+        break;
+      }
+    }
+
+    // 如果没有触摸到天体，则拖动视图
+    if (!touchedBody) {
+      setDraggingView(true);
+      setDragStartX(touch.clientX - viewOffsetX);
+      setDragStartY(touch.clientY - viewOffsetY);
+    }
+  };
+
+  // 处理触摸移动
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (!draggingView) return;
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    setViewOffsetX(touch.clientX - dragStartX);
+    setViewOffsetY(touch.clientY - dragStartY);
+  };
+
+  // 处理触摸结束
+  const handleTouchEnd = () => {
+    setDraggingView(false);
   };
 
   // 处理鼠标抬起
@@ -879,6 +959,30 @@ export default function NBodySimulator() {
             </div>
           </div>
 
+          {/* 画布拖动模式 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-blue-300">🖐️ 画布拖动</h3>
+              <button
+                onClick={() => setCanvasDragMode(!canvasDragMode)}
+                className={`w-12 h-6 rounded-full transition-all ${
+                  canvasDragMode ? 'bg-green-600' : 'bg-white/20'
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 bg-white rounded-full transition-all ${
+                    canvasDragMode ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+            </div>
+            <p className="text-xs text-blue-300/60 mt-2">
+              {canvasDragMode
+                ? '拖动模式已开启：拖动空白处移动视图'
+                : '拖动模式已关闭：双击画布或使用切换按钮开启'}
+            </p>
+          </div>
+
           {/* 操作说明 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">💡 操作说明</h3>
@@ -888,6 +992,9 @@ export default function NBodySimulator() {
               <li>• 悬停天体显示数据</li>
               <li>• 使用缩放滑块调整视图大小</li>
               <li>• 滚轮缩放视图（0.2x - 3x）</li>
+              <li>• 开启拖动模式：双击画布或切换按钮</li>
+              <li>• 拖动模式下：拖动空白处移动视图</li>
+              <li>• 手机端：直接触摸拖动画布</li>
               <li>• 按住 Shift + 拖动空白处移动视图</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
@@ -903,11 +1010,15 @@ export default function NBodySimulator() {
             <canvas
               ref={canvasRef}
               onClick={handleCanvasClick}
+              onDoubleClick={handleCanvasDoubleClick}
               onMouseMove={handleCanvasMouseMove}
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              className="w-full cursor-pointer"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className={`w-full ${canvasDragMode ? 'cursor-move' : 'cursor-pointer'}`}
               style={{ minHeight: '500px' }}
             />
           </div>
