@@ -360,13 +360,13 @@ export default function Home() {
                 }`}
                 style={
                   activeTab === tab.id
-                    ? { background: getThemeColor() }
-                    : {}
+                    ? { background: getThemeColor(), transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }
+                    : { transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }
                 }
               >
-                <span className="text-lg">{tab.icon}</span>
+                <span className={`text-lg animate-float ${activeTab === tab.id ? 'animate-pulse-glow' : ''}`}>{tab.icon}</span>
                 <span className="text-sm font-medium">{tab.label}</span>
-                
+
                 {/* 毛玻璃循环动画效果 */}
                 <div className={`absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse ${
                   activeTab === tab.id ? 'animate-pulse opacity-20' : ''
@@ -588,6 +588,32 @@ export default function Home() {
             opacity: 0.3;
             backdrop-filter: blur(4px);
           }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-3px);
+          }
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% {
+            filter: brightness(1) drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+          }
+          50% {
+            filter: brightness(1.3) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+          }
+        }
+
+        .animate-float {
+          animation: float 2s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
     </div>
