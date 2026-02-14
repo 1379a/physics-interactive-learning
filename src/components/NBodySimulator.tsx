@@ -663,6 +663,34 @@ export default function NBodySimulator() {
         const forceScale = 30 * viewScale; 
         const velocityScale = 40 * viewScale;
         const labelFontSize = Math.max(10, 12 / viewScale);
+        
+        // 计算天体在屏幕上的位置
+        const screenX = body.x * viewScale + viewOffsetX;
+        const screenY = body.y * viewScale + viewOffsetY;
+        
+        // 根据天体在屏幕上的位置决定UI布局
+        const isInLeft = screenX < canvas.width / 2;
+        const isInTop = screenY < canvas.height / 2;
+        
+        // 力的示意图和信息面板的偏移量（根据缩放调整）
+        const panelOffset = 150 / viewScale;
+        
+        // 决定力的示意图和信息面板的位置
+        let infoPanelX, infoPanelY, legendX, legendY;
+        
+        if (isInTop) {
+          // 天体在上半部分：信息面板在天体下方，力的示意图在更下方
+          infoPanelX = body.x - 120 / viewScale;
+          infoPanelY = body.y + body.radius + 20 / viewScale;
+          legendX = body.x - 80 / viewScale;
+          legendY = infoPanelY + 250 / viewScale;
+        } else {
+          // 天体在下半部分：信息面板在天体上方，力的示意图在更上方
+          infoPanelX = body.x - 120 / viewScale;
+          infoPanelY = body.y - body.radius - 260 / viewScale;
+          legendX = body.x - 80 / viewScale;
+          legendY = infoPanelY - 130 / viewScale;
+        }
 
         // 绘制箭头的辅助函数
         const drawArrow = (fromX: number, fromY: number, toX: number, toY: number, color: string, label: string, lineWidth: number = 2) => {
@@ -777,100 +805,91 @@ export default function NBodySimulator() {
           drawArrow(body.x, body.y, accelEndX, accelEndY, '#ef4444', `a: ${accelMag.toFixed(5)}`, 3);
         }
 
-        // 5. 绘制图例（相对于画布视图）
-        // 计算相对于画布视图的位置
-        const legendX = -viewOffsetX + 10;
-        const legendY = -viewOffsetY + canvas.height - 130;
-        const legendWidth = 160;
-        const legendHeight = 120;
+        // 5. 绘制图例（相对于天体位置）
+        const legendWidth = 160 / viewScale;
+        const legendHeight = 120 / viewScale;
 
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1 / viewScale;
         ctx.strokeRect(legendX, legendY, legendWidth, legendHeight);
 
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 12px Arial';
+        ctx.font = `bold ${12 / viewScale}px Arial`;
         ctx.textAlign = 'left';
-        ctx.fillText('力的示意图', legendX + 10, legendY + 20);
+        ctx.fillText('力的示意图', legendX + 10 / viewScale, legendY + 20 / viewScale);
 
-        ctx.font = '11px Arial';
-        let legendYPos = legendY + 40;
+        ctx.font = `${11 / viewScale}px Arial`;
+        let legendYPos = legendY + 40 / viewScale;
 
         // 速度图例
         ctx.fillStyle = '#4ade80';
-        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillRect(legendX + 10 / viewScale, legendYPos - 4 / viewScale, 20 / viewScale, 2 / viewScale);
         ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
-        ctx.fillText('速度 (v)', legendX + 35, legendYPos);
+        ctx.fillText('速度 (v)', legendX + 35 / viewScale, legendYPos);
 
         // 各个引力图例
-        legendYPos += 18;
+        legendYPos += 18 / viewScale;
         ctx.fillStyle = 'rgba(147, 197, 253, 0.6)';
-        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillRect(legendX + 10 / viewScale, legendYPos - 4 / viewScale, 20 / viewScale, 2 / viewScale);
         ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
-        ctx.fillText('各个引力 (F)', legendX + 35, legendYPos);
+        ctx.fillText('各个引力 (F)', legendX + 35 / viewScale, legendYPos);
 
         // 合力图例
-        legendYPos += 18;
+        legendYPos += 18 / viewScale;
         ctx.fillStyle = '#f97316';
-        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 4);
+        ctx.fillRect(legendX + 10 / viewScale, legendYPos - 4 / viewScale, 20 / viewScale, 4 / viewScale);
         ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
-        ctx.fillText('合力 (F合)', legendX + 35, legendYPos);
+        ctx.fillText('合力 (F合)', legendX + 35 / viewScale, legendYPos);
 
         // 加速度图例
-        legendYPos += 18;
+        legendYPos += 18 / viewScale;
         ctx.fillStyle = '#ef4444';
-        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillRect(legendX + 10 / viewScale, legendYPos - 4 / viewScale, 20 / viewScale, 2 / viewScale);
         ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
-        ctx.fillText('加速度 (a)', legendX + 35, legendYPos);
-      }
-    }
-
-    // 绘制信息面板（相对于画布视图）
-    if (selectedBody || hoveredBody) {
-      const bodyId = selectedBody || hoveredBody;
-      const body = bodies.find(b => b.id === bodyId);
-      if (body) {
+        ctx.fillText('加速度 (a)', legendX + 35 / viewScale, legendYPos);
+        
+        // 绘制信息面板（相对于天体位置）
         const info = calculateBodyInfo(body);
         setShowInfo(info);
 
-        // 计算相对于画布视图的位置
-        const infoX = -viewOffsetX + 10;
-        const infoY = -viewOffsetY + 10;
+        const infoWidth = 240 / viewScale;
+        const infoHeight = 240 / viewScale;
+        
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(infoX, infoY, 240, 240);
+        ctx.fillRect(infoPanelX, infoPanelY, infoWidth, infoHeight);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(infoX, infoY, 240, 240);
+        ctx.lineWidth = 1 / viewScale;
+        ctx.strokeRect(infoPanelX, infoPanelY, infoWidth, infoHeight);
 
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 14px Arial';
+        ctx.font = `bold ${14 / viewScale}px Arial`;
         ctx.textAlign = 'left';
-        ctx.fillText(body.name, infoX + 10, infoY + 25);
+        ctx.fillText(body.name, infoPanelX + 10 / viewScale, infoPanelY + 25 / viewScale);
 
-        ctx.font = '12px Arial';
+        ctx.font = `${12 / viewScale}px Arial`;
         ctx.fillStyle = 'rgba(200, 200, 255, 0.8)';
-        let yPos = infoY + 50;
+        let yPos = infoPanelY + 50 / viewScale;
         
         // 根据视图缩放调整显示精度
         const posPrecision = viewScale > 1 ? 2 : 1;
         const velPrecision = viewScale > 1 ? 4 : 3;
         
-        ctx.fillText(`位置: (${info.position?.x?.toFixed(posPrecision) || '0'}, ${info.position?.y?.toFixed(posPrecision) || '0'})`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`速度: ${(info.velocity || 0).toFixed(velPrecision)} 单位/帧`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`角速度: ${(info.angularVelocity || 0).toFixed(4)} rad/帧`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`周期: ${(info.period || 0).toFixed(1)} 帧`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoX + 10, yPos);
-        yPos += 20;
+        ctx.fillText(`位置: (${info.position?.x?.toFixed(posPrecision) || '0'}, ${info.position?.y?.toFixed(posPrecision) || '0'})`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.fillText(`速度: ${(info.velocity || 0).toFixed(velPrecision)} 单位/帧`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.fillText(`角速度: ${(info.angularVelocity || 0).toFixed(4)} rad/帧`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.fillText(`周期: ${(info.period || 0).toFixed(1)} 帧`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
         if (trajectories[body.id]) {
-          ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoX + 10, yPos);
+          ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoPanelX + 10 / viewScale, yPos);
         }
       }
     }
