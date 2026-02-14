@@ -840,11 +840,67 @@ export default function ProblemSolver() {
         </div>
       </div>
 
-      <div className="flex gap-2 mb-6 flex-wrap">
-        <button onClick={() => setActiveTab('steps')} className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'steps' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white/5 hover:bg-white/10 text-blue-300'}`}>📋 解题步骤</button>
-        <button onClick={() => setActiveTab('conversion')} className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'conversion' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white/5 hover:bg-white/10 text-blue-300'}`}>🔄 单位转换</button>
-        <button onClick={() => setActiveTab('constants')} className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'constants' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white/5 hover:bg-white/10 text-blue-300'}`}>📊 常数查询</button>
-        <button onClick={() => setActiveTab('materials')} className={`px-4 py-2 rounded-lg transition-all ${activeTab === 'materials' ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white/5 hover:bg-white/10 text-blue-300'}`}>🧪 常用物理量</button>
+      <div className="flex gap-2 gap-y-3 mb-6 flex-wrap">
+        <button
+          onClick={() => setActiveTab('steps')}
+          className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+            activeTab === 'steps'
+              ? 'text-white'
+              : 'bg-white/10 hover:bg-white/20 text-blue-300'
+          }`}
+          style={activeTab === 'steps' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+        >
+          <span className={`relative z-10 ${activeTab === 'steps' ? 'animate-pulse-glow' : ''}`}>📋 解题步骤</span>
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('conversion')}
+          className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+            activeTab === 'conversion'
+              ? 'text-white'
+              : 'bg-white/10 hover:bg-white/20 text-blue-300'
+          }`}
+          style={activeTab === 'conversion' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+        >
+          <span className={`relative z-10 ${activeTab === 'conversion' ? 'animate-pulse-glow' : ''}`}>🔄 单位转换</span>
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('constants')}
+          className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+            activeTab === 'constants'
+              ? 'text-white'
+              : 'bg-white/10 hover:bg-white/20 text-blue-300'
+          }`}
+          style={activeTab === 'constants' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+        >
+          <span className={`relative z-10 ${activeTab === 'constants' ? 'animate-pulse-glow' : ''}`}>📊 常数查询</span>
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('materials')}
+          className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+            activeTab === 'materials'
+              ? 'text-white'
+              : 'bg-white/10 hover:bg-white/20 text-blue-300'
+          }`}
+          style={activeTab === 'materials' ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+        >
+          <span className={`relative z-10 ${activeTab === 'materials' ? 'animate-pulse-glow' : ''}`}>🧪 常用物理量</span>
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-light-flow opacity-0 group-hover:opacity-100" />
+          </div>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
