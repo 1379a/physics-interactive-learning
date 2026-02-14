@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface Question {
   id: string;
@@ -15,8 +16,10 @@ interface Question {
   relatedConcepts: string[];
 }
 
+export type { Question };
+
 // 高考真题题库（2015-2024年）
-const quizQuestions: Question[] = [
+export const quizQuestions: Question[] = [
   // === 简单难度 (easy) - 基础概念与简单计算 ===
   {
     id: 'gaokao-2024-easy-1',
@@ -596,12 +599,20 @@ export default function QuizSection() {
   if (!quizStarted) {
     return (
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="text-4xl">📝</div>
-          <div>
-            <h2 className="text-2xl font-bold">自测与挑战区</h2>
-            <p className="text-sm text-blue-300/80">测试你的物理知识，巩固学习成果</p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="text-4xl">📝</div>
+            <div>
+              <h2 className="text-2xl font-bold">自测与挑战区</h2>
+              <p className="text-sm text-blue-300/80">测试你的物理知识，巩固学习成果</p>
+            </div>
           </div>
+          <Link 
+            href="/print"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium flex items-center gap-2 transition-colors"
+          >
+            🖨️ 打印题库
+          </Link>
         </div>
 
         <div className="max-w-2xl mx-auto">
@@ -683,12 +694,20 @@ export default function QuizSection() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl">📝</div>
-        <div>
-          <h2 className="text-2xl font-bold">自测与挑战区</h2>
-          <p className="text-sm text-blue-300/80">测试你的物理知识</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="text-4xl">📝</div>
+          <div>
+            <h2 className="text-2xl font-bold">自测与挑战区</h2>
+            <p className="text-sm text-blue-300/80">测试你的物理知识</p>
+          </div>
         </div>
+        <Link 
+          href="/print"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium flex items-center gap-2 transition-colors"
+        >
+          🖨️ 打印题库
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
