@@ -336,6 +336,24 @@ export default function NBodySimulator() {
   const calculateBodyInfo = (body: CelestialBody) => {
     const velocity = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
     
+    // 计算万有引力（所有其他天体对该天体的引力总和）
+    let totalGravitationalForce = 0;
+    const G = 0.5; // 引力常数（与模拟中使用的一致）
+    
+    for (const other of bodies) {
+      if (other.id === body.id) continue;
+      
+      const dx = other.x - body.x;
+      const dy = other.y - body.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance > 0) {
+        // 万有引力公式：F = G * m1 * m2 / r^2
+        const force = (G * body.mass * other.mass) / (distance * distance);
+        totalGravitationalForce += force;
+      }
+    }
+    
     // 计算角速度和周期（相对于固定天体）
     const fixedBody = bodies.find(b => b.isFixed);
     let angularVelocity = 0;
@@ -365,7 +383,8 @@ export default function NBodySimulator() {
       angularVelocity,
       period,
       mass: body.realMass || body.mass,
-      density
+      density,
+      gravitationalForce: totalGravitationalForce
     };
   };
 
@@ -516,10 +535,10 @@ export default function NBodySimulator() {
         const infoX = 10;
         const infoY = 10;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(infoX, infoY, 220, 240);
+        ctx.fillRect(infoX, infoY, 240, 260);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(infoX, infoY, 220, 240);
+        ctx.strokeRect(infoX, infoY, 240, 260);
 
         ctx.fillStyle = 'white';
         ctx.font = 'bold 14px Arial';
@@ -540,6 +559,8 @@ export default function NBodySimulator() {
         ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoX + 10, yPos);
         yPos += 20;
         ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoX + 10, yPos);
+        yPos += 20;
+        ctx.fillText(`万有引力: ${(info.gravitationalForce || 0).toFixed(3)} 单位`, infoX + 10, yPos);
         yPos += 20;
         if (trajectories[body.id]) {
           ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoX + 10, yPos);
