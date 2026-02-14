@@ -771,11 +771,10 @@ export default function Home() {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
-          /* 持续循环动画 */
-          animation: 
-            card-glow 4s ease-in-out infinite,
-            card-float 3s ease-in-out infinite;
+          background: rgba(var(--theme-rgb), 0.08);
           border: 1px solid rgba(var(--theme-rgb), 0.2);
+          box-shadow: 0 4px 12px rgba(var(--theme-rgb), 0.1),
+                      0 0 20px rgba(var(--theme-rgb), 0.05);
         }
 
         .card-tech:hover {
@@ -784,29 +783,15 @@ export default function Home() {
                       0 0 80px rgba(var(--theme-rgb), 0.25),
                       inset 0 0 40px rgba(var(--theme-rgb), 0.08);
           border-color: rgba(var(--theme-rgb), 0.6);
-          animation: 
-            card-glow 2s ease-in-out infinite,
-            card-float 1.5s ease-in-out infinite;
+          background: rgba(var(--theme-rgb), 0.12);
         }
 
         .card-tech::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
-          background-size: 200% 200%;
-          opacity: 0.6;
-          animation: card-gradient 6s ease infinite;
-          pointer-events: none;
-          z-index: 0;
+          display: none;
         }
 
         .card-tech:hover::before {
-          opacity: 0.9;
-          animation: card-gradient 3s ease infinite;
+          display: none;
         }
 
         .card-tech > * {
