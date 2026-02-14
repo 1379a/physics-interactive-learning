@@ -20,7 +20,10 @@ export default function WaveInterferenceSimulator() {
 
   useEffect(() => {
     setIsClient(true);
-    if (isRunning) {
+  }, []);
+
+  useEffect(() => {
+    if (isClient && isRunning) {
       animate();
     }
     return () => {
@@ -28,7 +31,7 @@ export default function WaveInterferenceSimulator() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isRunning, wavelength, sourceDistance, frequency, phaseDifference]);
+  }, [isClient, isRunning, wavelength, sourceDistance, frequency, phaseDifference]);
 
   const animate = () => {
     if (!canvasRef.current) return;

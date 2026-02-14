@@ -20,7 +20,10 @@ export default function WaveSimulator() {
 
   useEffect(() => {
     setIsClient(true);
-    if (isRunning) {
+  }, []);
+
+  useEffect(() => {
+    if (isClient && isRunning) {
       animate();
     }
     return () => {
@@ -28,7 +31,7 @@ export default function WaveSimulator() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isRunning, amplitude, wavelength, frequency, waveType]);
+  }, [isClient, isRunning, amplitude, wavelength, frequency, waveType]);
 
   const animate = () => {
     if (!canvasRef.current) return;

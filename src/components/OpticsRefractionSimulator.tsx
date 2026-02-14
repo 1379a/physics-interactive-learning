@@ -17,7 +17,6 @@ export default function OpticsRefractionSimulator() {
   const [n1, setN1] = useState(1.0); // 入射介质折射率
   const [n2, setN2] = useState(1.5); // 折射介质折射率
   const [incidentAngle, setIncidentAngle] = useState(30); // 入射角度
-  const [totalReflection, setTotalReflection] = useState(false);
 
   const canvasWidth = 600;
   const canvasHeight = 400;
@@ -26,8 +25,13 @@ export default function OpticsRefractionSimulator() {
 
   useEffect(() => {
     setIsClient(true);
-    draw();
-  }, [n1, n2, incidentAngle]);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      draw();
+    }
+  }, [n1, n2, incidentAngle, isClient]);
 
   const calculateRefraction = () => {
     const theta1 = (incidentAngle * Math.PI) / 180;
@@ -38,7 +42,6 @@ export default function OpticsRefractionSimulator() {
     
     // 检查是否发生全反射
     const isTotalReflection = Math.abs(sinTheta2) > 1;
-    setTotalReflection(isTotalReflection);
 
     let refractionAngle = 0;
     if (!isTotalReflection) {
@@ -219,7 +222,7 @@ export default function OpticsRefractionSimulator() {
     return <div className="p-8">加载中...</div>;
   }
 
-  const { theta2, criticalAngle } = calculateRefraction();
+  const { theta2, criticalAngle, isTotalReflection } = calculateRefraction();
 
   return (
     <div className="p-6">
@@ -249,7 +252,7 @@ export default function OpticsRefractionSimulator() {
             </div>
             <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-center">
               <div className="text-2xl font-bold text-green-400">
-                {totalReflection ? '-' : (theta2 * 180 / Math.PI).toFixed(1)}°
+                {isTotalReflection ? '-' : (theta2 * 180 / Math.PI).toFixed(1)}°
               </div>
               <div className="text-xs text-blue-300/80">折射角 θ₂</div>
             </div>
