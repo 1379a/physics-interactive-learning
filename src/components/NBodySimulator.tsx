@@ -599,9 +599,14 @@ export default function NBodySimulator() {
           // 绘制标签
           if (label) {
             ctx.fillStyle = color;
-            ctx.font = '11px Arial';
+            ctx.font = 'bold 12px Arial';
             ctx.textAlign = 'left';
-            ctx.fillText(label, toX + 5, toY - 5);
+            // 添加背景使文字更清晰
+            const metrics = ctx.measureText(label);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(toX + 3, toY - 16, metrics.width + 4, 18);
+            ctx.fillStyle = color;
+            ctx.fillText(label, toX + 5, toY - 2);
           }
         };
 
@@ -610,7 +615,7 @@ export default function NBodySimulator() {
         if (velocityMag > 0.01) {
           const velEndX = body.x + body.vx * velocityScale;
           const velEndY = body.y + body.vy * velocityScale;
-          drawArrow(body.x, body.y, velEndX, velEndY, '#4ade80', `v: ${velocityMag.toFixed(2)}`, 3);
+          drawArrow(body.x, body.y, velEndX, velEndY, '#4ade80', `v: ${velocityMag.toFixed(3)}`, 3);
         }
 
         // 2. 计算合力并绘制（橙色）
@@ -640,7 +645,7 @@ export default function NBodySimulator() {
             const forceEndY = body.y + fy * forceScale;
 
             ctx.setLineDash([3, 3]);
-            drawArrow(body.x, body.y, forceEndX, forceEndY, `rgba(147, 197, 253, 0.6)`, `F${other.id}: ${force.toFixed(2)}`, 1);
+            drawArrow(body.x, body.y, forceEndX, forceEndY, `rgba(147, 197, 253, 0.6)`, `F${other.name}: ${force.toFixed(3)}`, 1);
             ctx.setLineDash([]);
 
             // 绘制从其他天体到当前天体的连接线
@@ -660,7 +665,7 @@ export default function NBodySimulator() {
         if (totalForceMag > 0.01) {
           const totalForceEndX = body.x + totalFx * forceScale;
           const totalForceEndY = body.y + totalFy * forceScale;
-          drawArrow(body.x, body.y, totalForceEndX, totalForceEndY, '#f97316', `F合: ${totalForceMag.toFixed(2)}`, 4);
+          drawArrow(body.x, body.y, totalForceEndX, totalForceEndY, '#f97316', `F合: ${totalForceMag.toFixed(3)}`, 4);
         }
 
         // 4. 绘制加速度方向（红色，与合力方向相同）
@@ -673,7 +678,7 @@ export default function NBodySimulator() {
           
           const accelEndX = body.x + ax * accelScale;
           const accelEndY = body.y + ay * accelScale;
-          drawArrow(body.x, body.y, accelEndX, accelEndY, '#ef4444', `a: ${accelMag.toFixed(4)}`, 3);
+          drawArrow(body.x, body.y, accelEndX, accelEndY, '#ef4444', `a: ${accelMag.toFixed(5)}`, 3);
         }
 
         // 5. 绘制图例
@@ -736,10 +741,10 @@ export default function NBodySimulator() {
         const infoX = 10;
         const infoY = 10;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(infoX, infoY, 240, 260);
+        ctx.fillRect(infoX, infoY, 240, 240);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(infoX, infoY, 240, 260);
+        ctx.strokeRect(infoX, infoY, 240, 240);
 
         ctx.fillStyle = 'white';
         ctx.font = 'bold 14px Arial';
@@ -760,8 +765,6 @@ export default function NBodySimulator() {
         ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoX + 10, yPos);
         yPos += 20;
         ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoX + 10, yPos);
-        yPos += 20;
-        ctx.fillText(`万有引力: ${(info.gravitationalForce || 0).toFixed(3)} 单位`, infoX + 10, yPos);
         yPos += 20;
         if (trajectories[body.id]) {
           ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoX + 10, yPos);
