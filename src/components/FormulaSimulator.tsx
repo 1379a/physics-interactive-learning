@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 
 const BlockMath = dynamic(() => import('react-katex').then(mod => mod.BlockMath), {
@@ -206,11 +206,16 @@ const formulas: Formula[] = [
   }
 ];
 
+type ChartType = 'bar' | 'line' | 'scatter';
+
 export default function FormulaSimulator() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedFormula, setSelectedFormula] = useState<Formula>(formulas[0]);
   const [values, setValues] = useState<Record<string, number>>({});
   const [result, setResult] = useState<number>(0);
   const [history, setHistory] = useState<{ time: number; value: number }[]>([]);
+  const [chartType, setChartType] = useState<ChartType>('line');
+  const [showStats, setShowStats] = useState(true);
 
   useEffect(() => {
     const initialValues: Record<string, number> = {};
@@ -218,6 +223,7 @@ export default function FormulaSimulator() {
       initialValues[v.name] = v.default;
     });
     setValues(initialValues);
+    setHistory([]);
   }, [selectedFormula]);
 
   useEffect(() => {
@@ -227,12 +233,154 @@ export default function FormulaSimulator() {
     const now = Date.now();
     setHistory(prev => {
       const newHistory = [...prev, { time: now, value: newResult }];
-      if (newHistory.length > 50) {
-        return newHistory.slice(-50);
+      // 保留最近100个数据点
+      if (newHistory.length > 100) {
+        return newHistory.slice(-100);
       }
       return newHistory;
     });
   }, [values, selectedFormula]);
+
+  // 绘制Canvas图表
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || history.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const container = canvas.parentElement;
+    if (container) {
+      canvas.width = container.clientWidth;
+      canvas.height = 250;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 绘制背景
+    ctx.fillStyle = 'rgba(0, 0, 20, 0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 绘制网格
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+      const x = (i * canvas.width) / 10;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= 5; i++) {
+      const y = (i * canvas.height) / 5;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    // 计算数据范围
+    const values = history.map(h => h.value);
+    const maxVal = Math.max(...values, 0.001);
+    const minVal = Math.min(...values);
+    const range = maxVal - minVal || maxVal;
+
+    // 绘制图表
+    if (chartType === 'bar') {
+      const barWidth = canvas.width / history.length;
+      values.forEach((value, index) => {
+        const normalizedHeight = ((value - minVal) / range) * 0.8 + 0.1;
+        const height = normalizedHeight * canvas.height;
+        const x = index * barWidth;
+        const y = canvas.height - height;
+        const intensity = index / history.length;
+
+        // 创建渐变
+        const gradient = ctx.createLinearGradient(x, y, x, canvas.height);
+        gradient.addColorStop(0, `rgba(59, 130, 246, ${0.8 + intensity * 0.2})`);
+        gradient.addColorStop(1, `rgba(147, 51, 234, ${0.6 + intensity * 0.2})`);
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x + 1, y, barWidth - 2, height);
+      });
+    } else if (chartType === 'line') {
+      if (history.length < 2) return;
+
+      const padding = 20;
+      const graphWidth = canvas.width - 2 * padding;
+      const graphHeight = canvas.height - 2 * padding;
+
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.8)';
+      ctx.lineWidth = 2;
+
+      history.forEach((point, index) => {
+        const x = padding + (index / (history.length - 1)) * graphWidth;
+        const normalizedY = (point.value - minVal) / range;
+        const y = padding + (1 - normalizedY) * graphHeight;
+
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+
+      ctx.stroke();
+
+      // 填充渐变区域
+      ctx.lineTo(padding + graphWidth, padding + graphHeight);
+      ctx.lineTo(padding, padding + graphHeight);
+      ctx.closePath();
+
+      const gradient = ctx.createLinearGradient(0, padding, 0, padding + graphHeight);
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+      gradient.addColorStop(1, 'rgba(147, 51, 234, 0.1)');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // 绘制数据点
+      history.forEach((point, index) => {
+        const x = padding + (index / (history.length - 1)) * graphWidth;
+        const normalizedY = (point.value - minVal) / range;
+        const y = padding + (1 - normalizedY) * graphHeight;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fill();
+      });
+    } else if (chartType === 'scatter') {
+      const padding = 20;
+      const graphWidth = canvas.width - 2 * padding;
+      const graphHeight = canvas.height - 2 * padding;
+
+      values.forEach((value, index) => {
+        const x = padding + (index / values.length) * graphWidth;
+        const normalizedY = (value - minVal) / range;
+        const y = padding + (1 - normalizedY) * graphHeight;
+
+        const intensity = index / values.length;
+        const size = 4 + (value / maxVal) * 6;
+
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(59, 130, 246, ${0.5 + intensity * 0.5})`;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    }
+
+    // 绘制Y轴标签
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(maxVal.toExponential(2), canvas.width - 5, 15);
+    ctx.fillText(minVal.toExponential(2), canvas.width - 5, canvas.height - 5);
+
+  }, [history, chartType]);
 
   const handleValueChange = (variableName: string, newValue: number) => {
     setValues(prev => ({ ...prev, [variableName]: newValue }));
@@ -244,7 +392,17 @@ export default function FormulaSimulator() {
       initialValues[v.name] = v.default;
     });
     setValues(initialValues);
+    setHistory([]);
   };
+
+  // 计算统计信息
+  const stats = history.length > 0 ? {
+    current: history[history.length - 1].value,
+    max: Math.max(...history.map(h => h.value)),
+    min: Math.min(...history.map(h => h.value)),
+    avg: history.reduce((sum, h) => sum + h.value, 0) / history.length,
+    count: history.length
+  } : null;
 
   return (
     <div className="p-6">
@@ -252,7 +410,7 @@ export default function FormulaSimulator() {
         <div className="text-4xl">🧮</div>
         <div>
           <h2 className="text-2xl font-bold">动态公式演绎器</h2>
-          <p className="text-sm text-blue-300/80">调整变量参数，观察计算结果的变化</p>
+          <p className="text-sm text-blue-300/80">调整变量参数，观察计算结果的变化趋势</p>
         </div>
       </div>
 
@@ -321,7 +479,7 @@ export default function FormulaSimulator() {
               onClick={resetValues}
               className="w-full mt-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm"
             >
-              重置为默认值
+              🔄 重置为默认值
             </button>
           </div>
         </div>
@@ -338,30 +496,72 @@ export default function FormulaSimulator() {
             </div>
           </div>
 
-          <div className="bg-white/5 rounded-xl p-5 border border-white/10">
-            <div className="text-sm font-semibold mb-4 text-blue-300">结果变化趋势</div>
-            <div className="h-48 flex items-end gap-1 overflow-hidden">
-              {history.map((point, index) => {
-                const maxVal = Math.max(...history.map(h => h.value), 0.001);
-                const height = (point.value / maxVal) * 100;
-                const intensity = (index / history.length);
-                return (
-                  <div
-                    key={index}
-                    className="flex-1 rounded-t-sm transition-all"
-                    style={{
-                      height: `${height}%`,
-                      backgroundColor: `rgba(59, 130, 246, ${0.3 + intensity * 0.7})`
-                    }}
-                  />
-                );
-              })}
+          {/* 图表类型切换 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <div className="flex justify-between items-center mb-3">
+              <div className="text-sm font-semibold text-blue-300">结果变化趋势</div>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setChartType('bar')}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'bar' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  柱状
+                </button>
+                <button
+                  onClick={() => setChartType('line')}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'line' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  折线
+                </button>
+                <button
+                  onClick={() => setChartType('scatter')}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'scatter' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  散点
+                </button>
+              </div>
+            </div>
+            <div className="bg-black/20 rounded-lg overflow-hidden">
+              <canvas ref={canvasRef} className="w-full" />
             </div>
             <div className="flex justify-between text-xs text-blue-300/60 mt-2">
-              <span>历史</span>
-              <span>当前</span>
+              <span>历史记录</span>
+              <span>数据点: {history.length}</span>
             </div>
           </div>
+
+          {/* 统计信息 */}
+          {showStats && stats && (
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="flex justify-between items-center mb-3">
+                <div className="text-sm font-semibold text-blue-300">统计信息</div>
+                <button
+                  onClick={() => setShowStats(!showStats)}
+                  className="text-xs text-blue-300/60 hover:text-blue-300"
+                >
+                  {showStats ? '隐藏' : '显示'}
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-xs text-blue-300/60">当前值</div>
+                  <div className="font-mono text-blue-400">{stats.current.toExponential(3)}</div>
+                </div>
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-xs text-blue-300/60">最大值</div>
+                  <div className="font-mono text-green-400">{stats.max.toExponential(3)}</div>
+                </div>
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-xs text-blue-300/60">最小值</div>
+                  <div className="font-mono text-red-400">{stats.min.toExponential(3)}</div>
+                </div>
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-xs text-blue-300/60">平均值</div>
+                  <div className="font-mono text-purple-400">{stats.avg.toExponential(3)}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white/5 rounded-xl p-5 border border-white/10">
             <div className="text-sm font-semibold mb-3 text-blue-300">数值说明</div>
