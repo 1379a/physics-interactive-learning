@@ -415,7 +415,7 @@ export default function Home() {
             {activeTab === 'simulation' && (
               <div>
                 {/* 物理模拟子标签 */}
-                <div className="flex gap-2 mb-4 mt-6 flex-wrap">
+                <div className="flex gap-2 gap-y-3 mb-4 mt-6 flex-wrap">
                   <button
                     onClick={() => setSimulationSubTab('projectile')}
                     className={`card-tech sim-nav-card px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
