@@ -139,20 +139,25 @@ export default function NBodySimulator() {
   // 切换天体固定状态（中心天体）
   const toggleBodyFixed = (bodyId: string) => {
     setIsAnimating(false);
-    setBodies(prevBodies =>
-      prevBodies.map(body => {
-        if (body.id === bodyId) {
-          const newIsFixed = !body.isFixed;
-          // 如果原来是固定的（中心天体），现在变为自由运动，则改名
-          if (body.isFixed && !newIsFixed) {
-            return { ...body, isFixed: newIsFixed, name: '天体1234567' };
-          }
-          // 如果原来是自由的，现在变为固定的，保持名字不变
-          return { ...body, isFixed: newIsFixed };
-        }
-        return body;
-      })
-    );
+    setBodies(prevBodies => {
+      // 首先找出需要修改的天体
+      const targetBody = prevBodies.find(b => b.id === bodyId);
+      if (!targetBody) return prevBodies;
+
+      const newIsFixed = !targetBody.isFixed;
+      let newName = targetBody.name;
+
+      // 如果原来是固定的（中心天体），现在变为自由运动，则根据天体数量重新排序命名
+      if (targetBody.isFixed && !newIsFixed) {
+        // 计算该天体在数组中的索引位置
+        const index = prevBodies.findIndex(b => b.id === bodyId);
+        newName = `天体${index + 1}`;
+      }
+
+      return prevBodies.map(body =>
+        body.id === bodyId ? { ...body, isFixed: newIsFixed, name: newName } : body
+      );
+    });
     resetTrajectories();
   };
 
