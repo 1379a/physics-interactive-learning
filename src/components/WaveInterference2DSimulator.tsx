@@ -173,13 +173,14 @@ export default function WaveInterference2DSimulator() {
     setIntensityData(intensityArray);
 
     // 绘制二维干涉图样
-    draw(ctx, currentTime, k, omega, source1X, source1Y, source2X, source2Y);
+    draw(ctx, canvas, currentTime, k, omega, source1X, source1Y, source2X, source2Y);
 
     animationRef.current = requestAnimationFrame(animate);
   };
 
   const draw = (
     ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
     currentTime: number,
     k: number,
     omega: number,
