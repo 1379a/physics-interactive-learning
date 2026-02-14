@@ -679,6 +679,48 @@ export default function Home() {
           }
         }
 
+        @keyframes card-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), 
+                        0 0 40px rgba(59, 130, 246, 0.05),
+                        inset 0 0 20px rgba(59, 130, 246, 0.02);
+            border-color: rgba(59, 130, 246, 0.15);
+          }
+          33% {
+            box-shadow: 0 0 25px rgba(147, 51, 234, 0.15), 
+                        0 0 50px rgba(147, 51, 234, 0.08),
+                        inset 0 0 25px rgba(147, 51, 234, 0.03);
+            border-color: rgba(147, 51, 234, 0.2);
+          }
+          66% {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.15), 
+                        0 0 50px rgba(59, 130, 246, 0.08),
+                        inset 0 0 25px rgba(59, 130, 246, 0.03);
+            border-color: rgba(59, 130, 246, 0.25);
+          }
+        }
+
+        @keyframes card-gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        @keyframes card-float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-2px);
+          }
+        }
+
         .animate-float {
           animation: float 2s ease-in-out infinite;
         }
@@ -710,12 +752,22 @@ export default function Home() {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
+          /* 持续循环动画 */
+          animation: 
+            card-glow 4s ease-in-out infinite,
+            card-float 3s ease-in-out infinite;
+          border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         .card-tech:hover {
           transform: translateY(-4px);
-          box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
-          border-color: rgba(59, 130, 246, 0.4);
+          box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4), 
+                      0 0 60px rgba(59, 130, 246, 0.2),
+                      inset 0 0 30px rgba(59, 130, 246, 0.05);
+          border-color: rgba(59, 130, 246, 0.5);
+          animation: 
+            card-glow 2s ease-in-out infinite,
+            card-float 1.5s ease-in-out infinite;
         }
 
         .card-tech::before {
@@ -725,14 +777,17 @@ export default function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-          opacity: 0;
-          transition: opacity 0.3s ease-in-out;
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
+          background-size: 200% 200%;
+          opacity: 0.6;
+          animation: card-gradient 6s ease infinite;
           pointer-events: none;
+          z-index: 0;
         }
 
         .card-tech:hover::before {
-          opacity: 1;
+          opacity: 0.9;
+          animation: card-gradient 3s ease infinite;
         }
 
         .card-tech > * {
