@@ -65,6 +65,7 @@ export default function NBodySimulator() {
   const [dragStartY, setDragStartY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null); // 触摸起始位置，用于区分点击和拖动
   const [simulationSpeed, setSimulationSpeed] = useState(1);
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
@@ -844,7 +845,7 @@ export default function NBodySimulator() {
     }
   };
 
-  // 处理触摸开始（手机端拖动画布）
+  // 处理触摸开始（手机端拖动画布和点击天体）
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
@@ -854,6 +855,9 @@ export default function NBodySimulator() {
     const rect = canvas.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
+
+    // 记录触摸起始位置
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 
     // 转换到世界坐标
     const worldX = (x - viewOffsetX) / viewScale;
@@ -890,9 +894,53 @@ export default function NBodySimulator() {
     setViewOffsetY(touch.clientY - dragStartY);
   };
 
-  // 处理触摸结束
-  const handleTouchEnd = () => {
+  // 处理触摸结束（用于处理点击选择）
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
     setDraggingView(false);
+
+    // 检查是否是点击操作（移动距离很小）
+    if (!touchStartPos) return;
+
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const dx = touch.clientX - touchStartPos.x;
+    const dy = touch.clientY - touchStartPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // 如果移动距离小于 10 像素，认为是点击操作
+    if (distance < 10) {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      // 转换到世界坐标
+      const worldX = (x - viewOffsetX) / viewScale;
+      const worldY = (y - viewOffsetY) / viewScale;
+
+      // 检查是否点击了天体
+      let clickedBody = false;
+      for (const body of bodies) {
+        const bodyDx = worldX - body.x;
+        const bodyDy = worldY - body.y;
+        if (Math.sqrt(bodyDx * bodyDx + bodyDy * bodyDy) < body.radius) {
+          setSelectedBody(body.id);
+          clickedBody = true;
+          break;
+        }
+      }
+
+      // 如果点击空白处，取消选择
+      if (!clickedBody) {
+        setSelectedBody(null);
+      }
+    }
+
+    // 清除触摸起始位置
+    setTouchStartPos(null);
   };
 
   // 处理鼠标抬起
@@ -1177,6 +1225,7 @@ export default function NBodySimulator() {
               <li>• 拖动天体调整位置</li>
               <li>• 悬停天体显示数据和力的示意图</li>
               <li>• 力的示意图显示：速度、各引力、合力、加速度</li>
+              <li>• 手机端：点击天体也可查看力的示意图</li>
               <li>• 使用缩放滑块调整视图大小</li>
               <li>• 滚轮缩放视图（0.2x - 3x）</li>
               <li>• 开启拖动模式：双击画布或切换按钮</li>
