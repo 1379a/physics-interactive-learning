@@ -1025,22 +1025,16 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
             <button
               key={formula.id}
               onClick={() => setSelectedFormula(formula)}
-              className={`w-full p-4 rounded-xl text-left transition-all relative overflow-hidden ${
+              className={`card-tech formula-card w-full p-4 rounded-xl text-left transition-all relative overflow-hidden ${
                 selectedFormula.id === formula.id
-                  ? 'text-white shadow-lg'
-                  : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                  ? 'border-2 text-white'
+                  : 'border border-white/10'
               }`}
               style={selectedFormula.id === formula.id ? {
-                background: currentTheme.id === 'custom' 
-                  ? customColor 
-                  : `linear-gradient(to right, ${getThemeColor('primary')}, ${getThemeColor('secondary')})`,
-                boxShadow: currentTheme.id === 'custom' 
-                  ? `0 10px 15px -3px ${customColor}4D`
-                  : `0 10px 15px -3px ${getThemeColor('primary')}4D`
+                borderColor: currentTheme.id === 'custom' ? customColor : getThemeColor('primary'),
+                borderWidth: '2px'
               } : {}}
             >
-              {/* 毛玻璃动画效果 */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
               <div className="relative z-10">
                 <div className="font-semibold mb-1">{formula.name}</div>
                 <div className="text-xs opacity-80 line-clamp-1">{formula.description}</div>
@@ -1214,6 +1208,12 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .card-tech.formula-card {
+          background: transparent !important;
+        }
+      `}</style>
     </div>
   );
 }
