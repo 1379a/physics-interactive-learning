@@ -16,6 +16,9 @@ export default function IdealGasSimulator() {
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
 
+  // 使用 ref 存储分子位置，避免无限循环
+  const moleculesRef = useRef<Molecule[]>([]);
+
   // 历史记录（用于撤销/重做）
   const [history, setHistory] = useState<{ temperature: number; volume: number; moleculeCount: number }[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -34,7 +37,6 @@ export default function IdealGasSimulator() {
   const [pressure, setPressure] = useState(0); // 计算出的压力
   const [isRunning, setIsRunning] = useState(true);
 
-  const [molecules, setMolecules] = useState<Molecule[]>([]);
   const containerWidth = 600;
   const containerHeight = 400;
 
@@ -53,16 +55,16 @@ export default function IdealGasSimulator() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isRunning, molecules, volume, temperature]);
+  }, [isRunning, volume, temperature, moleculeCount]);
 
   const initMolecules = () => {
     const newMolecules: Molecule[] = [];
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-    
+
     for (let i = 0; i < moleculeCount; i++) {
       const speed = Math.sqrt(temperature / 300) * (2 + Math.random() * 2);
       const angle = Math.random() * Math.PI * 2;
-      
+
       newMolecules.push({
         x: 50 + Math.random() * (containerWidth - 100),
         y: 50 + Math.random() * (containerHeight - 100),
@@ -72,8 +74,8 @@ export default function IdealGasSimulator() {
         color: colors[Math.floor(Math.random() * colors.length)]
       });
     }
-    
-    setMolecules(newMolecules);
+
+    moleculesRef.current = newMolecules;
   };
 
   const animate = () => {
@@ -102,7 +104,7 @@ export default function IdealGasSimulator() {
     const currentVolume = (rightBoundary - 50) / (containerWidth - 100);
 
     // 更新分子位置
-    const updatedMolecules = molecules.map(mol => {
+    const updatedMolecules = moleculesRef.current.map(mol => {
       let newX = mol.x;
       let newY = mol.y;
       let newVx = mol.vx;
@@ -110,7 +112,7 @@ export default function IdealGasSimulator() {
 
       // 根据温度调整速度
       const speedFactor = Math.sqrt(temperature / 300);
-      
+
       // 更新位置
       newX += newVx * speedFactor;
       newY += newVy * speedFactor;
@@ -150,7 +152,8 @@ export default function IdealGasSimulator() {
     const calculatedPressure = (n * R * temperature) / (V * 10);
     setPressure(calculatedPressure);
 
-    setMolecules(updatedMolecules);
+    // 更新 ref 中的分子位置
+    moleculesRef.current = updatedMolecules;
 
     // 显示温度信息
     ctx.fillStyle = '#60A5FA';
