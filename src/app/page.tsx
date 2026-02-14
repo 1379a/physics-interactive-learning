@@ -399,7 +399,7 @@ export default function Home() {
                 <div className="flex gap-2 mb-4 flex-wrap">
                   <button
                     onClick={() => setSimulationSubTab('projectile')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'projectile'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -416,7 +416,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('nbody')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'nbody'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -433,7 +433,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('spring')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'spring'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -450,7 +450,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('gas')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'gas'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -467,7 +467,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('charged')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'charged'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -484,7 +484,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('optics')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'optics'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -501,7 +501,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('wave')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'wave'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -518,7 +518,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('interference')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'interference'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -535,7 +535,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('doppler')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'doppler'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -552,7 +552,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('soundwave')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'soundwave'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -569,7 +569,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('resonance')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'resonance'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
@@ -586,7 +586,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => setSimulationSubTab('interference2d')}
-                    className={`px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`card-tech px-4 py-2 rounded-xl transition-all relative overflow-hidden group ${
                       simulationSubTab === 'interference2d'
                         ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
