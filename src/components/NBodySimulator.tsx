@@ -225,8 +225,8 @@ export default function NBodySimulator() {
             // 每隔几个帧记录一次，避免轨迹过于密集
             newTrajectories[body.id].push({ x: body.x, y: body.y });
             // 限制轨迹长度
-            if (newTrajectories[body.id].length > 500) {
-              newTrajectories[body.id] = newTrajectories[body.id].slice(-500);
+            if (newTrajectories[body.id].length > 10000) {
+              newTrajectories[body.id] = newTrajectories[body.id].slice(-10000);
             }
           }
         });

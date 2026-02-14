@@ -8,6 +8,19 @@ const BlockMath = dynamic(() => import('react-katex').then(mod => mod.BlockMath)
   loading: () => <span className="text-blue-400">加载公式...</span>
 });
 
+interface Theme {
+  name: string;
+  id: string;
+  gradient: string;
+  accentColor: string;
+  textColor: string;
+}
+
+interface FormulaSimulatorProps {
+  currentTheme: Theme;
+  customColor: string;
+}
+
 interface Formula {
   id: string;
   name: string;
@@ -208,7 +221,21 @@ const formulas: Formula[] = [
 
 type ChartType = 'bar' | 'line' | 'scatter';
 
-export default function FormulaSimulator() {
+export default function FormulaSimulator({ currentTheme, customColor }: FormulaSimulatorProps) {
+  // 获取主题颜色
+  const getThemeColor = (variant: 'primary' | 'secondary' | 'text' | 'bg' = 'primary') => {
+    if (currentTheme.id === 'custom') {
+      return customColor;
+    }
+    const colorMap: Record<string, Record<string, string>> = {
+      'primary': { blue: '#3b82f6', purple: '#a855f7', green: '#22c55e', red: '#ef4444', zinc: '#71717a' },
+      'secondary': { blue: '#60a5fa', purple: '#c084fc', green: '#4ade80', red: '#f87171', zinc: '#a1a1aa' },
+      'text': { blue: '#93c5fd', purple: '#d8b4fe', green: '#86efac', red: '#fca5a5', zinc: '#d4d4d8' },
+      'bg': { blue: 'rgba(59, 130, 246, 0.3)', purple: 'rgba(168, 85, 247, 0.3)', green: 'rgba(34, 197, 94, 0.3)', red: 'rgba(239, 68, 68, 0.3)', zinc: 'rgba(113, 113, 122, 0.3)' }
+    };
+    return colorMap[variant][currentTheme.accentColor];
+  };
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedFormula, setSelectedFormula] = useState<Formula>(formulas[0]);
   const [values, setValues] = useState<Record<string, number>>({});
@@ -410,23 +437,31 @@ export default function FormulaSimulator() {
         <div className="text-4xl">🧮</div>
         <div>
           <h2 className="text-2xl font-bold">动态公式演绎器</h2>
-          <p className="text-sm text-blue-300/80">调整变量参数，观察计算结果的变化趋势</p>
+          <p className="text-sm" style={{ color: `${getThemeColor('text')}CC` }}>调整变量参数，观察计算结果的变化趋势</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 左侧：公式选择 */}
         <div className="lg:col-span-1 space-y-3">
-          <h3 className="text-lg font-semibold mb-4 text-blue-300">选择公式</h3>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: getThemeColor('text') }}>选择公式</h3>
           {formulas.map((formula) => (
             <button
               key={formula.id}
               onClick={() => setSelectedFormula(formula)}
               className={`w-full p-4 rounded-xl text-left transition-all relative overflow-hidden ${
                 selectedFormula.id === formula.id
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/30'
+                  ? 'text-white shadow-lg'
                   : 'bg-white/5 hover:bg-white/10 border border-white/10'
               }`}
+              style={selectedFormula.id === formula.id ? {
+                background: currentTheme.id === 'custom' 
+                  ? customColor 
+                  : `linear-gradient(to right, ${getThemeColor('primary')}, ${getThemeColor('secondary')})`,
+                boxShadow: currentTheme.id === 'custom' 
+                  ? `0 10px 15px -3px ${customColor}4D`
+                  : `0 10px 15px -3px ${getThemeColor('primary')}4D`
+              } : {}}
             >
               {/* 毛玻璃动画效果 */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -443,22 +478,22 @@ export default function FormulaSimulator() {
           <div className="bg-white/5 rounded-xl p-5 border border-white/10">
             <div className="text-center mb-4">
               <div className="text-lg mb-2">{selectedFormula.name}</div>
-              <div className="text-sm text-blue-300/80 mb-4">{selectedFormula.description}</div>
+              <div className="text-sm" style={{ color: `${getThemeColor('text')}CC`, marginBottom: '1rem' }}>{selectedFormula.description}</div>
               <div className="bg-black/30 rounded-lg p-4">
                 <BlockMath math={selectedFormula.latex} />
               </div>
             </div>
 
             <div className="space-y-4 mt-6">
-              <div className="text-sm font-semibold text-blue-300 mb-3">变量参数</div>
+              <div className="text-sm font-semibold mb-3" style={{ color: getThemeColor('text') }}>变量参数</div>
               {selectedFormula.variables.map((variable) => (
                 <div key={variable.name} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      <span className="text-blue-400 font-bold">{variable.symbol}</span>
-                      <span className="text-xs text-blue-300/70">{variable.description}</span>
+                      <span className="font-bold" style={{ color: getThemeColor('secondary') }}>{variable.symbol}</span>
+                      <span className="text-xs" style={{ color: `${getThemeColor('text')}B3` }}>{variable.description}</span>
                     </div>
-                    <span className="text-sm font-mono bg-blue-600/30 px-2 py-1 rounded">
+                    <span className="text-sm font-mono px-2 py-1 rounded" style={{ background: getThemeColor('bg') }}>
                       {values[variable.name]?.toFixed(2) || variable.default.toFixed(2)} {variable.unit}
                     </span>
                   </div>
@@ -469,9 +504,10 @@ export default function FormulaSimulator() {
                     step={(variable.max - variable.min) / 100}
                     value={values[variable.name] ?? variable.default}
                     onChange={(e) => handleValueChange(variable.name, parseFloat(e.target.value))}
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                    style={{ accentColor: getThemeColor('primary') }}
                   />
-                  <div className="flex justify-between text-xs text-blue-300/60">
+                  <div className="flex justify-between text-xs" style={{ color: `${getThemeColor('text')}99` }}>
                     <span>{variable.min}</span>
                     <span>{variable.max}</span>
                   </div>
@@ -491,12 +527,19 @@ export default function FormulaSimulator() {
 
         {/* 右侧：结果显示和图表 */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl p-5 border border-blue-500/30">
-            <div className="text-sm text-blue-300 mb-2">计算结果</div>
+          <div className="rounded-xl p-5 border" style={{
+            background: currentTheme.id === 'custom' 
+              ? `${customColor}33` 
+              : `linear-gradient(to bottom right, ${getThemeColor('bg')}, ${getThemeColor('bg')})`,
+            borderColor: currentTheme.id === 'custom'
+              ? `${customColor}4D`
+              : `${getThemeColor('primary')}4D`
+          }}>
+            <div className="text-sm mb-2" style={{ color: getThemeColor('text') }}>计算结果</div>
             <div className="text-4xl font-bold mb-2">
-              {result?.toFixed(4) || '0.0000'} <span className="text-lg text-blue-400">{selectedFormula.resultUnit}</span>
+              {result?.toFixed(4) || '0.0000'} <span className="text-lg" style={{ color: getThemeColor('secondary') }}>{selectedFormula.resultUnit}</span>
             </div>
-            <div className="text-xs text-blue-300/70">
+            <div className="text-xs" style={{ color: `${getThemeColor('text')}B3` }}>
               基于当前变量参数计算得出
             </div>
           </div>
@@ -504,23 +547,26 @@ export default function FormulaSimulator() {
           {/* 图表类型切换 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10">
             <div className="flex justify-between items-center mb-3">
-              <div className="text-sm font-semibold text-blue-300">结果变化趋势</div>
+              <div className="text-sm font-semibold" style={{ color: getThemeColor('text') }}>结果变化趋势</div>
               <div className="flex gap-1">
                 <button
                   onClick={() => setChartType('bar')}
-                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'bar' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'bar' ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                  style={chartType === 'bar' ? { background: getThemeColor('primary') } : {}}
                 >
                   柱状
                 </button>
                 <button
                   onClick={() => setChartType('line')}
-                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'line' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'line' ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                  style={chartType === 'line' ? { background: getThemeColor('primary') } : {}}
                 >
                   折线
                 </button>
                 <button
                   onClick={() => setChartType('scatter')}
-                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'scatter' ? 'bg-blue-600' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`px-2 py-1 rounded text-xs transition-all ${chartType === 'scatter' ? 'text-white' : 'bg-white/10 hover:bg-white/20'}`}
+                  style={chartType === 'scatter' ? { background: getThemeColor('primary') } : {}}
                 >
                   散点
                 </button>
@@ -529,7 +575,7 @@ export default function FormulaSimulator() {
             <div className="bg-black/20 rounded-lg overflow-hidden">
               <canvas ref={canvasRef} className="w-full" />
             </div>
-            <div className="flex justify-between text-xs text-blue-300/60 mt-2">
+            <div className="flex justify-between text-xs mt-2" style={{ color: `${getThemeColor('text')}99` }}>
               <span>历史记录</span>
               <span>数据点: {history.length}</span>
             </div>
@@ -539,29 +585,32 @@ export default function FormulaSimulator() {
           {showStats && stats && (
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="flex justify-between items-center mb-3">
-                <div className="text-sm font-semibold text-blue-300">统计信息</div>
+                <div className="text-sm font-semibold" style={{ color: getThemeColor('text') }}>统计信息</div>
                 <button
                   onClick={() => setShowStats(!showStats)}
-                  className="text-xs text-blue-300/60 hover:text-blue-300"
+                  className="text-xs transition-colors"
+                  style={{ color: `${getThemeColor('text')}99` }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = getThemeColor('text')}
+                  onMouseLeave={(e) => e.currentTarget.style.color = `${getThemeColor('text')}99`}
                 >
                   {showStats ? '隐藏' : '显示'}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="bg-black/30 rounded p-2">
-                  <div className="text-xs text-blue-300/60">当前值</div>
-                  <div className="font-mono text-blue-400">{stats.current.toExponential(3)}</div>
+                  <div className="text-xs" style={{ color: `${getThemeColor('text')}99` }}>当前值</div>
+                  <div className="font-mono" style={{ color: getThemeColor('secondary') }}>{stats.current.toExponential(3)}</div>
                 </div>
                 <div className="bg-black/30 rounded p-2">
-                  <div className="text-xs text-blue-300/60">最大值</div>
+                  <div className="text-xs" style={{ color: `${getThemeColor('text')}99` }}>最大值</div>
                   <div className="font-mono text-green-400">{stats.max.toExponential(3)}</div>
                 </div>
                 <div className="bg-black/30 rounded p-2">
-                  <div className="text-xs text-blue-300/60">最小值</div>
+                  <div className="text-xs" style={{ color: `${getThemeColor('text')}99` }}>最小值</div>
                   <div className="font-mono text-red-400">{stats.min.toExponential(3)}</div>
                 </div>
                 <div className="bg-black/30 rounded p-2">
-                  <div className="text-xs text-blue-300/60">平均值</div>
+                  <div className="text-xs" style={{ color: `${getThemeColor('text')}99` }}>平均值</div>
                   <div className="font-mono text-purple-400">{stats.avg.toExponential(3)}</div>
                 </div>
               </div>
@@ -569,19 +618,19 @@ export default function FormulaSimulator() {
           )}
 
           <div className="bg-white/5 rounded-xl p-5 border border-white/10">
-            <div className="text-sm font-semibold mb-3 text-blue-300">数值说明</div>
+            <div className="text-sm font-semibold mb-3" style={{ color: getThemeColor('text') }}>数值说明</div>
             <div className="space-y-2 text-sm">
               {selectedFormula.variables.map((variable) => (
                 <div key={variable.name} className="flex justify-between">
-                  <span className="text-blue-300/70">{variable.symbol} = </span>
+                  <span style={{ color: `${getThemeColor('text')}B3` }}>{variable.symbol} = </span>
                   <span className="font-mono">
                     {values[variable.name]?.toFixed(2) || variable.default.toFixed(2)} {variable.unit}
                   </span>
                 </div>
               ))}
               <div className="border-t border-white/10 pt-2 mt-2 flex justify-between">
-                <span className="text-blue-400">结果 = </span>
-                <span className="font-mono text-blue-400">
+                <span style={{ color: getThemeColor('secondary') }}>结果 = </span>
+                <span className="font-mono" style={{ color: getThemeColor('secondary') }}>
                   {result?.toFixed(4) || '0.0000'} {selectedFormula.resultUnit}
                 </span>
               </div>

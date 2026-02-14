@@ -290,7 +290,7 @@ export default function Home() {
           
           <div className="relative z-10">
             {activeTab === 'navigator' && <PhysicsConceptNavigator />}
-            {activeTab === 'formula' && <FormulaSimulator />}
+            {activeTab === 'formula' && <FormulaSimulator currentTheme={currentTheme} customColor={customColor} />}
             {activeTab === 'simulation' && (
               <div>
                 {/* 物理模拟子标签 */}
