@@ -137,8 +137,10 @@ export default function Home() {
     const gradientColors: Record<string, string> = {
       'blue': 'linear-gradient(to right, #3b82f6, #1d4ed8)',
       'green': 'linear-gradient(to right, #10b981, #059669)',
+      'emerald': 'linear-gradient(to right, #10b981, #059669)',
       'pink': 'linear-gradient(to right, #ec4899, #db2777)',
       'monochrome': 'linear-gradient(to right, #a1a1aa, #71717a)',
+      'zinc': 'linear-gradient(to right, #a1a1aa, #71717a)',
       'purple': 'linear-gradient(to right, #a855f7, #9333ea)',
       'orange': 'linear-gradient(to right, #f97316, #ea580c)'
     };
@@ -155,6 +157,7 @@ export default function Home() {
       'green': '#10b981',
       'pink': '#ec4899',
       'monochrome': '#a1a1aa',
+      'zinc': '#a1a1aa',
       'purple': '#a855f7',
       'orange': '#f97316',
       'emerald': '#10b981'
