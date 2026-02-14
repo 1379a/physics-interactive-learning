@@ -247,9 +247,9 @@ export default function NBodySimulator() {
           id: 'sun',
           name: '太阳',
           mass: 5000,
-          radius: 40,
+          radius: 35,
           x: 400,
-          y: 250,
+          y: 300,
           vx: 0,
           vy: 0,
           color: '#FFA500',
@@ -261,10 +261,10 @@ export default function NBodySimulator() {
           name: '水星',
           mass: 20,
           radius: 6,
-          x: 480,
-          y: 250,
+          x: 450,
+          y: 300,
           vx: 0,
-          vy: 3,
+          vy: 2.5,
           color: '#A9A9A9',
           realMass: 3.285e23
         },
@@ -272,11 +272,11 @@ export default function NBodySimulator() {
           id: 'venus',
           name: '金星',
           mass: 80,
-          radius: 10,
-          x: 550,
-          y: 250,
+          radius: 9,
+          x: 500,
+          y: 300,
           vx: 0,
-          vy: 2.3,
+          vy: 1.9,
           color: '#FFC0CB',
           realMass: 4.867e24
         },
@@ -284,18 +284,78 @@ export default function NBodySimulator() {
           id: 'earth',
           name: '地球',
           mass: 100,
-          radius: 11,
-          x: 650,
-          y: 250,
+          radius: 10,
+          x: 560,
+          y: 300,
           vx: 0,
-          vy: 1.9,
+          vy: 1.6,
           color: '#2E8B57',
           realMass: 5.972e24
+        },
+        {
+          id: 'mars',
+          name: '火星',
+          mass: 50,
+          radius: 8,
+          x: 620,
+          y: 300,
+          vx: 0,
+          vy: 1.3,
+          color: '#CD5C5C',
+          realMass: 6.39e23
+        },
+        {
+          id: 'jupiter',
+          name: '木星',
+          mass: 1200,
+          radius: 20,
+          x: 720,
+          y: 300,
+          vx: 0,
+          vy: 0.7,
+          color: '#DEB887',
+          realMass: 1.898e27
+        },
+        {
+          id: 'saturn',
+          name: '土星',
+          mass: 800,
+          radius: 17,
+          x: 820,
+          y: 300,
+          vx: 0,
+          vy: 0.52,
+          color: '#F4A460',
+          realMass: 5.683e26
+        },
+        {
+          id: 'uranus',
+          name: '天王星',
+          mass: 300,
+          radius: 14,
+          x: 920,
+          y: 300,
+          vx: 0,
+          vy: 0.37,
+          color: '#ADD8E6',
+          realMass: 8.681e25
+        },
+        {
+          id: 'neptune',
+          name: '海王星',
+          mass: 280,
+          radius: 14,
+          x: 1020,
+          y: 300,
+          vx: 0,
+          vy: 0.29,
+          color: '#4169E1',
+          realMass: 1.024e26
         }
       ]);
-      setBodyCount(4);
-      setViewScale(1);
-      setViewOffsetX(0);
+      setBodyCount(9);
+      setViewScale(0.6); // 缩小视图以容纳更多行星
+      setViewOffsetX(-150); // 向左偏移以显示更远的行星
       setViewOffsetY(0);
     }
   };
@@ -1072,7 +1132,7 @@ export default function NBodySimulator() {
                 onClick={() => loadPreset('solar')}
                 className={`w-full p-2 rounded-lg text-left transition-all ${preset === 'solar' ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10'}`}
               >
-                ☀️ 太阳系内行星
+                ☀️ 太阳系（八大行星）
               </button>
             </div>
           </div>

@@ -200,6 +200,51 @@ const celestialData = [
     velocityUnit: 'km/s',
     volume: '1.431×10²⁴',
     volumeUnit: 'm³'
+  },
+  {
+    name: '土星',
+    mass: '5.683×10²⁶',
+    massUnit: 'kg',
+    density: '0.687×10³',
+    densityUnit: 'kg/m³',
+    period: '29.46',
+    periodUnit: '年',
+    angularVelocity: '1.638×10⁻⁸',
+    angularVelocityUnit: 'rad/s',
+    velocity: '9.69',
+    velocityUnit: 'km/s',
+    volume: '8.27×10²³',
+    volumeUnit: 'm³'
+  },
+  {
+    name: '天王星',
+    mass: '8.681×10²⁵',
+    massUnit: 'kg',
+    density: '1.27×10³',
+    densityUnit: 'kg/m³',
+    period: '84.01',
+    periodUnit: '年',
+    angularVelocity: '2.37×10⁻⁹',
+    angularVelocityUnit: 'rad/s',
+    velocity: '6.81',
+    velocityUnit: 'km/s',
+    volume: '6.83×10²²',
+    volumeUnit: 'm³'
+  },
+  {
+    name: '海王星',
+    mass: '1.024×10²⁶',
+    massUnit: 'kg',
+    density: '1.638×10³',
+    densityUnit: 'kg/m³',
+    period: '164.8',
+    periodUnit: '年',
+    angularVelocity: '1.21×10⁻⁹',
+    angularVelocityUnit: 'rad/s',
+    velocity: '5.43',
+    velocityUnit: 'km/s',
+    volume: '6.25×10²²',
+    volumeUnit: 'm³'
   }
 ];
 
