@@ -62,6 +62,19 @@ const problemTypes: ProblemType[] = [
     ]
   },
   {
+    id: 'rods-constraint',
+    category: '力学',
+    title: '固定杆与活动杆',
+    description: '分析刚体平衡中不同约束条件下的受力',
+    steps: [
+      { step: 1, title: '识别约束类型', content: '判断支点是固定杆（固定支点）、活动杆（活动支点）还是活动铰链（活动支点）。固定杆约束全部运动，活动杆和活动铰链允许转动' },
+      { step: 2, title: '确定未知反力', content: '固定杆：反作用力方向和大小都未知（Fx, Fy, Mz）；活动杆：反作用力垂直于杆；活动铰链：反作用力方向和大小未知（Fx, Fy）', formula: '固定杆：\\sum F_x = 0, \\sum F_y = 0, \\sum M = 0' },
+      { step: 3, title: '建立平衡方程', content: '对刚体建立力平衡方程和力矩平衡方程。通常对未知力较多的点列力矩方程', formula: '\\sum F_x = 0, \\sum F_y = 0, \\sum M_O = 0' },
+      { step: 4, title: '计算约束反力', content: '根据平衡条件求解支点处的反作用力。对于活动杆，注意反力方向垂直于杆' },
+      { step: 5, title: '验证结果', content: '检查所有平衡条件是否满足，反力方向是否合理。若某支点为活动杆，则该支点处的反力应垂直于杆' }
+    ]
+  },
+  {
     id: 'capacitor',
     category: '电磁学',
     title: '电容充放电',
