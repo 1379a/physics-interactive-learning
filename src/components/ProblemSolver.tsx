@@ -36,6 +36,71 @@ const problemTypes: ProblemType[] = [
     ]
   },
   {
+    id: 'momentum-conservation',
+    category: '力学',
+    title: '动量守恒定律',
+    description: '分析碰撞或爆炸等过程中的动量守恒问题',
+    steps: [
+      { step: 1, title: '确定系统', content: '明确研究的系统，判断系统是否满足动量守恒条件（合外力为零或合外力冲量可忽略）' },
+      { step: 2, title: '判断守恒', content: '分析系统所受外力，若合外力为零或内力远大于外力，则动量守恒', formula: '\\Delta p = 0 \\Rightarrow p_{初} = p_{末}' },
+      { step: 3, title: '规定正方向', content: '选定正方向，通常以初速度方向为正方向' },
+      { step: 4, title: '列方程', content: '根据动量守恒定律列方程。注意动量是矢量', formula: 'm_1v_1 + m_2v_2 = m_1v_1\' + m_2v_2\'' },
+      { step: 5, title: '求解', content: '解方程求出未知量。若涉及碰撞，需判断碰撞类型（弹性/非弹性）' }
+    ]
+  },
+  {
+    id: 'collision',
+    category: '力学',
+    title: '碰撞问题',
+    description: '分析弹性碰撞、非弹性碰撞和完全非弹性碰撞',
+    steps: [
+      { step: 1, title: '判断碰撞类型', content: '判断是弹性碰撞、非弹性碰撞还是完全非弹性碰撞（共速）' },
+      { step: 2, title: '应用动量守恒', content: '所有碰撞过程动量都守恒（若合外力为零）', formula: 'm_1v_1 + m_2v_2 = m_1v_1\' + m_2v_2\'' },
+      { step: 3, title: '弹性碰撞补充能量守恒', content: '弹性碰撞需补充机械能守恒方程', formula: '\\frac{1}{2}m_1v_1^2 + \\frac{1}{2}m_2v_2^2 = \\frac{1}{2}m_1v_1\'^2 + \\frac{1}{2}m_2v_2\'^2' },
+      { step: 4, title: '非弹性碰撞能量损失', content: '非弹性碰撞有能量损失，计算损失的机械能', formula: '\\Delta E = E_{k初} - E_{k末}' },
+      { step: 5, title: '完全非弹性碰撞', content: '完全非弹性碰撞后两物体速度相同', formula: 'v\' = \\frac{m_1v_1 + m_2v_2}{m_1 + m_2}' }
+    ]
+  },
+  {
+    id: 'mechanical-energy',
+    category: '力学',
+    title: '机械能守恒定律',
+    description: '分析只有保守力做功的系统的机械能守恒问题',
+    steps: [
+      { step: 1, title: '确定研究对象', content: '明确研究的系统，通常是一个或多个物体与地球组成的系统' },
+      { step: 2, title: '分析受力做功', content: '分析系统所受各力的做功情况。若只有重力、弹簧弹力等保守力做功，则机械能守恒', formula: 'W_{非保力} = 0' },
+      { step: 3, title: '确定初末状态', content: '明确系统的初状态和末状态，确定各状态的动能和势能' },
+      { step: 4, title: '列守恒方程', content: '根据机械能守恒定律列方程', formula: 'E_{k1} + E_{p1} = E_{k2} + E_{p2}' },
+      { step: 5, title: '求解', content: '解方程求出未知物理量。注意参考面的选择影响势能值但不影响守恒关系' }
+    ]
+  },
+  {
+    id: 'circular-motion',
+    category: '力学',
+    title: '圆周运动',
+    description: '分析匀速圆周运动或竖直面圆周运动问题',
+    steps: [
+      { step: 1, title: '确定圆周运动类型', content: '判断是匀速圆周运动、水平面圆周运动还是竖直面圆周运动' },
+      { step: 2, title: '受力分析', content: '对物体进行受力分析，确定向心力来源（重力、支持力、绳拉力等）', formula: 'F_n = F_{向心}' },
+      { step: 3, title: '应用向心力公式', content: '根据向心力公式列方程', formula: 'F_n = m\\frac{v^2}{r} = m\\omega^2 r' },
+      { step: 4, title: '竖直面圆周运动', content: '竖直面圆周运动需分析最高点和最低点。最高点最小速度：v ≥ √(gr)', formula: 'mg + N = m\\frac{v^2}{r}' },
+      { step: 5, title: '求解', content: '解方程求出速度、角速度、周期、向心力等物理量' }
+    ]
+  },
+  {
+    id: 'gravitation',
+    category: '力学',
+    title: '万有引力定律应用',
+    description: '分析天体运动、卫星轨道等问题',
+    steps: [
+      { step: 1, title: '确定研究对象', content: '明确研究的中心天体和环绕天体' },
+      { step: 2, title: '应用万有引力公式', content: '计算天体间的万有引力', formula: 'F = G\\frac{Mm}{r^2}' },
+      { step: 3, title: '圆周运动分析', content: '卫星做圆周运动时，万有引力提供向心力', formula: 'G\\frac{Mm}{r^2} = m\\frac{v^2}{r} = m\\omega^2 r' },
+      { step: 4, title: '计算轨道参数', content: '计算卫星的线速度、角速度、周期', formula: 'v = \\sqrt{\\frac{GM}{r}}, \\omega = \\sqrt{\\frac{GM}{r^3}}, T = 2\\pi\\sqrt{\\frac{r^3}{GM}}' },
+      { step: 5, title: '黄金代换', content: '在天体表面：GM = gR²，可用于简化计算', formula: 'v_1 = \\sqrt{gR} ≈ 7.9 \\text{ km/s}' }
+    ]
+  },
+  {
     id: 'difference-method',
     category: '力学',
     title: '逐差法求加速度',
@@ -75,6 +140,71 @@ const problemTypes: ProblemType[] = [
     ]
   },
   {
+    id: 'simple-pendulum',
+    category: '力学',
+    title: '单摆问题',
+    description: '分析单摆的周期、摆长和重力加速度的关系',
+    steps: [
+      { step: 1, title: '理解单摆模型', content: '单摆由不可伸长的轻绳和小球组成，在小角度摆动时做简谐运动' },
+      { step: 2, title: '应用周期公式', content: '单摆的周期与摆长的平方根成正比，与重力加速度的平方根成反比', formula: 'T = 2\\pi\\sqrt{\\frac{l}{g}}' },
+      { step: 3, title: '等效摆长', content: '对于复杂的单摆系统，需先确定等效摆长', formula: 'l_{等效} = \\frac{\\sum m_i l_i}{\\sum m_i}' },
+      { step: 4, title: '等效重力加速度', content: '在非竖直平面或加速系统中，需确定等效重力加速度', formula: 'g_{等效} = \\sqrt{g^2 + a^2}' },
+      { step: 5, title: '求解应用', content: '利用单摆测重力加速度：g = 4π²l/T²。需多次测量求平均值减小误差' }
+    ]
+  },
+  {
+    id: 'kinetic-energy-theorem',
+    category: '力学',
+    title: '动能定理',
+    description: '应用动能定理解决变力做功问题',
+    steps: [
+      { step: 1, title: '确定研究对象', content: '明确要研究的物体或系统' },
+      { step: 2, title: '分析受力做功', content: '分析物体受到的所有力，计算各力所做的功。注意正功和负功', formula: 'W = \\int F\\cdot dr' },
+      { step: 3, title: '确定初末速度', content: '明确物体的初速度和末速度' },
+      { step: 4, title: '列动能定理方程', content: '所有外力做功的代数和等于动能的变化量', formula: 'W_合 = \\Delta E_k = \\frac{1}{2}mv_2^2 - \\frac{1}{2}mv_1^2' },
+      { step: 5, title: '求解', content: '解方程求出未知量。动能定理适用于恒力做功，也适用于变力做功' }
+    ]
+  },
+  {
+    id: 'closed-circuit',
+    category: '电磁学',
+    title: '闭合电路欧姆定律',
+    description: '分析含电源电路的电流、电压和功率分配',
+    steps: [
+      { step: 1, title: '识别电路结构', content: '识别电源、电阻、开关等元件，明确电路连接方式（串联/并联）' },
+      { step: 2, title: '计算外电路总电阻', content: '根据串并联规律计算外电路的总电阻 R' },
+      { step: 3, title: '应用闭合电路欧姆定律', content: '根据闭合电路欧姆定律计算电路总电流', formula: 'I = \\frac{E}{R + r}' },
+      { step: 4, title: '计算路端电压', content: '计算电源的路端电压（外电路电压）', formula: 'U = E - Ir = IR' },
+      { step: 5, title: '功率分析', content: '计算电源输出功率、内电路消耗功率等。当 R = r 时输出功率最大', formula: 'P_{out} = UI, P_{max} = \\frac{E^2}{4r}' }
+    ]
+  },
+  {
+    id: 'electromagnetic-induction',
+    category: '电磁学',
+    title: '电磁感应问题',
+    description: '分析导体切割磁感线或磁通量变化产生的感应电动势和电流',
+    steps: [
+      { step: 1, title: '确定感应方式', content: '判断是导体切割磁感线还是磁通量变化产生感应电动势' },
+      { step: 2, title: '切割磁感线模型', content: '导体棒切割磁感线，计算感应电动势', formula: '\\mathcal{E} = BLv\\sin\\theta' },
+      { step: 3, title: '磁通量变化模型', content: '根据法拉第电磁感应定律计算感应电动势', formula: '\\mathcal{E} = n\\frac{\\Delta\\Phi}{\\Delta t}' },
+      { step: 4, title: '判断电流方向', content: '应用楞次定律或右手定则判断感应电流方向' },
+      { step: 5, title: '综合分析', content: '结合闭合电路欧姆定律求电流，结合能量守恒或动量定理分析运动' }
+    ]
+  },
+  {
+    id: 'charged-particle-magnetic',
+    category: '电磁学',
+    title: '带电粒子在磁场中的运动',
+    description: '分析带电粒子在匀强磁场中的圆周运动',
+    steps: [
+      { step: 1, title: '受力分析', content: '带电粒子在磁场中只受洛伦兹力（忽略重力时）' },
+      { step: 2, title: '洛伦兹力提供向心力', content: '洛伦兹力提供粒子做圆周运动的向心力', formula: 'qvB = m\\frac{v^2}{r}' },
+      { step: 3, title: '计算轨道半径', content: '计算粒子的轨道半径', formula: 'r = \\frac{mv}{qB}' },
+      { step: 4, title: '计算运动周期', content: '计算粒子的运动周期', formula: 'T = \\frac{2\\pi r}{v} = \\frac{2\\pi m}{qB}' },
+      { step: 5, title: '轨迹分析', content: '确定圆心位置、偏转角度、运动时间等。应用于回旋加速器、质谱仪等' }
+    ]
+  },
+  {
     id: 'capacitor',
     category: '电磁学',
     title: '电容充放电',
@@ -88,6 +218,58 @@ const problemTypes: ProblemType[] = [
     ]
   },
   {
+    id: 'ideal-gas',
+    category: '热学',
+    title: '理想气体状态方程',
+    description: '分析理想气体状态变化问题',
+    steps: [
+      { step: 1, title: '确定研究对象', content: '明确研究的气体，确定气体的质量（或物质的量）' },
+      { step: 2, title: '确定初末状态', content: '明确气体的初状态和末状态，记录各状态的压强、体积、温度', formula: 'p_1V_1 = nRT_1, p_2V_2 = nRT_2' },
+      { step: 3, title: '判断过程类型', content: '判断是等温、等压、等容还是一般状态变化过程' },
+      { step: 4, title: '应用状态方程', content: '根据理想气体状态方程列方程', formula: '\\frac{p_1V_1}{T_1} = \\frac{p_2V_2}{T_2}' },
+      { step: 5, title: '求解', content: '解方程求出未知量。注意温度要用热力学温度（K）' }
+    ]
+  },
+  {
+    id: 'thermodynamics',
+    category: '热学',
+    title: '热力学第一定律',
+    description: '分析内能变化与做功、热量的关系',
+    steps: [
+      { step: 1, title: '理解符号规则', content: '内能增加 ΔU > 0，吸热 Q > 0，系统对外做功 W > 0' },
+      { step: 2, title: '确定初末状态', content: '明确系统的初状态和末状态，确定内能变化' },
+      { step: 3, title: '分析做功', content: '分析系统是否对外做功或外界对系统做功', formula: 'W = \\int p dV' },
+      { step: 4, title: '分析吸放热', content: '确定系统是吸热还是放热' },
+      { step: 5, title: '列方程求解', content: '根据热力学第一定律列方程', formula: '\\Delta U = Q - W' }
+    ]
+  },
+  {
+    id: 'refraction',
+    category: '光学',
+    title: '光的折射',
+    description: '分析光从一种介质进入另一种介质时的偏折现象',
+    steps: [
+      { step: 1, title: '确定折射率', content: '明确两种介质的折射率 n₁ 和 n₂' },
+      { step: 2, title: '确定入射角', content: '确定入射角 θ₁（光线与法线的夹角）' },
+      { step: 3, title: '应用斯涅尔定律', content: '根据折射定律计算折射角', formula: 'n_1\\sin\\theta_1 = n_2\\sin\\theta_2' },
+      { step: 4, title: '判断偏折方向', content: '从光密进入光疏时远离法线，从光疏进入光密时靠近法线' },
+      { step: 5, title: '计算实例', content: '水射入空气时（n₁=1.33, n₂≈1），入射角30°时折射角约为41°' }
+    ]
+  },
+  {
+    id: 'total-reflection',
+    category: '光学',
+    title: '全反射现象',
+    description: '分析光从光密介质进入光疏介质时的全反射',
+    steps: [
+      { step: 1, title: '判断发生条件', content: '光从光密介质进入光疏介质，且入射角大于临界角' },
+      { step: 2, title: '计算临界角', content: '根据折射率计算全反射临界角', formula: '\\sin C = \\frac{n_2}{n_1} (n_1 > n_2)' },
+      { step: 3, title: '判断是否全反射', content: '比较入射角与临界角，若 θ > C 则发生全反射' },
+      { step: 4, title: '应用实例', content: '光纤通信、全反射棱镜等应用' },
+      { step: 5, title: '计算', content: '光从玻璃（n₁=1.5）射入空气（n₂≈1）时，临界角 C ≈ 41.8°' }
+    ]
+  },
+  {
     id: 'interference',
     category: '光学',
     title: '干涉计算',
@@ -98,6 +280,45 @@ const problemTypes: ProblemType[] = [
       { step: 3, title: '判断明暗条件', content: '根据光程差判断明暗条纹', formula: '\\delta = d\\sin\\theta' },
       { step: 4, title: '计算位置', content: '计算第k级明/暗条纹在屏上的位置', formula: 'x_k = \\frac{k\\lambda L}{d}' },
       { step: 5, title: '验证结果', content: '检查结果是否合理，如条纹是否对称分布' }
+    ]
+  },
+  {
+    id: 'photoelectric-effect',
+    category: '近代物理',
+    title: '光电效应',
+    description: '分析光电效应中光电子的发射',
+    steps: [
+      { step: 1, title: '理解爱因斯坦光电方程', content: '光子能量 = 逸出功 + 光电子最大初动能', formula: 'hf = W_0 + E_{k}' },
+      { step: 2, title: '计算截止频率', content: '计算发生光电效应的最小频率', formula: 'f_0 = \\frac{W_0}{h}' },
+      { step: 3, title: '计算遏止电压', content: '计算使光电流为零的反向电压', formula: 'eU_0 = E_{k} = hf - W_0' },
+      { step: 4, title: '分析影响因素', content: '光强影响光电流大小但不影响光电子最大初动能；频率影响光电子最大初动能' },
+      { step: 5, title: '计算实例', content: '用波长400nm光照射金属（逸出功2.0eV），计算光电子最大初动能和遏止电压' }
+    ]
+  },
+  {
+    id: 'energy-level',
+    category: '近代物理',
+    title: '能级跃迁',
+    description: '分析原子能级跃迁发射或吸收光子',
+    steps: [
+      { step: 1, title: '理解能级概念', content: '原子只能处于特定的能量状态（能级）' },
+      { step: 2, title: '能级跃迁', content: '原子从高能级跃迁到低能级发射光子，从低能级跃迁到高能级吸收光子', formula: '\\Delta E = E_{高} - E_{低} = hf = \\frac{hc}{\\lambda}' },
+      { step: 3, title: '计算光子能量', content: '计算跃迁过程中发射或吸收的光子能量' },
+      { step: 4, title: '计算波长/频率', content: '根据光子能量计算波长或频率' },
+      { step: 5, title: '氢原子能级', content: '氢原子能级公式：E_n = -13.6/n² eV' }
+    ]
+  },
+  {
+    id: 'nuclear-reaction',
+    category: '近代物理',
+    title: '核反应方程',
+    description: '分析核反应中的质量亏损和能量释放',
+    steps: [
+      { step: 1, title: '理解核反应类型', content: '包括α衰变、β衰变、核裂变、核聚变等' },
+      { step: 2, title: '配平核反应方程', content: '根据质量数守恒和电荷数守恒配平方程' },
+      { step: 3, title: '计算质量亏损', content: '计算反应前后质量差', formula: '\\Delta m = \\sum m_{前} - \\sum m_{后}' },
+      { step: 4, title: '计算释放能量', content: '根据质能方程计算释放的能量', formula: '\\Delta E = \\Delta m c^2' },
+      { step: 5, title: '应用实例', content: '235U + 1n → 141Ba + 92Kr + 3·1n + 能量' }
     ]
   }
 ];
