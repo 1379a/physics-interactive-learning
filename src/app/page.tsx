@@ -230,7 +230,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="text-3xl">⚛️</div>
+              <div className="text-3xl animate-float">⚛️</div>
               <div>
                 <h1
                   className="text-2xl font-bold"
