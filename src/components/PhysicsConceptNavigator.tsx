@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import dynamic from 'next/dynamic';
 
 const BlockMath = dynamic(() => import('react-katex').then(mod => mod.BlockMath), {
@@ -27,6 +27,72 @@ interface Branch {
   icon: string;
   concepts: Concept[];
 }
+
+// 使用memo缓存分支卡片组件
+const BranchCard = memo(function BranchCard({ 
+  branch, 
+  isSelected, 
+  onClick 
+}: { 
+  branch: Branch; 
+  isSelected: boolean; 
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`card-tech branch-card w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
+        isSelected
+          ? 'border-2 text-white'
+          : 'border border-white/10'
+      }`}
+      style={
+        isSelected
+          ? { borderColor: '#3b82f6', borderWidth: '2px' }
+          : {}
+      }
+    >
+      <div className="relative z-10">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{branch.icon}</span>
+          <div>
+            <div className="font-semibold">{branch.name}</div>
+            <div className="text-xs opacity-80">{branch.concepts.length} 个核心概念</div>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+});
+
+// 使用memo缓存概念卡片组件
+const ConceptCard = memo(function ConceptCard({
+  concept,
+  isSelected,
+  onClick
+}: {
+  concept: Concept;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${
+        isSelected
+          ? 'bg-blue-600/30 border border-blue-500/50'
+          : 'bg-white/5 hover:bg-white/10 border border-white/10'
+      }`}
+    >
+      <div className="relative z-10">
+        <div className="font-medium mb-1">{concept.name}</div>
+        <div className="text-xs text-blue-300/70 line-clamp-2">{concept.description}</div>
+      </div>
+      {/* 毛玻璃循环动画效果 */}
+      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
+    </button>
+  );
+});
 
 const physicsBranches: Branch[] = [
   {
@@ -732,9 +798,19 @@ const physicsBranches: Branch[] = [
 export default function PhysicsConceptNavigator() {
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
+  
+  // 使用useMemo缓存当前选中的分支数据
+  const currentBranch = useMemo(() => {
+    return physicsBranches.find(b => b.id === selectedBranch);
+  }, [selectedBranch]);
+  
+  // 使用useMemo缓存当前选中的概念数据
+  const currentConcept = useMemo(() => {
+    return selectedConcept;
+  }, [selectedConcept]);
 
   return (
-    <div className="p-6">
+    <div className="p-6" style={{ contain: 'layout style' }}>
       <div className="flex items-center gap-3 mb-6">
         <div className="text-4xl animate-float">📚</div>
         <div>
@@ -745,65 +821,35 @@ export default function PhysicsConceptNavigator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 左侧：分支列表 */}
-        <div className="lg:col-span-1 space-y-3">
+        <div className="lg:col-span-1 space-y-3" style={{ contain: 'layout style' }}>
           {physicsBranches.map((branch) => (
-            <button
+            <BranchCard
               key={branch.id}
+              branch={branch}
+              isSelected={selectedBranch === branch.id}
               onClick={() => {
                 setSelectedBranch(branch.id);
                 setSelectedConcept(null);
               }}
-              className={`card-tech branch-card w-full p-4 rounded-xl text-left transition-all relative overflow-hidden group ${
-                selectedBranch === branch.id
-                  ? 'border-2 text-white'
-                  : 'border border-white/10'
-              }`}
-              style={
-                selectedBranch === branch.id
-                  ? { borderColor: '#3b82f6', borderWidth: '2px' }
-                  : {}
-              }
-            >
-              <div className="relative z-10">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{branch.icon}</span>
-                  <div>
-                    <div className="font-semibold">{branch.name}</div>
-                    <div className="text-xs opacity-80">{branch.concepts.length} 个核心概念</div>
-                  </div>
-                </div>
-              </div>
-            </button>
+            />
           ))}
         </div>
 
         {/* 中间：概念列表 */}
-        <div className="lg:col-span-1 space-y-3">
-          {selectedBranch ? (
+        <div className="lg:col-span-1 space-y-3" style={{ contain: 'layout style' }}>
+          {currentBranch ? (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-300">
-                {physicsBranches.find(b => b.id === selectedBranch)?.name} 概念
+                {currentBranch.name} 概念
               </h3>
-              {physicsBranches
-                .find(b => b.id === selectedBranch)
-                ?.concepts.map((concept) => (
-                  <button
-                    key={concept.id}
-                    onClick={() => setSelectedConcept(concept)}
-                    className={`w-full p-3 rounded-lg text-left transition-all relative overflow-hidden group ${
-                      selectedConcept?.id === concept.id
-                        ? 'bg-blue-600/30 border border-blue-500/50'
-                        : 'bg-white/5 hover:bg-white/10 border border-white/10'
-                    }`}
-                  >
-                    <div className="relative z-10">
-                      <div className="font-medium mb-1">{concept.name}</div>
-                      <div className="text-xs text-blue-300/70 line-clamp-2">{concept.description}</div>
-                    </div>
-                    {/* 毛玻璃循环动画效果 */}
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:animate-pulse group-hover:opacity-30 pointer-events-none" />
-                  </button>
-                ))}
+              {currentBranch.concepts.map((concept) => (
+                <ConceptCard
+                  key={concept.id}
+                  concept={concept}
+                  isSelected={currentConcept?.id === concept.id}
+                  onClick={() => setSelectedConcept(concept)}
+                />
+              ))}
             </>
           ) : (
             <div className="text-center text-blue-300/60 py-8">
@@ -817,25 +863,25 @@ export default function PhysicsConceptNavigator() {
         </div>
 
         {/* 右侧：概念详情 */}
-        <div className="lg:col-span-1">
-          {selectedConcept ? (
+        <div className="lg:col-span-1" style={{ contain: 'layout style' }}>
+          {currentConcept ? (
             <div className="bg-white/5 rounded-xl p-5 border border-white/10 space-y-4">
               <div>
-                <h3 className="text-xl font-bold mb-2">{selectedConcept.name}</h3>
-                <p className="text-sm text-blue-300/80">{selectedConcept.description}</p>
+                <h3 className="text-xl font-bold mb-2">{currentConcept.name}</h3>
+                <p className="text-sm text-blue-300/80">{currentConcept.description}</p>
               </div>
 
               <div className="bg-black/30 rounded-lg p-4 overflow-x-auto">
                 <div className="text-xs text-blue-400 mb-2">核心公式</div>
                 <div className="text-center text-lg min-w-fit">
-                  <BlockMath math={selectedConcept.formula} />
+                  <BlockMath math={currentConcept.formula} />
                 </div>
               </div>
 
               <div>
                 <div className="text-sm font-semibold mb-2 text-blue-300">关键要点</div>
                 <ul className="space-y-2">
-                  {selectedConcept.keyPoints.map((point, index) => (
+                  {currentConcept.keyPoints.map((point, index) => (
                     <li key={index} className="text-sm flex items-start gap-2">
                       <span className="text-blue-400 mt-1">•</span>
                       <span className="text-blue-100/80">{point}</span>

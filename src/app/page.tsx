@@ -1,88 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
-// 动态导入组件以避免SSR问题
+// 优化的加载占位组件 - 减少重绘
+const LoadingPlaceholder = () => (
+  <div className="p-8 text-center" style={{ contain: 'layout style' }}>
+    <div className="inline-block animate-pulse">加载中...</div>
+  </div>
+);
+
+// 动态导入组件以避免SSR问题 - 使用优化的加载占位符
+// 概念导航器作为默认显示组件
 const PhysicsConceptNavigator = dynamic(() => import('@/components/PhysicsConceptNavigator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const FormulaSimulator = dynamic(() => import('@/components/FormulaSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const ProjectileSimulator = dynamic(() => import('@/components/ProjectileSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const NBodySimulator = dynamic(() => import('@/components/NBodySimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const SpringOscillator = dynamic(() => import('@/components/SpringOscillator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const ProblemSolver = dynamic(() => import('@/components/ProblemSolver'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const QuizSection = dynamic(() => import('@/components/QuizSection'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 // 新增物理模拟组件
 const IdealGasSimulator = dynamic(() => import('@/components/IdealGasSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const ChargedParticleSimulator = dynamic(() => import('@/components/ChargedParticleSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const OpticsRefractionSimulator = dynamic(() => import('@/components/OpticsRefractionSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const WaveSimulator = dynamic(() => import('@/components/WaveSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const WaveInterferenceSimulator = dynamic(() => import('@/components/WaveInterferenceSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const DopplerEffectSimulator = dynamic(() => import('@/components/DopplerEffectSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const SoundWaveSimulator = dynamic(() => import('@/components/SoundWaveSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const ResonanceSimulator = dynamic(() => import('@/components/ResonanceSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 const WaveInterference2DSimulator = dynamic(() => import('@/components/WaveInterference2DSimulator'), {
   ssr: false,
-  loading: () => <div className="p-8">加载中...</div>
+  loading: LoadingPlaceholder
 });
 
 interface Theme {
@@ -210,6 +218,32 @@ export default function Home() {
     }
     // 确保页面从顶部开始
     window.scrollTo(0, 0);
+    
+    // 空闲时预加载其他组件
+    const preloadComponents = () => {
+      // 使用 requestIdleCallback 在浏览器空闲时预加载
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => {
+          // 预加载公式演绎组件
+          import('@/components/FormulaSimulator');
+        }, { timeout: 2000 });
+        
+        (window as any).requestIdleCallback(() => {
+          // 预加载问题求解组件
+          import('@/components/ProblemSolver');
+        }, { timeout: 3000 });
+        
+        (window as any).requestIdleCallback(() => {
+          // 预加载抛体运动组件
+          import('@/components/ProjectileSimulator');
+        }, { timeout: 4000 });
+      }
+    };
+    
+    // 延迟执行预加载，避免阻塞首次渲染
+    const preloadTimer = setTimeout(preloadComponents, 1000);
+    
+    return () => clearTimeout(preloadTimer);
   }, []);
 
   if (!isClient) {

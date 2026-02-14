@@ -306,3 +306,188 @@ body {
               0 0 40px rgba(var(--theme-rgb), 0.1),
               inset 0 0 20px rgba(var(--theme-rgb), 0.03);
 }
+
+/* ============================================
+   性能优化 - GPU加速与渲染隔离
+   ============================================ */
+
+/* 全局GPU加速层 */
+html {
+  /* 禁用浏览器默认的触摸延迟 */
+  touch-action: manipulation;
+}
+
+body {
+  /* 启用GPU加速 */
+  transform: translateZ(0);
+  /* 优化文本渲染 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 减少布局抖动 */
+  text-rendering: optimizeSpeed;
+}
+
+/* 毛玻璃效果容器优化 - 减少重绘范围 */
+.backdrop-blur-md,
+.backdrop-blur-sm,
+[class*="backdrop-blur"] {
+  /* 隔离渲染层 */
+  isolation: isolate;
+  /* GPU加速 */
+  will-change: backdrop-filter;
+  /* 减少重绘范围 */
+  contain: layout style paint;
+}
+
+/* 动画元素GPU加速 */
+.animate-float,
+.animate-pulse-glow,
+.animate-light-flow,
+[class*="animate-"] {
+  /* 强制GPU层 */
+  will-change: transform, opacity;
+  /* GPU加速 */
+  transform: translateZ(0);
+}
+
+/* 卡片组件性能优化 */
+.card-tech {
+  /* GPU加速 */
+  will-change: transform, box-shadow, border-color, background;
+  /* 隔离渲染 */
+  contain: layout style;
+  /* 强制GPU层 */
+  transform: translateZ(0);
+  /* 减少重绘范围 */
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 悬停状态优化 - 预告浏览器即将变化 */
+.card-tech:hover {
+  will-change: transform, box-shadow, border-color, background;
+}
+
+/* 按钮优化 */
+button {
+  /* 减少点击延迟 */
+  touch-action: manipulation;
+  /* GPU加速 */
+  transform: translateZ(0);
+  /* 隔离渲染 */
+  contain: layout style;
+}
+
+/* 卡片容器优化 - 减少重绘传播 */
+.branch-card,
+.sim-nav-card {
+  /* 内容隔离 */
+  contain: layout style paint;
+  /* GPU层 */
+  transform: translateZ(0);
+}
+
+/* 主内容区域优化 */
+.main-content-card {
+  /* 隔离渲染 */
+  contain: layout style;
+  /* GPU加速 */
+  transform: translateZ(0);
+}
+
+/* 头部固定导航优化 */
+header {
+  /* 隔离固定元素 */
+  contain: layout style;
+  /* GPU加速 */
+  transform: translateZ(0);
+}
+
+/* 列表项渲染优化 */
+.space-y-3 > *,
+.space-y-2 > * {
+  /* 减少重绘传播 */
+  contain: layout style;
+}
+
+/* 网格布局优化 */
+.grid {
+  /* 减少布局计算 */
+  contain: layout;
+}
+
+/* 滚动容器优化 */
+[class*="overflow"] {
+  /* GPU加速滚动 */
+  -webkit-overflow-scrolling: touch;
+  /* 减少滚动时的重绘 */
+  contain: layout style;
+}
+
+/* 渐变背景优化 */
+[class*="bg-gradient"] {
+  /* 隔离渲染 */
+  contain: layout style;
+}
+
+/* KaTeX公式渲染优化 */
+.katex-display,
+.katex {
+  /* 隔离公式渲染 */
+  contain: layout style;
+  /* GPU加速 */
+  transform: translateZ(0);
+}
+
+/* 隐藏元素优化 - 减少不必要的渲染 */
+.hidden,
+[class*="lg:hidden"],
+[class*="md:hidden"],
+[class*="sm:hidden"] {
+  /* 完全跳过渲染 */
+  content-visibility: hidden;
+}
+
+/* 可见内容延迟渲染优化 */
+.container {
+  /* 隔离容器 */
+  contain: layout;
+}
+
+/* 动态导入组件占位优化 */
+[data-loading="true"],
+.loading {
+  /* 最小化渲染 */
+  contain: strict;
+}
+
+/* 触摸反馈优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 移动端禁用hover状态的重绘优化 */
+  .card-tech:hover {
+    /* 移动端hover效果使用transform而非box-shadow变化 */
+    will-change: transform;
+  }
+  
+  /* 移动端毛玻璃效果简化 */
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* 减少动画帧率以提升性能 */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-light-flow {
+    /* 使用GPU优化的动画 */
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* 关键渲染路径优化 */
+#__next,
+#root {
+  contain: layout;
+}
