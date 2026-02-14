@@ -77,38 +77,53 @@ export default function NBodySimulator() {
   // 调整天体数量
   const adjustBodyCount = (count: number) => {
     if (preset !== 'custom') return;
-    
-    const newBodies = [...bodies];
-    if (count > bodies.length) {
-      // 添加天体
-      for (let i = bodies.length; i < count; i++) {
-        const angle = (i * Math.PI * 2) / count;
-        const distance = 120 + i * 40;
-        newBodies.push({
-          id: String(i + 1),
-          name: `天体${i + 1}`,
-          mass: 50 + Math.random() * 100,
-          radius: 8 + Math.random() * 8,
-          x: 400 + Math.cos(angle) * distance,
-          y: 250 + Math.sin(angle) * distance,
-          vx: -Math.sin(angle) * 1.5,
-          vy: Math.cos(angle) * 1.5,
-          color: `hsl(${(i * 60) % 360}, 70%, 60%)`,
-          realMass: (50 + Math.random() * 100) * 1e22
-        });
+
+    try {
+      const newBodies = [...bodies];
+      if (count > bodies.length) {
+        // 添加天体
+        for (let i = bodies.length; i < count; i++) {
+          const angle = (i * Math.PI * 2) / count;
+          const distance = 120 + i * 40;
+          newBodies.push({
+            id: String(i + 1),
+            name: `天体${i + 1}`,
+            mass: 50 + Math.random() * 100,
+            radius: 8 + Math.random() * 8,
+            x: 400 + Math.cos(angle) * distance,
+            y: 250 + Math.sin(angle) * distance,
+            vx: -Math.sin(angle) * 1.5,
+            vy: Math.cos(angle) * 1.5,
+            color: `hsl(${(i * 60) % 360}, 70%, 60%)`,
+            isFixed: false,
+            realMass: (50 + Math.random() * 100) * 1e22
+          });
+        }
+      } else if (count < bodies.length) {
+        // 删除天体
+        newBodies.length = count;
       }
-    } else if (count < bodies.length) {
-      // 删除天体
-      newBodies.length = count;
+      setBodies(newBodies);
+      setBodyCount(count);
+      resetTrajectories();
+    } catch (error) {
+      console.error('调整天体数量时出错:', error);
     }
-    setBodies(newBodies);
-    setBodyCount(count);
-    resetTrajectories();
   };
 
   // 重置轨迹
   const resetTrajectories = () => {
     setTrajectories({});
+  };
+
+  // 切换天体固定状态（中心天体）
+  const toggleBodyFixed = (bodyId: string) => {
+    setBodies(prevBodies =>
+      prevBodies.map(body =>
+        body.id === bodyId ? { ...body, isFixed: !body.isFixed } : body
+      )
+    );
+    resetTrajectories();
   };
 
   // 预设场景
@@ -600,6 +615,42 @@ export default function NBodySimulator() {
             )}
           </div>
 
+          {/* 天体列表和中心天体设置 */}
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
+            <h3 className="text-lg font-semibold mb-3 text-blue-300">🌟 天体设置</h3>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {bodies.map((body) => (
+                <div
+                  key={body.id}
+                  className="flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: body.color }}
+                    />
+                    <span className="text-sm">{body.name}</span>
+                  </div>
+                  <button
+                    onClick={() => toggleBodyFixed(body.id)}
+                    className={`px-2 py-1 rounded text-xs transition-all ${
+                      body.isFixed
+                        ? 'bg-yellow-600/80 text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                  >
+                    {body.isFixed ? '🔒 固定' : '🚀 自由'}
+                  </button>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-blue-300/60 mt-2">
+              {bodies.some(b => b.isFixed)
+                ? '固定天体作为中心，其他天体围绕运动'
+                : '所有天体自由运动，相互吸引'}
+            </p>
+          </div>
+
           {/* 模拟控制 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">⚙️ 模拟控制</h3>
@@ -677,6 +728,8 @@ export default function NBodySimulator() {
               <li>• 悬停天体显示数据</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
+              <li>• 设置天体为"固定"作为中心</li>
+              <li>• 无固定天体时进行相对运动</li>
             </ul>
           </div>
         </div>
