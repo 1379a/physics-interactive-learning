@@ -1221,22 +1221,15 @@ export default function NBodySimulator() {
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">💡 操作说明</h3>
             <ul className="text-sm text-blue-100/80 space-y-1">
-              <li>• 点击天体查看详细信息</li>
+              <li>• 点击或悬停天体查看信息与力的示意图</li>
               <li>• 拖动天体调整位置</li>
-              <li>• 悬停天体显示数据和力的示意图</li>
-              <li>• 力的示意图显示：速度、各引力、合力、加速度</li>
-              <li>• 手机端：点击天体也可查看力的示意图</li>
-              <li>• 使用缩放滑块调整视图大小</li>
-              <li>• 滚轮缩放视图（0.2x - 3x）</li>
-              <li>• 开启拖动模式：双击画布或切换按钮</li>
-              <li>• 拖动模式下：拖动空白处移动视图</li>
-              <li>• 手机端：直接触摸拖动画布</li>
-              <li>• 点击右下角"视角重置"按钮恢复初始视角</li>
+              <li>• 滚轮或滑块缩放视图（0.2x - 3x）</li>
               <li>• 按住 Shift + 拖动空白处移动视图</li>
+              <li>• 双击画布开启拖动模式，手机端直接触摸拖动</li>
+              <li>• 点击"视角重置"按钮恢复初始视角</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
-              <li>• 设置天体为"固定"作为中心</li>
-              <li>• 无固定天体时进行相对运动</li>
+              <li>• 设置天体为"固定"作为中心，无固定天体时进行相对运动</li>
             </ul>
           </div>
         </div>
