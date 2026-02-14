@@ -71,6 +71,7 @@ export default function NBodySimulator() {
   const [simulationSpeed, setSimulationSpeed] = useState(1);
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
+  const [solarViewMode, setSolarViewMode] = useState<'horizontal' | 'radial'>('horizontal'); // 太阳系视图模式
 
   // 天体数据（使用更适合演示的参数）
   const [bodies, setBodies] = useState<CelestialBody[]>([
@@ -248,14 +249,67 @@ export default function NBodySimulator() {
       setViewOffsetX(0);
       setViewOffsetY(0);
     } else if (preset === 'solar') {
+      // 太阳系视图模式
+      const centerX = 400;
+      const centerY = 300;
+      const sunRadius = 35;
+      const sunMass = 5000;
+      
+      // 行星数据配置
+      const planetConfigs = [
+        { id: 'mercury', name: '水星', mass: 20, radius: 6, distance: 50, velocity: 2.5, color: '#A9A9A9', realMass: 3.285e23 },
+        { id: 'venus', name: '金星', mass: 80, radius: 9, distance: 100, velocity: 1.9, color: '#FFC0CB', realMass: 4.867e24 },
+        { id: 'earth', name: '地球', mass: 100, radius: 10, distance: 160, velocity: 1.6, color: '#2E8B57', realMass: 5.972e24 },
+        { id: 'mars', name: '火星', mass: 50, radius: 8, distance: 220, velocity: 1.3, color: '#CD5C5C', realMass: 6.39e23 },
+        { id: 'jupiter', name: '木星', mass: 1200, radius: 20, distance: 320, velocity: 0.7, color: '#DEB887', realMass: 1.898e27 },
+        { id: 'saturn', name: '土星', mass: 800, radius: 17, distance: 420, velocity: 0.52, color: '#F4A460', realMass: 5.683e26 },
+        { id: 'uranus', name: '天王星', mass: 300, radius: 14, distance: 520, velocity: 0.37, color: '#ADD8E6', realMass: 8.681e25 },
+        { id: 'neptune', name: '海王星', mass: 280, radius: 14, distance: 620, velocity: 0.29, color: '#4169E1', realMass: 1.024e26 }
+      ];
+
+      // 根据视图模式计算行星位置
+      const planetBodies = planetConfigs.map((config, index) => {
+        let x, y, vx, vy;
+        
+        if (solarViewMode === 'horizontal') {
+          // 水平视图模式：所有行星在水平线上
+          x = centerX + config.distance;
+          y = centerY;
+          vx = 0;
+          vy = config.velocity;
+        } else {
+          // 环形鸟瞰模式：行星围绕太阳均匀分布
+          const angle = (index * Math.PI * 2) / planetConfigs.length;
+          x = centerX + Math.cos(angle) * config.distance;
+          y = centerY + Math.sin(angle) * config.distance;
+          // 速度方向垂直于位置矢量，使行星做圆周运动
+          vx = -Math.sin(angle) * config.velocity;
+          vy = Math.cos(angle) * config.velocity;
+        }
+        
+        return {
+          id: config.id,
+          name: config.name,
+          mass: config.mass,
+          radius: config.radius,
+          x,
+          y,
+          vx,
+          vy,
+          color: config.color,
+          showTrajectory: true,
+          realMass: config.realMass
+        };
+      });
+
       setBodies([
         {
           id: 'sun',
           name: '太阳',
-          mass: 5000,
-          radius: 35,
-          x: 400,
-          y: 300,
+          mass: sunMass,
+          radius: sunRadius,
+          x: centerX,
+          y: centerY,
           vx: 0,
           vy: 0,
           color: '#FFA500',
@@ -263,115 +317,21 @@ export default function NBodySimulator() {
           isFixed: true,
           realMass: 1.989e30
         },
-        {
-          id: 'mercury',
-          name: '水星',
-          mass: 20,
-          radius: 6,
-          x: 450,
-          y: 300,
-          vx: 0,
-          vy: 2.5,
-          color: '#A9A9A9',
-          showTrajectory: true,
-          realMass: 3.285e23
-        },
-        {
-          id: 'venus',
-          name: '金星',
-          mass: 80,
-          radius: 9,
-          x: 500,
-          y: 300,
-          vx: 0,
-          vy: 1.9,
-          color: '#FFC0CB',
-          showTrajectory: true,
-          realMass: 4.867e24
-        },
-        {
-          id: 'earth',
-          name: '地球',
-          mass: 100,
-          radius: 10,
-          x: 560,
-          y: 300,
-          vx: 0,
-          vy: 1.6,
-          color: '#2E8B57',
-          showTrajectory: true,
-          realMass: 5.972e24
-        },
-        {
-          id: 'mars',
-          name: '火星',
-          mass: 50,
-          radius: 8,
-          x: 620,
-          y: 300,
-          vx: 0,
-          vy: 1.3,
-          color: '#CD5C5C',
-          showTrajectory: true,
-          realMass: 6.39e23
-        },
-        {
-          id: 'jupiter',
-          name: '木星',
-          mass: 1200,
-          radius: 20,
-          x: 720,
-          y: 300,
-          vx: 0,
-          vy: 0.7,
-          color: '#DEB887',
-          showTrajectory: true,
-          realMass: 1.898e27
-        },
-        {
-          id: 'saturn',
-          name: '土星',
-          mass: 800,
-          radius: 17,
-          x: 820,
-          y: 300,
-          vx: 0,
-          vy: 0.52,
-          color: '#F4A460',
-          showTrajectory: true,
-          realMass: 5.683e26
-        },
-        {
-          id: 'uranus',
-          name: '天王星',
-          mass: 300,
-          radius: 14,
-          x: 920,
-          y: 300,
-          vx: 0,
-          vy: 0.37,
-          color: '#ADD8E6',
-          showTrajectory: true,
-          realMass: 8.681e25
-        },
-        {
-          id: 'neptune',
-          name: '海王星',
-          mass: 280,
-          radius: 14,
-          x: 1020,
-          y: 300,
-          vx: 0,
-          vy: 0.29,
-          color: '#4169E1',
-          showTrajectory: true,
-          realMass: 1.024e26
-        }
+        ...planetBodies
       ]);
+      
       setBodyCount(9);
-      setViewScale(0.6); // 缩小视图以容纳更多行星
-      setViewOffsetX(-150); // 向左偏移以显示更远的行星
-      setViewOffsetY(0);
+      
+      if (solarViewMode === 'horizontal') {
+        setViewScale(0.6);
+        setViewOffsetX(-150);
+        setViewOffsetY(0);
+      } else {
+        // 环形模式需要更大的缩放和居中
+        setViewScale(0.5);
+        setViewOffsetX(0);
+        setViewOffsetY(0);
+      }
     }
   };
 
@@ -1153,6 +1113,43 @@ export default function NBodySimulator() {
                 ☀️ 太阳系（八大行星）
               </button>
             </div>
+            
+            {/* 太阳系视图模式切换 */}
+            {preset === 'solar' && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-blue-300">🔭 视图模式</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setSolarViewMode('horizontal');
+                        loadPreset('solar');
+                      }}
+                      className={`px-3 py-1 rounded text-xs transition-all ${
+                        solarViewMode === 'horizontal'
+                          ? 'bg-blue-600/80 text-white'
+                          : 'bg-white/10 hover:bg-white/20 text-blue-300'
+                      }`}
+                    >
+                      水平视图
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSolarViewMode('radial');
+                        loadPreset('solar');
+                      }}
+                      className={`px-3 py-1 rounded text-xs transition-all ${
+                        solarViewMode === 'radial'
+                          ? 'bg-purple-600/80 text-white'
+                          : 'bg-white/10 hover:bg-white/20 text-blue-300'
+                      }`}
+                    >
+                      平面鸟瞰
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 天体数量控制 */}
