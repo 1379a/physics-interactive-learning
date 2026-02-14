@@ -96,6 +96,39 @@ export default function Home() {
   const [showThemePanel, setShowThemePanel] = useState(false);
   const [customColor, setCustomColor] = useState('#3B82F6');
 
+  // 获取主题渐变色
+  const getThemeGradient = () => {
+    if (currentTheme.id === 'custom') {
+      return `linear-gradient(to right, ${customColor}, ${customColor}CC)`;
+    }
+    const gradientColors: Record<string, string> = {
+      'blue': 'linear-gradient(to right, #3b82f6, #1d4ed8)',
+      'green': 'linear-gradient(to right, #10b981, #059669)',
+      'pink': 'linear-gradient(to right, #ec4899, #db2777)',
+      'monochrome': 'linear-gradient(to right, #a1a1aa, #71717a)',
+      'purple': 'linear-gradient(to right, #a855f7, #9333ea)',
+      'orange': 'linear-gradient(to right, #f97316, #ea580c)'
+    };
+    return gradientColors[currentTheme.accentColor] || gradientColors['blue'];
+  };
+
+  // 获取主题主色调（用于按钮等）
+  const getThemeColor = () => {
+    if (currentTheme.id === 'custom') {
+      return customColor;
+    }
+    const colors: Record<string, string> = {
+      'blue': '#3b82f6',
+      'green': '#10b981',
+      'pink': '#ec4899',
+      'monochrome': '#a1a1aa',
+      'purple': '#a855f7',
+      'orange': '#f97316',
+      'emerald': '#10b981'
+    };
+    return colors[currentTheme.accentColor] || colors['blue'];
+  };
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -144,9 +177,9 @@ export default function Home() {
               <div className="text-3xl">⚛️</div>
               <div>
                 <h1 
-                  className="text-xl font-bold bg-clip-text text-transparent"
+                  className="text-2xl font-bold bg-clip-text text-transparent"
                   style={{
-                    background: `linear-gradient(to right, ${currentTheme.accentColor === 'custom' ? customColor : `var(--tw-gradient-from-${currentTheme.accentColor})`}, ${currentTheme.accentColor === 'custom' ? customColor : `var(--tw-gradient-to-${currentTheme.accentColor})`})`
+                    background: getThemeGradient()
                   }}
                 >
                   物理学交互式学习平台
@@ -200,9 +233,10 @@ export default function Home() {
                         onClick={() => setCurrentTheme(theme)}
                         className={`px-3 py-2 rounded-lg text-sm transition-all ${
                           currentTheme.id === theme.id
-                            ? 'bg-blue-600 text-white'
+                            ? 'text-white'
                             : 'bg-white/10 hover:bg-white/20 text-white/80'
                         }`}
+                        style={currentTheme.id === theme.id ? { background: getThemeColor() } : {}}
                       >
                         {theme.name}
                       </button>
@@ -216,8 +250,9 @@ export default function Home() {
                   <button
                     onClick={() => setUseGradient(!useGradient)}
                     className={`w-12 h-6 rounded-full transition-all ${
-                      useGradient ? 'bg-blue-600' : 'bg-white/20'
+                      useGradient ? 'text-white' : 'bg-white/20'
                     }`}
+                    style={useGradient ? { background: getThemeColor() } : {}}
                   >
                     <div
                       className={`w-5 h-5 bg-white rounded-full transition-all ${
@@ -256,14 +291,12 @@ export default function Home() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`group flex items-center gap-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap relative overflow-hidden ${
                   activeTab === tab.id
-                    ? currentTheme.id === 'custom' 
-                      ? 'text-white shadow-lg'
-                      : `bg-${currentTheme.accentColor}-600 text-white shadow-lg`
+                    ? 'text-white shadow-lg'
                     : 'text-white/70 hover:bg-white/5 hover:text-white'
                 }`}
                 style={
-                  activeTab === tab.id && currentTheme.id === 'custom'
-                    ? { background: customColor }
+                  activeTab === tab.id
+                    ? { background: getThemeColor() }
                     : {}
                 }
               >
@@ -299,12 +332,10 @@ export default function Home() {
                     onClick={() => setSimulationSubTab('projectile')}
                     className={`px-4 py-2 rounded-lg transition-all ${
                       simulationSubTab === 'projectile'
-                        ? currentTheme.id === 'custom'
-                          ? 'text-white'
-                          : `bg-${currentTheme.accentColor}-600 text-white`
+                        ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
-                    style={simulationSubTab === 'projectile' && currentTheme.id === 'custom' ? { background: customColor } : {}}
+                    style={simulationSubTab === 'projectile' ? { background: getThemeColor() } : {}}
                   >
                     🎯 抛体运动
                   </button>
@@ -312,12 +343,10 @@ export default function Home() {
                     onClick={() => setSimulationSubTab('nbody')}
                     className={`px-4 py-2 rounded-lg transition-all ${
                       simulationSubTab === 'nbody'
-                        ? currentTheme.id === 'custom'
-                          ? 'text-white'
-                          : `bg-${currentTheme.accentColor}-600 text-white`
+                        ? 'text-white'
                         : 'bg-white/10 hover:bg-white/20'
                     }`}
-                    style={simulationSubTab === 'nbody' && currentTheme.id === 'custom' ? { background: customColor } : {}}
+                    style={simulationSubTab === 'nbody' ? { background: getThemeColor() } : {}}
                   >
                     🌌 多体运动
                   </button>
