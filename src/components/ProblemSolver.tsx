@@ -36,6 +36,32 @@ const problemTypes: ProblemType[] = [
     ]
   },
   {
+    id: 'difference-method',
+    category: '力学',
+    title: '逐差法求加速度',
+    description: '利用打点计时器数据，用逐差法计算物体的加速度',
+    steps: [
+      { step: 1, title: '理解逐差法原理', content: '逐差法用于处理等时间间隔的位移数据，可以有效减小偶然误差', formula: 'a = \\frac{\\Delta x}{T^2}' },
+      { step: 2, title: '整理数据', content: '将位移数据分成相等的两组，确保每组数据点数相同。例如：x₁, x₂, x₃ 和 x₄, x₅, x₆' },
+      { step: 3, title: '应用逐差公式', content: '计算两组对应项的位移差，然后求平均值', formula: 'a = \\frac{(x_4-x_1)+(x_5-x_2)+(x_6-x_3)}{3 \\times 3T^2} = \\frac{x_4+x_5+x_6-(x_1+x_2+x_3)}{9T^2}' },
+      { step: 4, title: '简化计算', content: '如果相邻计数点的时间间隔为 T，则加速度为', formula: 'a = \\frac{(s_m+s_{m-1}+...)-(s_n+s_{n-1}+...)}{mT^2}' },
+      { step: 5, title: '验证结果', content: '检查计算结果是否合理，加速度的方向是否与运动方向一致' }
+    ]
+  },
+  {
+    id: 'weight-change',
+    category: '力学',
+    title: '失重与超重',
+    description: '分析物体在加速运动中的视重变化',
+    steps: [
+      { step: 1, title: '认识视重与实重', content: '实重 G = mg 是物体受到的重力，视重是弹簧测力计或台秤的示数', formula: 'F_{视} = m(g ± a)' },
+      { step: 2, title: '判断运动状态', content: '分析物体的加速度方向和加速度大小' },
+      { step: 3, title: '应用牛顿定律', content: '根据牛顿第二定律计算视重', formula: 'N - mg = ma \\Rightarrow N = m(g + a)' },
+      { step: 4, title: '判断失重/超重', content: '若 a 方向向下（包括减速上升、加速下降），物体失重；若 a 方向向上，物体超重' },
+      { step: 5, title: '计算实例', content: '电梯加速上升时：视重 > 实重（超重）；电梯减速下降时：视重 < 实重（失重）' }
+    ]
+  },
+  {
     id: 'capacitor',
     category: '电磁学',
     title: '电容充放电',
@@ -72,6 +98,34 @@ const constants = [
   { name: '库仑常数', symbol: 'k', value: '8.988×10⁹', unit: 'N·m²/C²' },
   { name: '真空磁导率', symbol: 'μ₀', value: '4π×10⁻⁷', unit: 'H/m' },
   { name: '玻尔兹曼常数', symbol: 'k', value: '1.381×10⁻²³', unit: 'J/K' }
+];
+
+// 宇宙速度
+const cosmicVelocities = [
+  { 
+    name: '第一宇宙速度', 
+    symbol: 'v₁', 
+    value: '7.9', 
+    unit: 'km/s',
+    description: '环绕速度，卫星在地球表面附近绕地球做圆周运动的速度',
+    formula: 'v₁ = \\sqrt{\\frac{GM}{R}} ≈ 7.9 \\text{ km/s}'
+  },
+  { 
+    name: '第二宇宙速度', 
+    symbol: 'v₂', 
+    value: '11.2', 
+    unit: 'km/s',
+    description: '脱离速度，航天器脱离地球引力进入太阳系的最小速度',
+    formula: 'v₂ = \\sqrt{\\frac{2GM}{R}} ≈ 11.2 \\text{ km/s}'
+  },
+  { 
+    name: '第三宇宙速度', 
+    symbol: 'v₃', 
+    value: '16.7', 
+    unit: 'km/s',
+    description: '逃逸速度，航天器脱离太阳系引力进入星际空间的最小速度',
+    formula: 'v₃ = \\sqrt{(\\sqrt{2}-1)^2 v_1^2 + v_2^2} ≈ 16.7 \\text{ km/s}'
+  }
 ];
 
 // 常见液体密度
@@ -537,6 +591,28 @@ export default function ProblemSolver() {
                         </div>
                         <div className="text-sm text-blue-300/70 mt-1">{constant.value} {constant.unit}</div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                <h4 className="text-lg font-semibold mb-4 text-purple-300">🚀 宇宙速度</h4>
+                <div className="space-y-3">
+                  {cosmicVelocities.map((velocity, index) => (
+                    <div key={index} className="bg-black/30 rounded-lg p-4 hover:bg-black/40 transition-all">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-purple-400 font-bold">{velocity.symbol}</span>
+                        <span className="font-semibold">{velocity.name}</span>
+                        <span className="text-sm bg-purple-600/30 px-2 py-1 rounded">{velocity.value} {velocity.unit}</span>
+                      </div>
+                      <div className="text-sm text-blue-300/80 mb-2">{velocity.description}</div>
+                      {velocity.formula && (
+                        <div className="text-sm">
+                          <span className="text-blue-400/70">公式：</span>
+                          <BlockMath math={velocity.formula} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
