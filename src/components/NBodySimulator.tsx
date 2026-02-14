@@ -154,18 +154,35 @@ export default function NBodySimulator() {
       if (!targetBody) return prevBodies;
 
       const newIsFixed = !targetBody.isFixed;
-      let newName = targetBody.name;
 
-      // 如果原来是固定的（中心天体），现在变为自由运动，则根据天体数量重新排序命名
+      // 如果天体被设置为固定，重新命名所有固定的天体
+      if (!targetBody.isFixed && newIsFixed) {
+        const chineseNumbers = ['一', '二', '三', '四', '五', '六', '七', '八'];
+        let fixedIndex = 0;
+        
+        return prevBodies.map(body => {
+          if (body.id === bodyId) {
+            // 设置为固定，使用新的名称
+            return { ...body, isFixed: true, name: `中心天体${chineseNumbers[fixedIndex++]}` };
+          } else if (body.isFixed) {
+            // 其他固定的天体也重新命名
+            return { ...body, name: `中心天体${chineseNumbers[fixedIndex++]}` };
+          } else {
+            // 自由运动的天体，保持原名
+            return body;
+          }
+        });
+      }
+      
+      // 如果天体被取消固定，改回"天体N"
       if (targetBody.isFixed && !newIsFixed) {
-        // 计算该天体在数组中的索引位置
         const index = prevBodies.findIndex(b => b.id === bodyId);
-        newName = `天体${index + 1}`;
+        return prevBodies.map(body =>
+          body.id === bodyId ? { ...body, isFixed: false, name: `天体${index + 1}` } : body
+        );
       }
 
-      return prevBodies.map(body =>
-        body.id === bodyId ? { ...body, isFixed: newIsFixed, name: newName } : body
-      );
+      return prevBodies;
     });
     resetTrajectories();
   };
