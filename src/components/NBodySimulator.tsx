@@ -546,13 +546,29 @@ export default function NBodySimulator() {
       });
     }
 
-    // 绘制轨道线（仅显示选中天体相对于固定天体的理想轨道）
+    // 绘制轨道线
+    // 如果是太阳系平面鸟瞰模式，绘制同心圆轨道
+    if (preset === 'solar' && solarViewMode === 'radial') {
+      const fixedBody = bodies.find(b => b.isFixed);
+      if (fixedBody) {
+        const orbitDistances = [50, 100, 160, 220, 320, 420, 520, 620]; // 各行星轨道半径
+        ctx.strokeStyle = 'rgba(100, 200, 255, 0.15)';
+        ctx.lineWidth = 1;
+        orbitDistances.forEach(distance => {
+          ctx.beginPath();
+          ctx.arc(fixedBody.x, fixedBody.y, distance, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+      }
+    }
+    
+    // 绘制选中天体的理想轨道
     if (selectedBody) {
       const fixedBody = bodies.find(b => b.isFixed);
       const selectedBodyObj = bodies.find(b => b.id === selectedBody);
       if (fixedBody && selectedBodyObj && selectedBody !== fixedBody.id) {
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(100, 200, 255, 0.2)';
+        ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
         ctx.setLineDash([5, 5]);
         const distance = Math.sqrt(
           Math.pow(selectedBodyObj.x - fixedBody.x, 2) + 
