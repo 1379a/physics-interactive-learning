@@ -264,12 +264,26 @@ export default function NBodySimulator() {
         }
       ]);
       setBodyCount(2);
+      
+      // 动态计算视角偏移量
+      const canvas = canvasRef.current;
+      let canvasWidth = 800; // 默认宽度
+      let canvasHeight = 500;
+      if (canvas && canvas.parentElement) {
+        canvasWidth = canvas.parentElement.clientWidth;
+      }
+      
+      const customCenterX = 400;
+      const customCenterY = 250;
+      const offsetX = canvasWidth / 2 - customCenterX;
+      const offsetY = canvasHeight / 2 - customCenterY;
+      
       setViewScale(1);
-      setViewOffsetX(0);
-      setViewOffsetY(0);
+      setViewOffsetX(offsetX);
+      setViewOffsetY(offsetY);
       // 重置视图模式到默认
       setSolarViewMode('horizontal');
-      setInitialView({ scale: 1, offsetX: 0, offsetY: 0 });
+      setInitialView({ scale: 1, offsetX, offsetY });
     } else if (preset === 'earth-moon') {
       // 地月系 - 基于真实物理参数
       const centerX = 400;
@@ -323,10 +337,24 @@ export default function NBodySimulator() {
         }
       ]);
       setBodyCount(2);
+      
+      // 动态计算视角偏移量
+      const canvas = canvasRef.current;
+      let canvasWidth = 800; // 默认宽度
+      let canvasHeight = 500;
+      if (canvas && canvas.parentElement) {
+        canvasWidth = canvas.parentElement.clientWidth;
+      }
+      
+      const earthMoonCenterX = 400;
+      const earthMoonCenterY = 250;
+      const offsetX = canvasWidth / 2 - earthMoonCenterX;
+      const offsetY = canvasHeight / 2 - earthMoonCenterY;
+      
       setViewScale(1);
-      setViewOffsetX(0);
-      setViewOffsetY(0);
-      setInitialView({ scale: 1, offsetX: 0, offsetY: 0 });
+      setViewOffsetX(offsetX);
+      setViewOffsetY(offsetY);
+      setInitialView({ scale: 1, offsetX, offsetY });
     } else if (preset === 'solar') {
       // 太阳系视图模式 - 基于真实物理参数
       const centerX = 400;
@@ -509,16 +537,35 @@ export default function NBodySimulator() {
       
       setBodyCount(9);
       
+      // 动态计算视角偏移量，使太阳居中
+      const canvas = canvasRef.current;
+      let canvasWidth = 800; // 默认宽度
+      let canvasHeight = 500;
+      if (canvas && canvas.parentElement) {
+        canvasWidth = canvas.parentElement.clientWidth;
+        canvasHeight = 500;
+      }
+      
+      // 太阳系中心
+      const solarCenterX = 400;
+      const solarCenterY = 300;
+      
       if (currentViewMode === 'horizontal') {
-        setViewScale(0.65);
-        setViewOffsetX(-120);
-        setViewOffsetY(0);
-        setInitialView({ scale: 0.65, offsetX: -120, offsetY: 0 });
+        const scale = 0.65;
+        const offsetX = canvasWidth / 2 - solarCenterX * scale;
+        const offsetY = canvasHeight / 2 - solarCenterY * scale;
+        setViewScale(scale);
+        setViewOffsetX(offsetX);
+        setViewOffsetY(offsetY);
+        setInitialView({ scale, offsetX, offsetY });
       } else {
-        setViewScale(0.5);
-        setViewOffsetX(0);
-        setViewOffsetY(0);
-        setInitialView({ scale: 0.5, offsetX: 0, offsetY: 0 });
+        const scale = 0.5;
+        const offsetX = canvasWidth / 2 - solarCenterX * scale;
+        const offsetY = canvasHeight / 2 - solarCenterY * scale;
+        setViewScale(scale);
+        setViewOffsetX(offsetX);
+        setViewOffsetY(offsetY);
+        setInitialView({ scale, offsetX, offsetY });
       }
     }
   };
@@ -1186,6 +1233,38 @@ export default function NBodySimulator() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // 初始化视角，使天体居中显示
+  const [viewInitialized, setViewInitialized] = useState(false);
+  useEffect(() => {
+    if (!isClient || viewInitialized) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const container = canvas.parentElement;
+    if (!container) return;
+    
+    const canvasWidth = container.clientWidth;
+    const canvasHeight = 500;
+    
+    // 计算天体中心位置（默认自定义/地月系）
+    let centerX = 400;
+    let centerY = 250;
+    if (preset === 'solar') {
+      centerX = 400;
+      centerY = 300;
+    }
+    
+    // 计算偏移量使天体居中
+    const newOffsetX = canvasWidth / 2 - centerX;
+    const newOffsetY = canvasHeight / 2 - centerY;
+    
+    setViewOffsetX(newOffsetX);
+    setViewOffsetY(newOffsetY);
+    setInitialView({ scale: 1, offsetX: newOffsetX, offsetY: newOffsetY });
+    setViewInitialized(true);
+  }, [isClient, viewInitialized, preset]);
 
   // 处理鼠标点击
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -1966,29 +2045,9 @@ export default function NBodySimulator() {
           <div className="absolute -top-12 right-0 flex gap-2 z-20">
             <button
               onClick={() => {
-                // 根据画布尺寸计算居中偏移量
-                const canvas = canvasRef.current;
-                if (canvas) {
-                  const canvasWidth = canvas.width;
-                  const canvasHeight = canvas.height;
-                  // 计算天体中心位置
-                  let centerX = 400; // 默认中心
-                  let centerY = 250;
-                  if (preset === 'solar') {
-                    centerX = 400;
-                    centerY = 300;
-                  }
-                  // 计算偏移量使天体居中
-                  const newOffsetX = canvasWidth / 2 - centerX * initialView.scale;
-                  const newOffsetY = canvasHeight / 2 - centerY * initialView.scale;
-                  setViewOffsetX(newOffsetX);
-                  setViewOffsetY(newOffsetY);
-                  setViewScale(initialView.scale);
-                } else {
-                  setViewOffsetX(initialView.offsetX);
-                  setViewOffsetY(initialView.offsetY);
-                  setViewScale(initialView.scale);
-                }
+                setViewOffsetX(initialView.offsetX);
+                setViewOffsetY(initialView.offsetY);
+                setViewScale(initialView.scale);
               }}
               className="px-4 py-2 bg-blue-600/80 hover:bg-blue-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2"
               title="重置视角到初始状态"
