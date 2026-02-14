@@ -1009,8 +1009,8 @@ export default function FormulaSimulator({ currentTheme, customColor }: FormulaS
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl animate-float animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>🧮</div>
+      <div className="flex items-center gap-3 mb-6 group">
+        <div className="text-4xl group-hover:animate-float group-hover:animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>🧮</div>
         <div>
           <h2 className="text-2xl font-bold">动态公式演绎器</h2>
           <p className="text-sm" style={{ color: `${getThemeColor('text')}CC` }}>调整变量参数，观察计算结果的变化趋势</p>

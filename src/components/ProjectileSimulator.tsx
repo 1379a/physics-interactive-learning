@@ -289,8 +289,8 @@ export default function ProjectileSimulator() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="text-4xl animate-float animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>🎯</div>
+      <div className="flex items-center gap-3 mb-6 group">
+        <div className="text-4xl group-hover:animate-float group-hover:animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>🎯</div>
         <div>
           <h2 className="text-2xl font-bold">
             {motionType === 'horizontal' ? '平抛运动模拟' : '斜抛运动模拟'}

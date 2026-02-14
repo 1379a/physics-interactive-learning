@@ -754,8 +754,8 @@ export default function QuizSection() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="text-4xl animate-float animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>📝</div>
+          <div className="flex items-center gap-3 group">
+            <div className="text-4xl group-hover:animate-float group-hover:animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>📝</div>
             <div>
               <h2 className="text-2xl font-bold">自测与挑战区</h2>
               <p className="text-sm text-blue-300/80">测试你的物理知识，巩固学习成果</p>
@@ -849,8 +849,8 @@ export default function QuizSection() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="text-4xl animate-float animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>📝</div>
+        <div className="flex items-center gap-3 group">
+          <div className="text-4xl group-hover:animate-float group-hover:animate-pulse-glow transition-all" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>📝</div>
           <div>
             <h2 className="text-2xl font-bold">自测与挑战区</h2>
             <p className="text-sm text-blue-300/80">测试你的物理知识</p>
