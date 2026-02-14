@@ -11,6 +11,9 @@ interface CelestialBody {
   y: number;
   vx: number;
   vy: number;
+  ax?: number; // 加速度 x 分量
+  ay?: number; // 加速度 y 分量
+  angularVelocity?: number; // 角速度（相对于中心天体）
   color: string;
   trajectoryColor?: string; // 轨迹颜色（如果不设置则使用天体颜色）
   showTrajectory?: boolean; // 是否显示轨迹（默认显示）
@@ -29,10 +32,14 @@ interface TrajectoryPoint {
 interface BodyInfo {
   position?: { x: number; y: number };
   velocity?: number;
+  acceleration?: number;
+  ax?: number;
+  ay?: number;
   angularVelocity?: number;
   period?: number;
   mass?: number;
   density?: number;
+  gravitationalForce?: number;
 }
 
 // 将颜色转换为带透明度的格式
@@ -542,9 +549,17 @@ export default function NBodySimulator() {
           fy += force * (dy / dist);
         }
 
+        // 计算引力加速度
+        const gravAx = fx / newBodies[i].mass;
+        const gravAy = fy / newBodies[i].mass;
+        
         // 更新速度
-        newBodies[i].vx += (fx / newBodies[i].mass) * dt;
-        newBodies[i].vy += (fy / newBodies[i].mass) * dt;
+        newBodies[i].vx += gravAx * dt;
+        newBodies[i].vy += gravAy * dt;
+        
+        // 存储当前加速度（用于显示）
+        newBodies[i].ax = gravAx;
+        newBodies[i].ay = gravAy;
       }
 
       // 更新位置
@@ -617,6 +632,9 @@ export default function NBodySimulator() {
       }
     }
 
+    // 计算加速度
+    const acceleration = Math.sqrt((body.ax ?? 0) ** 2 + (body.ay ?? 0) ** 2);
+
     // 估算密度 (假设球体，使用显示半径)
     const volume = (4 / 3) * Math.PI * Math.pow(body.radius, 3);
     const density = body.mass / volume;
@@ -624,6 +642,9 @@ export default function NBodySimulator() {
     return {
       position: { x: body.x, y: body.y },
       velocity,
+      acceleration,
+      ax: body.ax ?? 0,
+      ay: body.ay ?? 0,
       angularVelocity,
       period,
       mass: body.realMass || body.mass,
@@ -1088,7 +1109,7 @@ export default function NBodySimulator() {
         setShowInfo(info);
 
         const infoWidth = 260 / viewScale;
-        const infoHeight = 280 / viewScale;
+        const infoHeight = 320 / viewScale;
         
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(infoPanelX, infoPanelY, infoWidth, infoHeight);
@@ -1127,6 +1148,14 @@ export default function NBodySimulator() {
         
         ctx.fillText(`速度: ${(info.velocity || 0).toFixed(velPrecision)} 单位/帧`, infoPanelX + 10 / viewScale, yPos);
         yPos += 20 / viewScale;
+        ctx.fillText(`加速度: ${(info.acceleration || 0).toFixed(5)} 单位/帧²`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 18 / viewScale;
+        ctx.font = `${10 / viewScale}px Arial`;
+        ctx.fillStyle = 'rgba(150, 200, 255, 0.7)';
+        ctx.fillText(`  Ax: ${(info.ax || 0).toFixed(5)}, Ay: ${(info.ay || 0).toFixed(5)}`, infoPanelX + 10 / viewScale, yPos);
+        yPos += 20 / viewScale;
+        ctx.font = `${12 / viewScale}px Arial`;
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.8)';
         ctx.fillText(`角速度: ${(info.angularVelocity || 0).toFixed(4)} rad/帧`, infoPanelX + 10 / viewScale, yPos);
         yPos += 20 / viewScale;
         ctx.fillText(`周期: ${(info.period || 0).toFixed(1)} 帧`, infoPanelX + 10 / viewScale, yPos);
@@ -1693,6 +1722,60 @@ export default function NBodySimulator() {
                         <span className="text-xs text-white">
                           {((Math.atan2(body.vy, body.vx) * 180 / Math.PI + 360) % 360).toFixed(1)}°
                         </span>
+                      </div>
+                      
+                      {/* 加速度设置 */}
+                      <div className="text-xs text-blue-300 font-semibold mb-1 mt-2">⚡ 加速度</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">Ax:</label>
+                          <input
+                            type="number"
+                            step="0.001"
+                            value={(body.ax ?? 0).toFixed(4)}
+                            onChange={(e) => updateBodyProperty(body.id, 'ax', parseFloat(e.target.value) || 0)}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs text-blue-300/80 w-8">Ay:</label>
+                          <input
+                            type="number"
+                            step="0.001"
+                            value={(body.ay ?? 0).toFixed(4)}
+                            onChange={(e) => updateBodyProperty(body.id, 'ay', parseFloat(e.target.value) || 0)}
+                            className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <label className="text-xs text-blue-300/80 w-16">大小:</label>
+                        <span className="text-xs text-white">
+                          {Math.sqrt((body.ax ?? 0) ** 2 + (body.ay ?? 0) ** 2).toFixed(5)}
+                        </span>
+                        <span className="text-xs text-blue-300/60">(模拟中由引力计算)</span>
+                      </div>
+                      
+                      {/* 角速度设置 */}
+                      <div className="text-xs text-blue-300 font-semibold mb-1 mt-2">🔄 角速度</div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-blue-300/80 w-16">ω (rad/s):</label>
+                        <input
+                          type="number"
+                          step="0.001"
+                          value={(body.angularVelocity ?? 0).toFixed(4)}
+                          onChange={(e) => updateBodyProperty(body.id, 'angularVelocity', parseFloat(e.target.value) || 0)}
+                          className="flex-1 px-2 py-1 text-xs bg-white/10 border border-white/20 rounded focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <label className="text-xs text-blue-300/80 w-16">周期:</label>
+                        <span className="text-xs text-white">
+                          {(body.angularVelocity && body.angularVelocity > 0) 
+                            ? (2 * Math.PI / body.angularVelocity).toFixed(2) + ' s'
+                            : '∞'}
+                        </span>
+                        <span className="text-xs text-blue-300/60">(T = 2π/ω)</span>
                       </div>
                       
                       {/* 质量设置 */}
