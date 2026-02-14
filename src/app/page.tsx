@@ -177,9 +177,12 @@ export default function Home() {
               <div className="text-3xl">⚛️</div>
               <div>
                 <h1 
-                  className="text-2xl font-bold bg-clip-text text-transparent"
+                  className="text-2xl font-bold"
                   style={{
-                    background: getThemeGradient()
+                    background: getThemeGradient(),
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent'
                   }}
                 >
                   物理学交互式学习平台
