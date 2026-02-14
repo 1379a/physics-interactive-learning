@@ -672,24 +672,114 @@ export default function NBodySimulator() {
         const isInLeft = screenX < canvas.width / 2;
         const isInTop = screenY < canvas.height / 2;
         
-        // 力的示意图和信息面板的偏移量（根据缩放调整）
-        const panelOffset = 150 / viewScale;
+        // 力的示意图和信息面板的尺寸（根据缩放调整）
+        const infoPanelWidth = 240 / viewScale;
+        const infoPanelHeight = 240 / viewScale;
+        const legendWidth = 160 / viewScale;
+        const legendHeight = 120 / viewScale;
+        const panelMargin = 20 / viewScale; // 面板与画布边界的间距
+        const panelGap = 40 / viewScale; // 信息面板和力的示意图之间的间距
         
         // 决定力的示意图和信息面板的位置
         let infoPanelX, infoPanelY, legendX, legendY;
         
+        // 首先计算理想位置
+        let idealInfoPanelX, idealInfoPanelY, idealLegendX, idealLegendY;
+        
         if (isInTop) {
           // 天体在上半部分：信息面板在天体下方，力的示意图在更下方
-          infoPanelX = body.x - 120 / viewScale;
-          infoPanelY = body.y + body.radius + 20 / viewScale;
-          legendX = body.x - 80 / viewScale;
-          legendY = infoPanelY + 250 / viewScale;
+          idealInfoPanelX = body.x - infoPanelWidth / 2;
+          idealInfoPanelY = body.y + body.radius + panelMargin;
+          idealLegendX = body.x - legendWidth / 2;
+          idealLegendY = idealInfoPanelY + infoPanelHeight + panelGap;
         } else {
           // 天体在下半部分：信息面板在天体上方，力的示意图在更上方
-          infoPanelX = body.x - 120 / viewScale;
-          infoPanelY = body.y - body.radius - 260 / viewScale;
-          legendX = body.x - 80 / viewScale;
-          legendY = infoPanelY - 130 / viewScale;
+          idealInfoPanelX = body.x - infoPanelWidth / 2;
+          idealInfoPanelY = body.y - body.radius - infoPanelHeight - panelMargin;
+          idealLegendX = body.x - legendWidth / 2;
+          idealLegendY = idealInfoPanelY - legendHeight - panelGap;
+        }
+        
+        // 计算画布的世界坐标边界
+        const worldLeft = -viewOffsetX / viewScale;
+        const worldRight = (canvas.width - viewOffsetX) / viewScale;
+        const worldTop = -viewOffsetY / viewScale;
+        const worldBottom = (canvas.height - viewOffsetY) / viewScale;
+        
+        // 调整信息面板位置，确保在可视画布内
+        infoPanelX = idealInfoPanelX;
+        infoPanelY = idealInfoPanelY;
+        
+        // 检测左边界
+        if (infoPanelX < worldLeft + panelMargin) {
+          infoPanelX = worldLeft + panelMargin;
+        }
+        // 检测右边界
+        if (infoPanelX + infoPanelWidth > worldRight - panelMargin) {
+          infoPanelX = worldRight - infoPanelWidth - panelMargin;
+        }
+        
+        // 检测上边界
+        if (infoPanelY < worldTop + panelMargin) {
+          infoPanelY = worldTop + panelMargin;
+          // 如果上方空间不足，尝试放在下方
+          if (body.y + body.radius + panelMargin + infoPanelHeight <= worldBottom - panelMargin) {
+            infoPanelY = body.y + body.radius + panelMargin;
+          }
+        }
+        // 检测下边界
+        if (infoPanelY + infoPanelHeight > worldBottom - panelMargin) {
+          infoPanelY = worldBottom - infoPanelHeight - panelMargin;
+          // 如果下方空间不足，尝试放在上方
+          if (body.y - body.radius - panelMargin - infoPanelHeight >= worldTop + panelMargin) {
+            infoPanelY = body.y - body.radius - infoPanelHeight - panelMargin;
+          }
+        }
+        
+        // 调整力的示意图位置，确保在可视画布内
+        legendX = idealLegendX;
+        legendY = idealLegendY;
+        
+        // 检测左边界
+        if (legendX < worldLeft + panelMargin) {
+          legendX = worldLeft + panelMargin;
+        }
+        // 检测右边界
+        if (legendX + legendWidth > worldRight - panelMargin) {
+          legendX = worldRight - legendWidth - panelMargin;
+        }
+        
+        // 检测上边界
+        if (legendY < worldTop + panelMargin) {
+          legendY = worldTop + panelMargin;
+        }
+        // 检测下边界
+        if (legendY + legendHeight > worldBottom - panelMargin) {
+          legendY = worldBottom - legendHeight - panelMargin;
+        }
+        
+        // 确保力的示意图和信息面板不重叠
+        // 检测垂直方向的重叠
+        if (infoPanelY < legendY + legendHeight && infoPanelY + infoPanelHeight > legendY) {
+          // 有垂直重叠，检查水平方向
+          if (infoPanelX < legendX + legendWidth && infoPanelX + infoPanelWidth > legendX) {
+            // 有水平重叠，需要调整
+            if (isInTop) {
+              // 将力的示意图移到信息面板上方
+              legendY = infoPanelY - legendHeight - panelGap;
+              // 如果上方空间不足，移到下方
+              if (legendY < worldTop + panelMargin) {
+                legendY = infoPanelY + infoPanelHeight + panelGap;
+              }
+            } else {
+              // 将力的示意图移到信息面板下方
+              legendY = infoPanelY + infoPanelHeight + panelGap;
+              // 如果下方空间不足，移到上方
+              if (legendY + legendHeight > worldBottom - panelMargin) {
+                legendY = infoPanelY - legendHeight - panelGap;
+              }
+            }
+          }
         }
 
         // 绘制箭头的辅助函数
@@ -806,9 +896,6 @@ export default function NBodySimulator() {
         }
 
         // 5. 绘制图例（相对于天体位置）
-        const legendWidth = 160 / viewScale;
-        const legendHeight = 120 / viewScale;
-
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
