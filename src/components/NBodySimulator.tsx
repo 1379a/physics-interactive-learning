@@ -16,6 +16,9 @@ interface CelestialBody {
   showTrajectory?: boolean; // 是否显示轨迹（默认显示）
   isFixed?: boolean;
   realMass?: number; // 真实质量（用于显示）
+  realRadius?: number; // 真实半径（km）
+  au?: number; // 轨道半径（天文单位）
+  orbitalPeriod?: number; // 轨道周期（地球年）
 }
 
 interface TrajectoryPoint {
@@ -292,48 +295,144 @@ export default function NBodySimulator() {
       setViewOffsetX(0);
       setViewOffsetY(0);
     } else if (preset === 'solar') {
-      // 太阳系视图模式
+      // 太阳系视图模式 - 基于真实物理参数
       const centerX = 400;
       const centerY = 300;
-      const sunRadius = 35;
-      const sunMass = 5000;
       
-      // 行星数据配置
+      // 引力常数（模拟用）
+      const G = 0.5;
+      // 太阳质量（模拟单位）
+      const sunMass = 10000;
+      const sunRadius = 30;
+      
+      // 真实太阳系数据（AU单位，用于计算比例）
+      // 轨道半径：水星0.387, 金星0.723, 地球1.0, 火星1.524, 木星5.2, 土星9.58, 天王星19.22, 海王星30.05
+      // 为了在画布上合理显示，使用对数缩放压缩外层行星轨道
+      // 基础单位：1 AU = 50 像素（内行星），外行星使用压缩比例
+      
+      const calculateDisplayDistance = (au: number) => {
+        // 内行星（<= 2 AU）使用线性缩放，外行星使用压缩缩放
+        if (au <= 2) {
+          return au * 60; // 1 AU = 60 像素
+        } else {
+          // 对数压缩：让外行星也能显示在合理范围内
+          return 120 + Math.log2(au) * 80;
+        }
+      };
+      
+      // 根据开普勒定律计算圆周运动速度：v = √(GM/r)
+      // 模拟中速度需要适当缩放以便观察
+      const calculateOrbitalVelocity = (displayDistance: number) => {
+        // 理论速度
+        const theoreticalV = Math.sqrt(G * sunMass / displayDistance);
+        // 为了更好的视觉效果，适当调整速度比例
+        return theoreticalV * 0.8;
+      };
+      
+      // 行星数据配置（基于真实比例）
       const planetConfigs = [
-        { id: 'mercury', name: '水星', mass: 20, radius: 6, distance: 50, velocity: 2.5, color: '#A9A9A9', realMass: 3.285e23 },
-        { id: 'venus', name: '金星', mass: 80, radius: 9, distance: 100, velocity: 1.9, color: '#FFC0CB', realMass: 4.867e24 },
-        { id: 'earth', name: '地球', mass: 100, radius: 10, distance: 160, velocity: 1.6, color: '#2E8B57', realMass: 5.972e24 },
-        { id: 'mars', name: '火星', mass: 50, radius: 8, distance: 220, velocity: 1.3, color: '#CD5C5C', realMass: 6.39e23 },
-        { id: 'jupiter', name: '木星', mass: 1200, radius: 20, distance: 320, velocity: 0.7, color: '#DEB887', realMass: 1.898e27 },
-        { id: 'saturn', name: '土星', mass: 800, radius: 17, distance: 420, velocity: 0.52, color: '#F4A460', realMass: 5.683e26 },
-        { id: 'uranus', name: '天王星', mass: 300, radius: 14, distance: 520, velocity: 0.37, color: '#ADD8E6', realMass: 8.681e25 },
-        { id: 'neptune', name: '海王星', mass: 280, radius: 14, distance: 620, velocity: 0.29, color: '#4169E1', realMass: 1.024e26 }
+        { 
+          id: 'mercury', name: '水星', 
+          au: 0.387, 
+          mass: 0.055,  // 相对地球质量
+          radius: 5, 
+          color: '#B5B5B5',
+          realMass: 3.285e23,
+          realRadius: 2440
+        },
+        { 
+          id: 'venus', name: '金星', 
+          au: 0.723, 
+          mass: 0.815,
+          radius: 9, 
+          color: '#E6C87A',
+          realMass: 4.867e24,
+          realRadius: 6052
+        },
+        { 
+          id: 'earth', name: '地球', 
+          au: 1.0, 
+          mass: 1.0,
+          radius: 10, 
+          color: '#6B93D6',
+          realMass: 5.972e24,
+          realRadius: 6371
+        },
+        { 
+          id: 'mars', name: '火星', 
+          au: 1.524, 
+          mass: 0.107,
+          radius: 7, 
+          color: '#CD5C5C',
+          realMass: 6.39e23,
+          realRadius: 3390
+        },
+        { 
+          id: 'jupiter', name: '木星', 
+          au: 5.203, 
+          mass: 317.8,
+          radius: 22, 
+          color: '#D4A574',
+          realMass: 1.898e27,
+          realRadius: 69911
+        },
+        { 
+          id: 'saturn', name: '土星', 
+          au: 9.537, 
+          mass: 95.16,
+          radius: 18, 
+          color: '#F4D59E',
+          realMass: 5.683e26,
+          realRadius: 58232
+        },
+        { 
+          id: 'uranus', name: '天王星', 
+          au: 19.19, 
+          mass: 14.54,
+          radius: 13, 
+          color: '#A5D6E7',
+          realMass: 8.681e25,
+          realRadius: 25362
+        },
+        { 
+          id: 'neptune', name: '海王星', 
+          au: 30.07, 
+          mass: 17.15,
+          radius: 12, 
+          color: '#4B70DD',
+          realMass: 1.024e26,
+          realRadius: 24622
+        }
       ];
 
-      // 根据视图模式计算行星位置
+      // 计算每个行星的显示参数
       const planetBodies = planetConfigs.map((config, index) => {
+        const displayDistance = calculateDisplayDistance(config.au);
+        const velocity = calculateOrbitalVelocity(displayDistance);
+        
         let x, y, vx, vy;
         
         if (solarViewMode === 'horizontal') {
-          // 水平视图模式：所有行星在水平线上
-          x = centerX + config.distance;
+          // 水平视图模式：所有行星在水平线上，从右侧开始运动
+          x = centerX + displayDistance;
           y = centerY;
           vx = 0;
-          vy = config.velocity;
+          vy = velocity; // 向上运动，形成逆时针轨道
         } else {
-          // 环形鸟瞰模式：行星围绕太阳均匀分布
-          const angle = (index * Math.PI * 2) / planetConfigs.length;
-          x = centerX + Math.cos(angle) * config.distance;
-          y = centerY + Math.sin(angle) * config.distance;
-          // 速度方向垂直于位置矢量，使行星做圆周运动
-          vx = -Math.sin(angle) * config.velocity;
-          vy = Math.cos(angle) * config.velocity;
+          // 环形鸟瞰模式：行星按真实角度分布（根据公转周期）
+          // 使用真实的角度分布，让行星在不同位置
+          const angle = (index * Math.PI * 0.7) + Math.PI / 4; // 间隔分布
+          x = centerX + Math.cos(angle) * displayDistance;
+          y = centerY + Math.sin(angle) * displayDistance;
+          // 速度方向垂直于位置矢量（逆时针）
+          vx = -Math.sin(angle) * velocity;
+          vy = Math.cos(angle) * velocity;
         }
         
         return {
           id: config.id,
           name: config.name,
-          mass: config.mass,
+          mass: config.mass * 10, // 缩放质量用于模拟
           radius: config.radius,
           x,
           y,
@@ -341,7 +440,10 @@ export default function NBodySimulator() {
           vy,
           color: config.color,
           showTrajectory: true,
-          realMass: config.realMass
+          realMass: config.realMass,
+          realRadius: config.realRadius,
+          au: config.au, // 保存AU信息用于显示
+          orbitalPeriod: Math.pow(config.au, 1.5) // 开普勒第三定律：T² ∝ a³
         };
       });
 
@@ -355,10 +457,11 @@ export default function NBodySimulator() {
           y: centerY,
           vx: 0,
           vy: 0,
-          color: '#FFA500',
+          color: '#FFD700',
           showTrajectory: true,
           isFixed: true,
-          realMass: 1.989e30
+          realMass: 1.989e30,
+          realRadius: 696340
         },
         ...planetBodies
       ]);
@@ -366,12 +469,12 @@ export default function NBodySimulator() {
       setBodyCount(9);
       
       if (solarViewMode === 'horizontal') {
-        setViewScale(0.6);
-        setViewOffsetX(-150);
+        setViewScale(0.7);
+        setViewOffsetX(-100);
         setViewOffsetY(0);
       } else {
         // 环形模式需要更大的缩放和居中
-        setViewScale(0.5);
+        setViewScale(0.55);
         setViewOffsetX(0);
         setViewOffsetY(0);
       }
@@ -595,7 +698,15 @@ export default function NBodySimulator() {
     if (preset === 'solar' && solarViewMode === 'radial') {
       const fixedBody = bodies.find(b => b.isFixed);
       if (fixedBody) {
-        const orbitDistances = [50, 100, 160, 220, 320, 420, 520, 620]; // 各行星轨道半径
+        // 计算各行星的显示轨道距离（与loadPreset中的计算一致）
+        const auValues = [0.387, 0.723, 1.0, 1.524, 5.203, 9.537, 19.19, 30.07];
+        const orbitDistances = auValues.map(au => {
+          if (au <= 2) {
+            return au * 60;
+          } else {
+            return 120 + Math.log2(au) * 80;
+          }
+        });
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.15)';
         ctx.lineWidth = 1;
         orbitDistances.forEach(distance => {
@@ -947,30 +1058,44 @@ export default function NBodySimulator() {
         const info = calculateBodyInfo(body);
         setShowInfo(info);
 
-        const infoWidth = 240 / viewScale;
-        const infoHeight = 240 / viewScale;
+        const infoWidth = 260 / viewScale;
+        const infoHeight = 280 / viewScale;
         
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(infoPanelX, infoPanelY, infoWidth, infoHeight);
         ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
         ctx.lineWidth = 1 / viewScale;
         ctx.strokeRect(infoPanelX, infoPanelY, infoWidth, infoHeight);
 
-        ctx.fillStyle = 'white';
-        ctx.font = `bold ${14 / viewScale}px Arial`;
+        ctx.fillStyle = body.color;
+        ctx.font = `bold ${15 / viewScale}px Arial`;
         ctx.textAlign = 'left';
         ctx.fillText(body.name, infoPanelX + 10 / viewScale, infoPanelY + 25 / viewScale);
 
         ctx.font = `${12 / viewScale}px Arial`;
-        ctx.fillStyle = 'rgba(200, 200, 255, 0.8)';
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
         let yPos = infoPanelY + 50 / viewScale;
+        
+        // 显示轨道半径（AU）- 对于太阳系行星
+        if (body.au) {
+          ctx.fillStyle = 'rgba(100, 200, 255, 0.9)';
+          ctx.fillText(`轨道半径: ${body.au.toFixed(3)} AU`, infoPanelX + 10 / viewScale, yPos);
+          yPos += 20 / viewScale;
+        }
+        
+        // 显示轨道周期（地球年）- 对于太阳系行星
+        if (body.orbitalPeriod) {
+          ctx.fillStyle = 'rgba(100, 200, 255, 0.9)';
+          ctx.fillText(`公转周期: ${body.orbitalPeriod.toFixed(2)} 地球年`, infoPanelX + 10 / viewScale, yPos);
+          yPos += 20 / viewScale;
+        }
+        
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.8)';
         
         // 根据视图缩放调整显示精度
         const posPrecision = viewScale > 1 ? 2 : 1;
         const velPrecision = viewScale > 1 ? 4 : 3;
         
-        ctx.fillText(`位置: (${info.position?.x?.toFixed(posPrecision) || '0'}, ${info.position?.y?.toFixed(posPrecision) || '0'})`, infoPanelX + 10 / viewScale, yPos);
-        yPos += 20 / viewScale;
         ctx.fillText(`速度: ${(info.velocity || 0).toFixed(velPrecision)} 单位/帧`, infoPanelX + 10 / viewScale, yPos);
         yPos += 20 / viewScale;
         ctx.fillText(`角速度: ${(info.angularVelocity || 0).toFixed(4)} rad/帧`, infoPanelX + 10 / viewScale, yPos);
@@ -979,7 +1104,11 @@ export default function NBodySimulator() {
         yPos += 20 / viewScale;
         ctx.fillText(`质量: ${(info.mass || 0).toExponential(2)} kg`, infoPanelX + 10 / viewScale, yPos);
         yPos += 20 / viewScale;
-        ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoPanelX + 10 / viewScale, yPos);
+        if (body.realRadius) {
+          ctx.fillText(`半径: ${body.realRadius.toLocaleString()} km`, infoPanelX + 10 / viewScale, yPos);
+        } else {
+          ctx.fillText(`密度: ${(info.density || 0).toFixed(4)} 单位³`, infoPanelX + 10 / viewScale, yPos);
+        }
         yPos += 20 / viewScale;
         if (trajectories[body.id]) {
           ctx.fillText(`轨迹点: ${trajectories[body.id].length}`, infoPanelX + 10 / viewScale, yPos);
