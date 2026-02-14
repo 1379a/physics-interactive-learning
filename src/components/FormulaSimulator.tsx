@@ -216,6 +216,368 @@ const formulas: Formula[] = [
     ],
     calculate: (v) => v.voltage * v.current,
     resultUnit: 'W'
+  },
+  {
+    id: 'centripetal-force',
+    name: '向心力',
+    description: '物体做圆周运动所需的力',
+    latex: 'F_n = m\\frac{v^2}{r}',
+    variables: [
+      {
+        name: 'mass',
+        symbol: 'm',
+        min: 0.1,
+        max: 100,
+        default: 5,
+        unit: 'kg',
+        description: '质量'
+      },
+      {
+        name: 'velocity',
+        symbol: 'v',
+        min: 1,
+        max: 100,
+        default: 10,
+        unit: 'm/s',
+        description: '线速度'
+      },
+      {
+        name: 'radius',
+        symbol: 'r',
+        min: 0.1,
+        max: 50,
+        default: 5,
+        unit: 'm',
+        description: '轨道半径'
+      }
+    ],
+    calculate: (v) => v.mass * Math.pow(v.velocity, 2) / v.radius,
+    resultUnit: 'N'
+  },
+  {
+    id: 'gravitation',
+    name: '万有引力',
+    description: '两个物体之间的引力',
+    latex: 'F = G\\frac{Mm}{r^2}',
+    variables: [
+      {
+        name: 'mass1',
+        symbol: 'M',
+        min: 1e20,
+        max: 1e30,
+        default: 5.972e24,
+        unit: 'kg',
+        description: '质量1'
+      },
+      {
+        name: 'mass2',
+        symbol: 'm',
+        min: 1,
+        max: 1e10,
+        default: 1000,
+        unit: 'kg',
+        description: '质量2'
+      },
+      {
+        name: 'distance',
+        symbol: 'r',
+        min: 1e6,
+        max: 1e9,
+        default: 6.371e6,
+        unit: 'm',
+        description: '距离'
+      }
+    ],
+    calculate: (v) => 6.674e-11 * v.mass1 * v.mass2 / Math.pow(v.distance, 2),
+    resultUnit: 'N'
+  },
+  {
+    id: 'escape-velocity',
+    name: '第一宇宙速度',
+    description: '卫星环绕地球做圆周运动的最小发射速度',
+    latex: 'v_1 = \\sqrt{\\frac{GM}{R}} = \\sqrt{gR}',
+    variables: [
+      {
+        name: 'gravity',
+        symbol: 'g',
+        min: 1.6,
+        max: 10,
+        default: 9.8,
+        unit: 'm/s²',
+        description: '重力加速度'
+      },
+      {
+        name: 'radius',
+        symbol: 'R',
+        min: 1e6,
+        max: 1e8,
+        default: 6.371e6,
+        unit: 'm',
+        description: '星球半径'
+      }
+    ],
+    calculate: (v) => Math.sqrt(v.gravity * v.radius),
+    resultUnit: 'm/s'
+  },
+  {
+    id: 'electric-field',
+    name: '点电荷电场强度',
+    description: '点电荷产生的电场强度',
+    latex: 'E = k\\frac{Q}{r^2}',
+    variables: [
+      {
+        name: 'charge',
+        symbol: 'Q',
+        min: -1e-6,
+        max: 1e-6,
+        default: 1e-9,
+        unit: 'C',
+        description: '电荷量'
+      },
+      {
+        name: 'distance',
+        symbol: 'r',
+        min: 0.01,
+        max: 10,
+        default: 0.1,
+        unit: 'm',
+        description: '距离'
+      }
+    ],
+    calculate: (v) => 8.99e9 * v.charge / Math.pow(v.distance, 2),
+    resultUnit: 'N/C'
+  },
+  {
+    id: 'capacitor',
+    name: '平行板电容器电容',
+    description: '平行板电容器的电容',
+    latex: 'C = \\frac{\\varepsilon S}{4\\pi kd}',
+    variables: [
+      {
+        name: 'area',
+        symbol: 'S',
+        min: 0.0001,
+        max: 1,
+        default: 0.01,
+        unit: 'm²',
+        description: '极板面积'
+      },
+      {
+        name: 'distance',
+        symbol: 'd',
+        min: 0.0001,
+        max: 0.1,
+        default: 0.001,
+        unit: 'm',
+        description: '极板间距'
+      },
+      {
+        name: 'dielectric',
+        symbol: 'ε',
+        min: 1,
+        max: 10,
+        default: 4,
+        unit: '',
+        description: '介电常数'
+      }
+    ],
+    calculate: (v) => v.dielectric * 8.854e-12 * v.area / v.distance,
+    resultUnit: 'F'
+  },
+  {
+    id: 'induction-emf',
+    name: '切割磁感线感应电动势',
+    description: '导体棒切割磁感线产生的感应电动势',
+    latex: '\\mathcal{E} = BLv',
+    variables: [
+      {
+        name: 'magnetic-field',
+        symbol: 'B',
+        min: 0.01,
+        max: 10,
+        default: 0.5,
+        unit: 'T',
+        description: '磁感应强度'
+      },
+      {
+        name: 'length',
+        symbol: 'L',
+        min: 0.1,
+        max: 10,
+        default: 1,
+        unit: 'm',
+        description: '导体棒长度'
+      },
+      {
+        name: 'velocity',
+        symbol: 'v',
+        min: 0,
+        max: 100,
+        default: 10,
+        unit: 'm/s',
+        description: '切割速度'
+      }
+    ],
+    calculate: (v) => v.magneticField * v.length * v.velocity,
+    resultUnit: 'V'
+  },
+  {
+    id: 'lorentz-force',
+    name: '洛伦兹力',
+    description: '带电粒子在磁场中受到的力',
+    latex: 'F = qvB',
+    variables: [
+      {
+        name: 'charge',
+        symbol: 'q',
+        min: -1e-6,
+        max: 1e-6,
+        default: 1.6e-19,
+        unit: 'C',
+        description: '电荷量'
+      },
+      {
+        name: 'velocity',
+        symbol: 'v',
+        min: 1,
+        max: 1e7,
+        default: 1e6,
+        unit: 'm/s',
+        description: '速度'
+      },
+      {
+        name: 'magnetic-field',
+        symbol: 'B',
+        min: 0.001,
+        max: 10,
+        default: 0.1,
+        unit: 'T',
+        description: '磁感应强度'
+      }
+    ],
+    calculate: (v) => v.charge * v.velocity * v.magneticField,
+    resultUnit: 'N'
+  },
+  {
+    id: 'simple-pendulum',
+    name: '单摆周期',
+    description: '单摆的振动周期',
+    latex: 'T = 2\\pi\\sqrt{\\frac{l}{g}}',
+    variables: [
+      {
+        name: 'length',
+        symbol: 'l',
+        min: 0.1,
+        max: 10,
+        default: 1,
+        unit: 'm',
+        description: '摆长'
+      },
+      {
+        name: 'gravity',
+        symbol: 'g',
+        min: 1.6,
+        max: 10,
+        default: 9.8,
+        unit: 'm/s²',
+        description: '重力加速度'
+      }
+    ],
+    calculate: (v) => 2 * Math.PI * Math.sqrt(v.length / v.gravity),
+    resultUnit: 's'
+  },
+  {
+    id: 'wave-speed',
+    name: '机械波速度',
+    description: '机械波的传播速度',
+    latex: 'v = \\lambda f',
+    variables: [
+      {
+        name: 'wavelength',
+        symbol: 'λ',
+        min: 0.1,
+        max: 100,
+        default: 2,
+        unit: 'm',
+        description: '波长'
+      },
+      {
+        name: 'frequency',
+        symbol: 'f',
+        min: 1,
+        max: 1000,
+        default: 50,
+        unit: 'Hz',
+        description: '频率'
+      }
+    ],
+    calculate: (v) => v.wavelength * v.frequency,
+    resultUnit: 'm/s'
+  },
+  {
+    id: 'photoelectric',
+    name: '光电效应方程',
+    description: '光电子的最大初动能',
+    latex: 'E_k = hf - W_0',
+    variables: [
+      {
+        name: 'frequency',
+        symbol: 'f',
+        min: 1e14,
+        max: 1e16,
+        default: 5e14,
+        unit: 'Hz',
+        description: '入射光频率'
+      },
+      {
+        name: 'work-function',
+        symbol: 'W₀',
+        min: 1,
+        max: 10,
+        default: 2,
+        unit: 'eV',
+        description: '逸出功'
+      }
+    ],
+    calculate: (v) => 4.136e-15 * v.frequency - v.workFunction,
+    resultUnit: 'eV'
+  },
+  {
+    id: 'interference-spacing',
+    name: '双缝干涉条纹间距',
+    description: '双缝干涉实验中相邻亮条纹或暗条纹的间距',
+    latex: '\\Delta x = \\frac{L\\lambda}{d}',
+    variables: [
+      {
+        name: 'screen-distance',
+        symbol: 'L',
+        min: 0.1,
+        max: 10,
+        default: 1,
+        unit: 'm',
+        description: '双缝到屏距离'
+      },
+      {
+        name: 'wavelength',
+        symbol: 'λ',
+        min: 400,
+        max: 700,
+        default: 600,
+        unit: 'nm',
+        description: '光波长'
+      },
+      {
+        name: 'slit-distance',
+        symbol: 'd',
+        min: 0.0001,
+        max: 0.01,
+        default: 0.001,
+        unit: 'm',
+        description: '双缝间距'
+      }
+    ],
+    calculate: (v) => (v.screenDistance * v.wavelength * 1e-9) / v.slitDistance,
+    resultUnit: 'm'
   }
 ];
 

@@ -24,6 +24,11 @@ const NBodySimulator = dynamic(() => import('@/components/NBodySimulator'), {
   loading: () => <div className="p-8">加载中...</div>
 });
 
+const SpringOscillator = dynamic(() => import('@/components/SpringOscillator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
 const ProblemSolver = dynamic(() => import('@/components/ProblemSolver'), {
   ssr: false,
   loading: () => <div className="p-8">加载中...</div>
@@ -90,7 +95,7 @@ const themes: Theme[] = [
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
-  const [simulationSubTab, setSimulationSubTab] = useState<'projectile' | 'nbody'>('projectile');
+  const [simulationSubTab, setSimulationSubTab] = useState<'projectile' | 'nbody' | 'spring'>('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
   const [showThemePanel, setShowThemePanel] = useState(false);
@@ -330,7 +335,7 @@ export default function Home() {
             {activeTab === 'simulation' && (
               <div>
                 {/* 物理模拟子标签 */}
-                <div className="flex gap-2 mb-4">
+                <div className="flex gap-2 mb-4 flex-wrap">
                   <button
                     onClick={() => setSimulationSubTab('projectile')}
                     className={`px-4 py-2 rounded-lg transition-all ${
@@ -351,11 +356,23 @@ export default function Home() {
                     }`}
                     style={simulationSubTab === 'nbody' ? { background: getThemeColor() } : {}}
                   >
-                    🌌 多体运动
+                    🌌 天体运动
+                  </button>
+                  <button
+                    onClick={() => setSimulationSubTab('spring')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'spring'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'spring' ? { background: getThemeColor() } : {}}
+                  >
+                    🔄 弹簧振子
                   </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
                 {simulationSubTab === 'nbody' && <NBodySimulator />}
+                {simulationSubTab === 'spring' && <SpringOscillator currentTheme={currentTheme} customColor={customColor} />}
               </div>
             )}
             {activeTab === 'solver' && <ProblemSolver />}
