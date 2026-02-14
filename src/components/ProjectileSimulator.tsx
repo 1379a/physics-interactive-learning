@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 
+type MotionType = 'horizontal' | 'oblique';
+
 interface ProjectileData {
   x: number;
   y: number;
@@ -14,6 +16,9 @@ export default function ProjectileSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const [isClient, setIsClient] = useState(false);
+
+  // 运动类型
+  const [motionType, setMotionType] = useState<MotionType>('oblique');
 
   // 物理参数
   const [velocity, setVelocity] = useState(50); // 初速度 m/s
@@ -28,13 +33,28 @@ export default function ProjectileSimulator() {
 
   const calculateTrajectory = () => {
     const v0 = velocity;
-    const theta = (angle * Math.PI) / 180;
+    const theta = motionType === 'horizontal' ? 0 : (angle * Math.PI) / 180;
     const g = gravity;
 
     // 理论计算
-    const tTotal = (2 * v0 * Math.sin(theta)) / g;
-    const hMax = (Math.pow(v0 * Math.sin(theta), 2)) / (2 * g);
-    const dMax = (Math.pow(v0, 2) * Math.sin(2 * theta)) / g;
+    let tTotal: number;
+    let hMax: number;
+    let dMax: number;
+
+    if (motionType === 'horizontal') {
+      // 平抛运动：仅由高度决定飞行时间
+      // 假设抛出高度为0，则立即落地
+      // 这里我们假设抛出高度为100米，使平抛运动有意义
+      const h = 100; // 抛出高度
+      tTotal = Math.sqrt(2 * h / g);
+      hMax = h;
+      dMax = v0 * tTotal;
+    } else {
+      // 斜抛运动
+      tTotal = (2 * v0 * Math.sin(theta)) / g;
+      hMax = (Math.pow(v0 * Math.sin(theta), 2)) / (2 * g);
+      dMax = (Math.pow(v0, 2) * Math.sin(2 * theta)) / g;
+    }
 
     setMaxHeight(hMax);
     setMaxDistance(dMax);
@@ -46,10 +66,21 @@ export default function ProjectileSimulator() {
     let t = 0;
 
     while (t <= tTotal) {
-      const x = v0 * Math.cos(theta) * t;
-      const y = v0 * Math.sin(theta) * t - 0.5 * g * Math.pow(t, 2);
-      const vx = v0 * Math.cos(theta);
-      const vy = v0 * Math.sin(theta) - g * t;
+      let x: number, y: number;
+      
+      if (motionType === 'horizontal') {
+        // 平抛运动
+        const h = 100; // 抛出高度
+        x = v0 * t;
+        y = h - 0.5 * g * Math.pow(t, 2);
+      } else {
+        // 斜抛运动
+        x = v0 * Math.cos(theta) * t;
+        y = v0 * Math.sin(theta) * t - 0.5 * g * Math.pow(t, 2);
+      }
+      
+      const vx = motionType === 'horizontal' ? v0 : v0 * Math.cos(theta);
+      const vy = motionType === 'horizontal' ? -g * t : v0 * Math.sin(theta) - g * t;
 
       points.push({ x, y, t, vx, vy });
       t += dt;
@@ -60,7 +91,7 @@ export default function ProjectileSimulator() {
 
   useEffect(() => {
     calculateTrajectory();
-  }, [velocity, angle, gravity]);
+  }, [velocity, angle, gravity, motionType]);
 
   const startAnimation = () => {
     if (isAnimating) return;
@@ -229,8 +260,10 @@ export default function ProjectileSimulator() {
 
     // 绘制发射器
     const launchX = padding;
-    const launchY = canvas.height - padding;
-    const launchAngle = (angle * Math.PI) / 180;
+    const launchY = motionType === 'horizontal' 
+      ? canvas.height - padding - (100 * scale) // 平抛运动：在100米高度
+      : canvas.height - padding; // 斜抛运动：在地面上
+    const launchAngle = motionType === 'horizontal' ? 0 : (angle * Math.PI) / 180;
     const launcherLength = 40;
 
     ctx.save();
@@ -248,7 +281,7 @@ export default function ProjectileSimulator() {
     ctx.fill();
 
     ctx.restore();
-  }, [trajectory, currentPosition, maxHeight, maxDistance, angle, isClient]);
+  }, [trajectory, currentPosition, maxHeight, maxDistance, angle, motionType, isClient]);
 
   useEffect(() => {
     setIsClient(true);
@@ -259,8 +292,14 @@ export default function ProjectileSimulator() {
       <div className="flex items-center gap-3 mb-6">
         <div className="text-4xl">🎯</div>
         <div>
-          <h2 className="text-2xl font-bold">抛体运动模拟</h2>
-          <p className="text-sm text-blue-300/80">模拟抛体运动轨迹和实时数据</p>
+          <h2 className="text-2xl font-bold">
+            {motionType === 'horizontal' ? '平抛运动模拟' : '斜抛运动模拟'}
+          </h2>
+          <p className="text-sm text-blue-300/80">
+            {motionType === 'horizontal' 
+              ? '模拟平抛运动轨迹和实时数据（固定水平抛出）' 
+              : '模拟斜抛运动轨迹和实时数据'}
+          </p>
         </div>
       </div>
 
@@ -270,6 +309,33 @@ export default function ProjectileSimulator() {
           {/* 参数控制 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-4 text-blue-300">⚙️ 参数设置</h3>
+
+            {/* 运动类型选择 */}
+            <div className="mb-4">
+              <label className="text-sm text-blue-200 block mb-2">运动类型</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setMotionType('horizontal')}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    motionType === 'horizontal'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white/10 text-blue-200 hover:bg-white/20'
+                  }`}
+                >
+                  水平抛体
+                </button>
+                <button
+                  onClick={() => setMotionType('oblique')}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    motionType === 'oblique'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white/10 text-blue-200 hover:bg-white/20'
+                  }`}
+                >
+                  斜向抛体
+                </button>
+              </div>
+            </div>
 
             <div className="space-y-4">
               <div>
@@ -292,8 +358,12 @@ export default function ProjectileSimulator() {
               <div>
                 <div className="flex justify-between mb-2">
                   <label className="text-sm text-blue-200">发射角度 (θ)</label>
-                  <span className="text-sm font-mono bg-blue-600/30 px-2 py-1 rounded">
-                    {angle.toFixed(1)}°
+                  <span className={`text-sm font-mono px-2 py-1 rounded ${
+                    motionType === 'horizontal' 
+                      ? 'bg-gray-600/30 text-gray-400'
+                      : 'bg-blue-600/30 text-blue-400'
+                  }`}>
+                    {motionType === 'horizontal' ? '0° (固定)' : `${angle.toFixed(1)}°`}
                   </span>
                 </div>
                 <input
@@ -302,7 +372,12 @@ export default function ProjectileSimulator() {
                   max="90"
                   value={angle}
                   onChange={(e) => setAngle(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  disabled={motionType === 'horizontal'}
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
+                    motionType === 'horizontal'
+                      ? 'bg-gray-600/30 cursor-not-allowed'
+                      : 'bg-white/10 accent-blue-500'
+                  }`}
                 />
               </div>
 
@@ -387,10 +462,23 @@ export default function ProjectileSimulator() {
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">📝 运动方程</h3>
             <div className="space-y-2 text-sm text-blue-200">
-              <div>x(t) = v₀·cos(θ)·t</div>
-              <div>y(t) = v₀·sin(θ)·t - ½gt²</div>
-              <div>vₓ(t) = v₀·cos(θ)</div>
-              <div>v_y(t) = v₀·sin(θ) - gt</div>
+              {motionType === 'horizontal' ? (
+                <>
+                  <div className="text-blue-400/80 font-medium mb-2">水平抛体（平抛）</div>
+                  <div>x(t) = v₀·t</div>
+                  <div>y(t) = h - ½gt²</div>
+                  <div>vₓ(t) = v₀</div>
+                  <div>v_y(t) = -gt</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-blue-400/80 font-medium mb-2">斜向抛体</div>
+                  <div>x(t) = v₀·cos(θ)·t</div>
+                  <div>y(t) = v₀·sin(θ)·t - ½gt²</div>
+                  <div>vₓ(t) = v₀·cos(θ)</div>
+                  <div>v_y(t) = v₀·sin(θ) - gt</div>
+                </>
+              )}
             </div>
           </div>
         </div>
