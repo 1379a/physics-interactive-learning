@@ -569,7 +569,8 @@ export default function NBodySimulator() {
         // 使用轨迹颜色，如果没有设置则使用天体颜色
         const trajectoryColor = body.trajectoryColor || body.color;
         ctx.strokeStyle = getColorWithAlpha(trajectoryColor, 0.4); // 半透明
-        ctx.lineWidth = 2;
+        // 轨迹线宽随视图缩放调整
+        ctx.lineWidth = Math.max(1, 2 / viewScale);
         
         points.forEach((point, index) => {
           if (index === 0) {
@@ -646,9 +647,10 @@ export default function NBodySimulator() {
 
       // 绘制名称
       ctx.fillStyle = 'white';
-      ctx.font = '12px Arial';
+      const nameFontSize = Math.max(10, 12 / viewScale); // 字体大小随视图缩放调整
+      ctx.font = `${nameFontSize}px Arial`;
       ctx.textAlign = 'center';
-      ctx.fillText(body.name, body.x, body.y - body.radius - 8);
+      ctx.fillText(body.name, body.x, body.y - body.radius - 8 / viewScale);
     });
 
     // 绘制力的示意图（当有选中或悬停的天体时）
@@ -657,25 +659,27 @@ export default function NBodySimulator() {
       const body = bodies.find(b => b.id === bodyId);
       if (body) {
         const G = 0.5; // 引力常数
-        const forceScale = 30; // 力的显示缩放比例
-        const velocityScale = 40; // 速度的显示缩放比例
+        // 力的显示缩放比例随视图缩放调整
+        const forceScale = 30 * viewScale; 
+        const velocityScale = 40 * viewScale;
+        const labelFontSize = Math.max(10, 12 / viewScale);
 
         // 绘制箭头的辅助函数
         const drawArrow = (fromX: number, fromY: number, toX: number, toY: number, color: string, label: string, lineWidth: number = 2) => {
-          const headLength = 8;
+          const headLength = 8 * viewScale; // 箭头头部大小随缩放调整
           const dx = toX - fromX;
           const dy = toY - fromY;
           const angle = Math.atan2(dy, dx);
           const length = Math.sqrt(dx * dx + dy * dy);
 
-          if (length < 5) return; // 太短的箭头不绘制
+          if (length < 5 * viewScale) return; // 阈值随缩放调整
 
           // 绘制箭头线
           ctx.beginPath();
           ctx.moveTo(fromX, fromY);
           ctx.lineTo(toX, toY);
           ctx.strokeStyle = color;
-          ctx.lineWidth = lineWidth;
+          ctx.lineWidth = lineWidth * viewScale; // 线宽随缩放调整
           ctx.stroke();
 
           // 绘制箭头头部
@@ -690,14 +694,15 @@ export default function NBodySimulator() {
           // 绘制标签
           if (label) {
             ctx.fillStyle = color;
-            ctx.font = 'bold 12px Arial';
+            ctx.font = `bold ${labelFontSize}px Arial`;
             ctx.textAlign = 'left';
             // 添加背景使文字更清晰
             const metrics = ctx.measureText(label);
+            const padding = 3 / viewScale;
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.fillRect(toX + 3, toY - 16, metrics.width + 4, 18);
+            ctx.fillRect(toX + padding, toY - 16 * viewScale, metrics.width + padding * 2, 18 * viewScale);
             ctx.fillStyle = color;
-            ctx.fillText(label, toX + 5, toY - 2);
+            ctx.fillText(label, toX + padding * 2, toY - 2 * viewScale);
           }
         };
 
@@ -845,9 +850,14 @@ export default function NBodySimulator() {
         ctx.font = '12px Arial';
         ctx.fillStyle = 'rgba(200, 200, 255, 0.8)';
         let yPos = infoY + 50;
-        ctx.fillText(`位置: (${info.position?.x?.toFixed(1) || '0'}, ${info.position?.y?.toFixed(1) || '0'})`, infoX + 10, yPos);
+        
+        // 根据视图缩放调整显示精度
+        const posPrecision = viewScale > 1 ? 2 : 1;
+        const velPrecision = viewScale > 1 ? 4 : 3;
+        
+        ctx.fillText(`位置: (${info.position?.x?.toFixed(posPrecision) || '0'}, ${info.position?.y?.toFixed(posPrecision) || '0'})`, infoX + 10, yPos);
         yPos += 20;
-        ctx.fillText(`速度: ${(info.velocity || 0).toFixed(3)} 单位/帧`, infoX + 10, yPos);
+        ctx.fillText(`速度: ${(info.velocity || 0).toFixed(velPrecision)} 单位/帧`, infoX + 10, yPos);
         yPos += 20;
         ctx.fillText(`角速度: ${(info.angularVelocity || 0).toFixed(4)} rad/帧`, infoX + 10, yPos);
         yPos += 20;
