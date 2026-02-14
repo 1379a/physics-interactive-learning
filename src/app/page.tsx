@@ -65,6 +65,11 @@ const WaveInterferenceSimulator = dynamic(() => import('@/components/WaveInterfe
   loading: () => <div className="p-8">加载中...</div>
 });
 
+const DopplerEffectSimulator = dynamic(() => import('@/components/DopplerEffectSimulator'), {
+  ssr: false,
+  loading: () => <div className="p-8">加载中...</div>
+});
+
 interface Theme {
   name: string;
   id: string;
@@ -122,7 +127,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState('navigator');
   const [simulationSubTab, setSimulationSubTab] = useState<
-    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference'
+    'projectile' | 'nbody' | 'spring' | 'gas' | 'charged' | 'optics' | 'wave' | 'interference' | 'doppler'
   >('projectile');
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [useGradient, setUseGradient] = useState(true);
@@ -456,6 +461,17 @@ export default function Home() {
                   >
                     🔮 波的干涉
                   </button>
+                  <button
+                    onClick={() => setSimulationSubTab('doppler')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      simulationSubTab === 'doppler'
+                        ? 'text-white'
+                        : 'bg-white/10 hover:bg-white/20'
+                    }`}
+                    style={simulationSubTab === 'doppler' ? { background: getThemeColor() } : {}}
+                  >
+                    📡 多普勒效应
+                  </button>
                 </div>
                 {simulationSubTab === 'projectile' && <ProjectileSimulator />}
                 {simulationSubTab === 'nbody' && <NBodySimulator />}
@@ -465,6 +481,7 @@ export default function Home() {
                 {simulationSubTab === 'optics' && <OpticsRefractionSimulator />}
                 {simulationSubTab === 'wave' && <WaveSimulator />}
                 {simulationSubTab === 'interference' && <WaveInterferenceSimulator />}
+                {simulationSubTab === 'doppler' && <DopplerEffectSimulator />}
               </div>
             )}
             {activeTab === 'solver' && <ProblemSolver />}
