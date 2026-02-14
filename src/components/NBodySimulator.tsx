@@ -1451,7 +1451,7 @@ export default function NBodySimulator() {
                       <div className="flex items-center gap-2">
                         <label className="text-xs text-blue-300/80 w-16">显示:</label>
                         <button
-                          onClick={() => updateBodyProperty(body.id, 'showTrajectory', body.showTrajectory !== false)}
+                          onClick={() => updateBodyProperty(body.id, 'showTrajectory', body.showTrajectory === false)}
                           className={`flex-1 px-2 py-1 rounded text-xs transition-all ${
                             body.showTrajectory !== false
                               ? 'bg-green-600/80 text-white'
