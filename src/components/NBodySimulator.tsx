@@ -1247,30 +1247,30 @@ export default function NBodySimulator() {
 
         {/* 模拟画布 */}
         <div id="canvas-area" className="lg:col-span-3 relative">
-          {/* 跳转到控制面板 */}
-          <button
-            onClick={() => document.getElementById('control-panel')?.scrollIntoView({ behavior: 'smooth' })}
-            className="absolute -top-12 right-0 px-4 py-2 bg-purple-600/80 hover:bg-purple-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2 z-20"
-          >
-            <span>⚙️</span>
-            <span>调整设置</span>
-          </button>
-
-          <div className="bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
-            {/* 视角重置浮动按钮 */}
+          {/* 顶部按钮组 */}
+          <div className="absolute -top-12 right-0 flex gap-2 z-20">
             <button
               onClick={() => {
                 setViewOffsetX(0);
                 setViewOffsetY(0);
                 setViewScale(1);
               }}
-              className="absolute bottom-4 right-4 px-4 py-2 bg-blue-600/90 hover:bg-blue-700/90 text-white rounded-lg shadow-lg backdrop-blur-sm transition-all flex items-center gap-2 z-10"
+              className="px-4 py-2 bg-blue-600/80 hover:bg-blue-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2"
               title="重置视角到初始状态"
             >
-              <span className="text-lg">🔄</span>
-              <span className="text-sm font-medium">视角重置</span>
+              <span>🔄</span>
+              <span>视角重置</span>
             </button>
+            <button
+              onClick={() => document.getElementById('control-panel')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-4 py-2 bg-purple-600/80 hover:bg-purple-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2"
+            >
+              <span>⚙️</span>
+              <span>调整设置</span>
+            </button>
+          </div>
 
+          <div className="bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
             <canvas
               ref={canvasRef}
               onClick={handleCanvasClick}
