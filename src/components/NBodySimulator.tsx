@@ -66,8 +66,6 @@ export default function NBodySimulator() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null); // 触摸起始位置，用于区分点击和拖动
-  const [pageScroll, setPageScroll] = useState(0); // 页面滚动位置
-  const [isDraggingScroll, setIsDraggingScroll] = useState(false); // 是否正在拖动滚动条
   const [simulationSpeed, setSimulationSpeed] = useState(1);
   const [showTrajectories, setShowTrajectories] = useState(true);
   const [trajectories, setTrajectories] = useState<Record<string, TrajectoryPoint[]>>({});
@@ -743,85 +741,6 @@ export default function NBodySimulator() {
     setIsClient(true);
   }, []);
 
-  // 监听页面滚动
-  useEffect(() => {
-    const handleScroll = () => {
-      setPageScroll(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // 处理滚动条拖动
-  const handleScrollThumbMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDraggingScroll(true);
-  };
-
-  useEffect(() => {
-    const handleScrollMouseMove = (e: MouseEvent) => {
-      if (!isDraggingScroll) return;
-      
-      const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollBar = document.getElementById('page-scrollbar');
-      if (!scrollBar) return;
-      
-      const rect = scrollBar.getBoundingClientRect();
-      const thumb = scrollBar.querySelector('[data-scroll-thumb]') as HTMLElement;
-      if (!thumb) return;
-      
-      const thumbRect = thumb.getBoundingClientRect();
-      const thumbHeight = thumbRect.height;
-      const trackHeight = rect.height;
-      const availableHeight = trackHeight - thumbHeight;
-      
-      const relativeY = e.clientY - rect.top - thumbHeight / 2;
-      const clampedY = Math.max(0, Math.min(relativeY, availableHeight));
-      
-      const scrollRatio = clampedY / availableHeight;
-      const newScrollY = scrollRatio * documentHeight;
-      
-      window.scrollTo({ top: newScrollY, behavior: 'instant' });
-    };
-
-    const handleScrollMouseUp = () => {
-      setIsDraggingScroll(false);
-    };
-
-    if (isDraggingScroll) {
-      window.addEventListener('mousemove', handleScrollMouseMove);
-      window.addEventListener('mouseup', handleScrollMouseUp);
-      
-      return () => {
-        window.removeEventListener('mousemove', handleScrollMouseMove);
-        window.removeEventListener('mouseup', handleScrollMouseUp);
-      };
-    }
-  }, [isDraggingScroll]);
-
-  // 处理滚动条轨道点击
-  const handleScrollTrackClick = (e: React.MouseEvent) => {
-    const scrollBar = document.getElementById('page-scrollbar');
-    if (!scrollBar) return;
-    
-    const rect = scrollBar.getBoundingClientRect();
-    const thumb = scrollBar.querySelector('[data-scroll-thumb]') as HTMLElement;
-    if (!thumb) return;
-    
-    const thumbRect = thumb.getBoundingClientRect();
-    const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const trackHeight = rect.height;
-    
-    const clickY = e.clientY - rect.top;
-    const thumbRatio = thumbRect.height / trackHeight;
-    
-    const scrollRatio = clickY / trackHeight;
-    const newScrollY = scrollRatio * documentHeight - (thumbRatio * documentHeight / 2);
-    
-    window.scrollTo({ top: Math.max(0, newScrollY), behavior: 'smooth' });
-  };
-
   // 处理鼠标点击
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -1085,7 +1004,16 @@ export default function NBodySimulator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* 控制面板 */}
-        <div className="lg:col-span-1 space-y-4">
+        <div id="control-panel" className="lg:col-span-1 space-y-4">
+          {/* 跳转到画布 */}
+          <button
+            onClick={() => document.getElementById('canvas-area')?.scrollIntoView({ behavior: 'smooth' })}
+            className="w-full p-3 bg-blue-600/80 hover:bg-blue-700/80 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+          >
+            <span>🖼️</span>
+            <span>跳转到画布</span>
+          </button>
+
           {/* 预设场景 */}
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all">
             <h3 className="text-lg font-semibold mb-3 text-blue-300">🌌 预设场景</h3>
@@ -1307,7 +1235,8 @@ export default function NBodySimulator() {
               <li>• 滚轮或滑块缩放视图（0.2x - 3x）</li>
               <li>• 按住 Shift + 拖动空白处移动视图</li>
               <li>• 双击画布开启拖动模式，手机端直接触摸拖动</li>
-              <li>• 拖动画布右侧的滑块滚动页面</li>
+              <li>• 点击"调整设置"按钮跳转到控制面板</li>
+              <li>• 点击"跳转到画布"按钮返回画布区域</li>
               <li>• 点击"视角重置"按钮恢复初始视角</li>
               <li>• 选择预设场景快速开始</li>
               <li>• 调整速度控制模拟快慢</li>
@@ -1317,8 +1246,17 @@ export default function NBodySimulator() {
         </div>
 
         {/* 模拟画布 */}
-        <div className="lg:col-span-3 flex gap-4">
-          <div className="flex-1 bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
+        <div id="canvas-area" className="lg:col-span-3 relative">
+          {/* 跳转到控制面板 */}
+          <button
+            onClick={() => document.getElementById('control-panel')?.scrollIntoView({ behavior: 'smooth' })}
+            className="absolute -top-12 right-0 px-4 py-2 bg-purple-600/80 hover:bg-purple-700/80 text-white rounded-lg font-medium transition-all flex items-center gap-2 z-20"
+          >
+            <span>⚙️</span>
+            <span>调整设置</span>
+          </button>
+
+          <div className="bg-black/40 rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all relative">
             {/* 视角重置浮动按钮 */}
             <button
               onClick={() => {
@@ -1346,29 +1284,6 @@ export default function NBodySimulator() {
               onTouchEnd={handleTouchEnd}
               className={`w-full ${canvasDragMode ? 'cursor-move' : 'cursor-pointer'}`}
               style={{ minHeight: '500px' }}
-            />
-          </div>
-
-          {/* 页面滚动滑块 */}
-          <div 
-            id="page-scrollbar"
-            className="w-12 bg-white/5 rounded-xl border border-white/10 hover:border-white/20 transition-all cursor-pointer relative overflow-hidden"
-            style={{ minHeight: '500px' }}
-            onClick={handleScrollTrackClick}
-          >
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-4xl opacity-20">↓</div>
-            </div>
-            <div
-              data-scroll-thumb
-              className="absolute left-1/2 -translate-x-1/2 bg-blue-600/80 hover:bg-blue-600 rounded-full transition-all cursor-grab active:cursor-grabbing shadow-lg hover:shadow-xl"
-              style={{
-                width: '24px',
-                top: `${(pageScroll / (document.documentElement.scrollHeight - window.innerHeight)) * 100}%`,
-                height: `${Math.min((window.innerHeight / document.documentElement.scrollHeight) * 100, 50)}%`,
-                transform: 'translate(-50%, 0)'
-              }}
-              onMouseDown={handleScrollThumbMouseDown}
             />
           </div>
         </div>
