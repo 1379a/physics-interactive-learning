@@ -524,6 +524,171 @@ export default function NBodySimulator() {
       ctx.fillText(body.name, body.x, body.y - body.radius - 8);
     });
 
+    // 绘制力的示意图（当有选中或悬停的天体时）
+    if (selectedBody || hoveredBody) {
+      const bodyId = selectedBody || hoveredBody;
+      const body = bodies.find(b => b.id === bodyId);
+      if (body) {
+        const G = 0.5; // 引力常数
+        const forceScale = 30; // 力的显示缩放比例
+        const velocityScale = 40; // 速度的显示缩放比例
+
+        // 绘制箭头的辅助函数
+        const drawArrow = (fromX: number, fromY: number, toX: number, toY: number, color: string, label: string, lineWidth: number = 2) => {
+          const headLength = 8;
+          const dx = toX - fromX;
+          const dy = toY - fromY;
+          const angle = Math.atan2(dy, dx);
+          const length = Math.sqrt(dx * dx + dy * dy);
+
+          if (length < 5) return; // 太短的箭头不绘制
+
+          // 绘制箭头线
+          ctx.beginPath();
+          ctx.moveTo(fromX, fromY);
+          ctx.lineTo(toX, toY);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = lineWidth;
+          ctx.stroke();
+
+          // 绘制箭头头部
+          ctx.beginPath();
+          ctx.moveTo(toX, toY);
+          ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+          ctx.lineTo(toX, toY);
+          ctx.fillStyle = color;
+          ctx.fill();
+
+          // 绘制标签
+          if (label) {
+            ctx.fillStyle = color;
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(label, toX + 5, toY - 5);
+          }
+        };
+
+        // 1. 绘制速度矢量（绿色）
+        const velocityMag = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
+        if (velocityMag > 0.01) {
+          const velEndX = body.x + body.vx * velocityScale;
+          const velEndY = body.y + body.vy * velocityScale;
+          drawArrow(body.x, body.y, velEndX, velEndY, '#4ade80', `v: ${velocityMag.toFixed(2)}`, 3);
+        }
+
+        // 2. 计算合力并绘制（橙色）
+        let totalFx = 0;
+        let totalFy = 0;
+        const forces: { fromX: number; fromY: number; toX: number; toY: number; color: string; label: string }[] = [];
+
+        // 计算每个天体对当前天体的引力
+        for (const other of bodies) {
+          if (other.id === body.id) continue;
+
+          const dx = other.x - body.x;
+          const dy = other.y - body.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance > 0) {
+            // 万有引力公式：F = G * m1 * m2 / r^2
+            const force = (G * body.mass * other.mass) / (distance * distance);
+            const fx = force * (dx / distance);
+            const fy = force * (dy / distance);
+
+            totalFx += fx;
+            totalFy += fy;
+
+            // 绘制各个引力（淡蓝色虚线）
+            const forceEndX = body.x + fx * forceScale;
+            const forceEndY = body.y + fy * forceScale;
+
+            ctx.setLineDash([3, 3]);
+            drawArrow(body.x, body.y, forceEndX, forceEndY, `rgba(147, 197, 253, 0.6)`, `F${other.id}: ${force.toFixed(2)}`, 1);
+            ctx.setLineDash([]);
+
+            // 绘制从其他天体到当前天体的连接线
+            ctx.beginPath();
+            ctx.moveTo(other.x, other.y);
+            ctx.lineTo(body.x, body.y);
+            ctx.strokeStyle = `rgba(147, 197, 253, 0.3)`;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+
+        // 3. 绘制合力（橙色粗箭头）
+        const totalForceMag = Math.sqrt(totalFx * totalFx + totalFy * totalFy);
+        if (totalForceMag > 0.01) {
+          const totalForceEndX = body.x + totalFx * forceScale;
+          const totalForceEndY = body.y + totalFy * forceScale;
+          drawArrow(body.x, body.y, totalForceEndX, totalForceEndY, '#f97316', `F合: ${totalForceMag.toFixed(2)}`, 4);
+        }
+
+        // 4. 绘制加速度方向（红色，与合力方向相同）
+        if (totalForceMag > 0.01) {
+          // 加速度 a = F / m
+          const ax = totalFx / body.mass;
+          const ay = totalFy / body.mass;
+          const accelMag = Math.sqrt(ax * ax + ay * ay);
+          const accelScale = 800; // 加速度显示的缩放比例
+          
+          const accelEndX = body.x + ax * accelScale;
+          const accelEndY = body.y + ay * accelScale;
+          drawArrow(body.x, body.y, accelEndX, accelEndY, '#ef4444', `a: ${accelMag.toFixed(4)}`, 3);
+        }
+
+        // 5. 绘制图例
+        const legendX = 10;
+        const legendY = canvas.height - 130;
+        const legendWidth = 160;
+        const legendHeight = 120;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(legendX, legendY, legendWidth, legendHeight);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX, legendY, legendWidth, legendHeight);
+
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('力的示意图', legendX + 10, legendY + 20);
+
+        ctx.font = '11px Arial';
+        let legendYPos = legendY + 40;
+
+        // 速度图例
+        ctx.fillStyle = '#4ade80';
+        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
+        ctx.fillText('速度 (v)', legendX + 35, legendYPos);
+
+        // 各个引力图例
+        legendYPos += 18;
+        ctx.fillStyle = 'rgba(147, 197, 253, 0.6)';
+        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
+        ctx.fillText('各个引力 (F)', legendX + 35, legendYPos);
+
+        // 合力图例
+        legendYPos += 18;
+        ctx.fillStyle = '#f97316';
+        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 4);
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
+        ctx.fillText('合力 (F合)', legendX + 35, legendYPos);
+
+        // 加速度图例
+        legendYPos += 18;
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(legendX + 10, legendYPos - 4, 20, 2);
+        ctx.fillStyle = 'rgba(200, 200, 255, 0.9)';
+        ctx.fillText('加速度 (a)', legendX + 35, legendYPos);
+      }
+    }
+
     // 绘制信息面板
     if (selectedBody || hoveredBody) {
       const bodyId = selectedBody || hoveredBody;
@@ -1010,7 +1175,8 @@ export default function NBodySimulator() {
             <ul className="text-sm text-blue-100/80 space-y-1">
               <li>• 点击天体查看详细信息</li>
               <li>• 拖动天体调整位置</li>
-              <li>• 悬停天体显示数据</li>
+              <li>• 悬停天体显示数据和力的示意图</li>
+              <li>• 力的示意图显示：速度、各引力、合力、加速度</li>
               <li>• 使用缩放滑块调整视图大小</li>
               <li>• 滚轮缩放视图（0.2x - 3x）</li>
               <li>• 开启拖动模式：双击画布或切换按钮</li>
