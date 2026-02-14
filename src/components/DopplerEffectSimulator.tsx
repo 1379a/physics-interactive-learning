@@ -53,6 +53,11 @@ export default function DopplerEffectSimulator() {
   const scale = 30; // 像素/米
   const centerY = canvasHeight / 2;
 
+  // 图表类型状态
+  type ChartType = 'line' | 'bar' | 'scatter';
+  const [frequencyChartType, setFrequencyChartType] = useState<ChartType>('line');
+  const [positionChartType, setPositionChartType] = useState<ChartType>('line');
+
   useEffect(() => {
     setIsClient(true);
     saveToHistory();
@@ -292,6 +297,127 @@ export default function DopplerEffectSimulator() {
     }
   };
 
+  // 渲染图表的辅助函数
+  const renderChart = (
+    data: { time: number; frequency?: number; position?: number }[],
+    chartType: ChartType,
+    color: string,
+    maxValue: number,
+    minValue: number = 0
+  ) => {
+    if (data.length === 0) return null;
+    
+    const width = 560;
+    const height = 128;
+    const padding = 10;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+    const range = maxValue - minValue || 1;
+
+    if (chartType === 'line') {
+      return (
+        <polyline
+          points={data.map((point, i) => {
+            const x = padding + (i / Math.max(data.length - 1, 1)) * graphWidth;
+            const value = point.frequency ?? point.position ?? 0;
+            const y = padding + graphHeight - ((value - minValue) / range) * graphHeight;
+            return `${x},${y}`;
+          }).join(' ')}
+          fill="none"
+          stroke={color}
+          strokeWidth="2"
+        />
+      );
+    } else if (chartType === 'bar') {
+      const barWidth = graphWidth / data.length;
+      return (
+        <>
+          {data.map((point, i) => {
+            const x = padding + i * barWidth;
+            const value = point.frequency ?? point.position ?? 0;
+            const barHeight = ((value - minValue) / range) * graphHeight;
+            const y = padding + graphHeight - barHeight;
+            return (
+              <rect
+                key={i}
+                x={x}
+                y={y}
+                width={Math.max(barWidth - 1, 2)}
+                height={Math.max(barHeight, 1)}
+                fill={color}
+                opacity={0.7 + (i / data.length) * 0.3}
+              />
+            );
+          })}
+        </>
+      );
+    } else if (chartType === 'scatter') {
+      return (
+        <>
+          {data.map((point, i) => {
+            const x = padding + (i / data.length) * graphWidth;
+            const value = point.frequency ?? point.position ?? 0;
+            const y = padding + graphHeight - ((value - minValue) / range) * graphHeight;
+            const size = 3 + (value / maxValue) * 4;
+            return (
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r={size}
+                fill={color}
+                opacity={0.5 + (i / data.length) * 0.5}
+              />
+            );
+          })}
+        </>
+      );
+    }
+    return null;
+  };
+
+  // 图表类型切换按钮
+  const ChartTypeSelector = ({ 
+    chartType, 
+    setChartType 
+  }: { 
+    chartType: ChartType; 
+    setChartType: (type: ChartType) => void 
+  }) => (
+    <div className="flex gap-1">
+      <button
+        onClick={() => setChartType('line')}
+        className={`px-2 py-0.5 rounded text-xs transition-all ${
+          chartType === 'line' 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-white/10 hover:bg-white/20'
+        }`}
+      >
+        折线
+      </button>
+      <button
+        onClick={() => setChartType('bar')}
+        className={`px-2 py-0.5 rounded text-xs transition-all ${
+          chartType === 'bar' 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-white/10 hover:bg-white/20'
+        }`}
+      >
+        柱状
+      </button>
+      <button
+        onClick={() => setChartType('scatter')}
+        className={`px-2 py-0.5 rounded text-xs transition-all ${
+          chartType === 'scatter' 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-white/10 hover:bg-white/20'
+        }`}
+      >
+        散点
+      </button>
+    </div>
+  );
+
   if (!isClient) {
     return <div className="p-8">加载中...</div>;
   }
@@ -334,38 +460,38 @@ export default function DopplerEffectSimulator() {
 
           {/* 接收频率图表 */}
           <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10 card-tech">
-            <h3 className="text-sm font-semibold text-blue-300 mb-2">接收频率随时间变化</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-blue-300">接收频率随时间变化</h3>
+              <ChartTypeSelector chartType={frequencyChartType} setChartType={setFrequencyChartType} />
+            </div>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
-                <polyline
-                  points={frequencyHistory.map((point, i) => {
-                    const x = (i / 200) * 560;
-                    const y = 64 - (point.frequency / frequency) * 30 + 32;
-                    return `${x},${y}`;
-                  }).join(' ')}
-                  fill="none"
-                  stroke="#F59E0B"
-                  strokeWidth="2"
-                />
+                {renderChart(
+                  frequencyHistory,
+                  frequencyChartType,
+                  '#F59E0B',
+                  frequency * 1.5,
+                  frequency * 0.5
+                )}
               </svg>
             </div>
           </div>
 
           {/* 波源位置图表 */}
           <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10 card-tech">
-            <h3 className="text-sm font-semibold text-blue-300 mb-2">波源位置随时间变化</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-blue-300">波源位置随时间变化</h3>
+              <ChartTypeSelector chartType={positionChartType} setChartType={setPositionChartType} />
+            </div>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
-                <polyline
-                  points={positionHistory.map((point, i) => {
-                    const x = (i / 200) * 560;
-                    const y = 64 - (point.position / 10) * 30 + 32;
-                    return `${x},${y}`;
-                  }).join(' ')}
-                  fill="none"
-                  stroke="#EF4444"
-                  strokeWidth="2"
-                />
+                {renderChart(
+                  positionHistory,
+                  positionChartType,
+                  '#EF4444',
+                  15,
+                  -5
+                )}
               </svg>
             </div>
           </div>

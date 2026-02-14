@@ -26,6 +26,10 @@ export default function ResonanceSimulator() {
   const [mass, setMass] = useState(defaultValues.mass); // 质量 kg
   const [isRunning, setIsRunning] = useState(false);
 
+  // 图表类型
+  type ChartType = 'line' | 'bar' | 'scatter';
+  const [chartType, setChartType] = useState<ChartType>('line');
+
   // 实时数据
   const [displacement, setDisplacement] = useState(0);
   const [amplitude, setAmplitude] = useState(0);
@@ -330,10 +334,38 @@ export default function ResonanceSimulator() {
 
           {/* 共振曲线图 */}
           <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10">
-            <h3 className="text-sm font-semibold text-blue-300 mb-2">振幅-频率特性曲线</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-blue-300">振幅-频率特性曲线</h3>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setChartType('line')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'line' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  折线
+                </button>
+                <button
+                  onClick={() => setChartType('bar')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'bar' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  柱状
+                </button>
+                <button
+                  onClick={() => setChartType('scatter')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'scatter' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  散点
+                </button>
+              </div>
+            </div>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
-                {/* 理论共振曲线 */}
+                {/* 理论共振曲线 - 始终显示 */}
                 <path
                   d={Array.from({ length: 100 }, (_, i) => {
                     const freq = 0.5 + (i / 100) * 4;
@@ -348,13 +380,56 @@ export default function ResonanceSimulator() {
                   strokeWidth="2"
                   strokeDasharray="5,5"
                 />
-                {/* 实际测量点 */}
-                {amplitudeHistory.map((point, i) => {
+                {/* 实际测量点 - 根据图表类型渲染 */}
+                {chartType === 'line' && amplitudeHistory.length > 1 && (
+                  <polyline
+                    points={amplitudeHistory.map((point) => {
+                      const x = (point.freq / 5) * 560;
+                      const y = 120 - point.amp * 30;
+                      return `${x},${Math.max(0, y)}`;
+                    }).join(' ')}
+                    fill="none"
+                    stroke="#FFA500"
+                    strokeWidth="2"
+                  />
+                )}
+                {chartType === 'bar' && amplitudeHistory.map((point, i) => {
+                  const x = (point.freq / 5) * 560 - 3;
+                  const barHeight = point.amp * 30;
+                  const y = 120 - barHeight;
+                  return (
+                    <rect
+                      key={i}
+                      x={x}
+                      y={Math.max(0, y)}
+                      width={6}
+                      height={Math.max(barHeight, 1)}
+                      fill="#FFA500"
+                      opacity={0.8}
+                    />
+                  );
+                })}
+                {chartType === 'scatter' && amplitudeHistory.map((point, i) => {
                   const x = (point.freq / 5) * 560;
                   const y = 120 - point.amp * 30;
                   return (
                     <circle
                       key={i}
+                      cx={x}
+                      cy={Math.max(0, y)}
+                      r={5}
+                      fill="#FFA500"
+                      opacity={0.7}
+                    />
+                  );
+                })}
+                {/* 数据点标记 */}
+                {amplitudeHistory.map((point, i) => {
+                  const x = (point.freq / 5) * 560;
+                  const y = 120 - point.amp * 30;
+                  return (
+                    <circle
+                      key={`marker-${i}`}
                       cx={x}
                       cy={Math.max(0, y)}
                       r={3}

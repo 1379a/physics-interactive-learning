@@ -28,6 +28,10 @@ export default function WaveInterference2DSimulator() {
   const [displayMode, setDisplayMode] = useState(defaultValues.displayMode); // 显示模式
   const [isRunning, setIsRunning] = useState(false);
 
+  // 图表类型
+  type ChartType = 'line' | 'bar' | 'scatter';
+  const [chartType, setChartType] = useState<ChartType>('line');
+
   // 实时数据
   const [time, setTime] = useState(0);
   const [intensityData, setIntensityData] = useState<number[]>([]);
@@ -313,31 +317,96 @@ export default function WaveInterference2DSimulator() {
           </div>
 
           {/* 中轴线强度分布图 */}
+          {/* 中轴线强度分布图 */}
           <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10">
-            <h3 className="text-sm font-semibold text-blue-300 mb-2">中轴线强度分布</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-blue-300">中轴线强度分布</h3>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setChartType('line')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'line' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  折线
+                </button>
+                <button
+                  onClick={() => setChartType('bar')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'bar' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  柱状
+                </button>
+                <button
+                  onClick={() => setChartType('scatter')}
+                  className={`px-2 py-0.5 rounded text-xs transition-all ${
+                    chartType === 'scatter' ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                >
+                  散点
+                </button>
+              </div>
+            </div>
             <div className="h-32 bg-black/30 rounded flex items-center">
               <svg width="100%" height="100%" viewBox="0 0 560 128">
-                <path
-                  d={intensityData.map((intensity, i) => {
-                    const x = (i / intensityData.length) * 560;
-                    const y = 128 - intensity * 120;
-                    return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-                  }).join(' ')}
-                  fill="none"
-                  stroke="#4A90E2"
-                  strokeWidth="2"
-                />
-                <path
-                  d={intensityData.map((intensity, i) => {
-                    const x = (i / intensityData.length) * 560;
-                    return `${i === 0 ? 'M' : 'L'} ${x} 128`;
-                  }).join(' ') + ' ' + intensityData.map((intensity, i) => {
-                    const x = (intensityData.length - 1 - i) / intensityData.length * 560;
-                    const y = 128 - intensity * 120;
-                    return `L ${x} ${y}`;
-                  }).join(' ') + ' Z'}
-                  fill="rgba(74, 144, 226, 0.3)"
-                />
+                {chartType === 'line' && (
+                  <>
+                    <path
+                      d={intensityData.map((intensity, i) => {
+                        const x = (i / intensityData.length) * 560;
+                        const y = 128 - intensity * 120;
+                        return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                      }).join(' ')}
+                      fill="none"
+                      stroke="#4A90E2"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d={intensityData.map((intensity, i) => {
+                        const x = (i / intensityData.length) * 560;
+                        return `${i === 0 ? 'M' : 'L'} ${x} 128`;
+                      }).join(' ') + ' ' + intensityData.map((intensity, i) => {
+                        const x = (intensityData.length - 1 - i) / intensityData.length * 560;
+                        const y = 128 - intensity * 120;
+                        return `L ${x} ${y}`;
+                      }).join(' ') + ' Z'}
+                      fill="rgba(74, 144, 226, 0.3)"
+                    />
+                  </>
+                )}
+                {chartType === 'bar' && intensityData.map((intensity, i) => {
+                  const barWidth = 560 / intensityData.length;
+                  const x = i * barWidth;
+                  const barHeight = intensity * 120;
+                  const y = 128 - barHeight;
+                  return (
+                    <rect
+                      key={i}
+                      x={x}
+                      y={Math.max(0, y)}
+                      width={Math.max(barWidth - 1, 2)}
+                      height={Math.max(barHeight, 1)}
+                      fill="#4A90E2"
+                      opacity={0.6 + intensity * 0.4}
+                    />
+                  );
+                })}
+                {chartType === 'scatter' && intensityData.map((intensity, i) => {
+                  const x = (i / intensityData.length) * 560;
+                  const y = 128 - intensity * 120;
+                  const size = 2 + intensity * 4;
+                  return (
+                    <circle
+                      key={i}
+                      cx={x}
+                      cy={Math.max(0, y)}
+                      r={size}
+                      fill="#4A90E2"
+                      opacity={0.5 + intensity * 0.5}
+                    />
+                  );
+                })}
               </svg>
             </div>
           </div>
