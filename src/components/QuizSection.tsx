@@ -1,22 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
 interface Question {
   id: string;
   category: string;
+  knowledgePoint?: string; // 知识点（可选）
   difficulty: 'easy' | 'medium' | 'hard'; // 难度梯度
   source: string; // 题目来源（如：2023年高考全国甲卷、2022年高考北京卷等）
   year: number; // 年份
   question: string;
   options: string[];
-  correctAnswer: number;
+  correctAnswer: number | number[]; // 支持单选和多选
+  isMultiple?: boolean; // 是否多选题（可选，默认为false）
   explanation: string;
   relatedConcepts: string[];
 }
 
 export type { Question };
+
+// 知识点分类
+const knowledgePoints: Record<string, string[]> = {
+  '力学': [
+    '牛顿运动定律', '匀变速直线运动', '自由落体运动', '抛体运动',
+    '圆周运动', '万有引力', '动量守恒', '能量守恒', '机械能守恒',
+    '功与功率', '受力分析', '摩擦力', '弹力', '向心力'
+  ],
+  '电磁学': [
+    '库仑定律', '电场强度', '电势与电势能', '电容', '带电粒子运动',
+    '欧姆定律', '电功率', '磁场', '安培力', '洛伦兹力',
+    '电磁感应', '楞次定律', '法拉第定律', '交流电', '自感与互感'
+  ],
+  '热学': [
+    '分子动理论', '内能', '热力学定律', '理想气体', '气体状态方程',
+    '热传递', '物态变化', '热机效率'
+  ],
+  '光学': [
+    '光的反射', '光的折射', '全反射', '光的干涉', '光的衍射',
+    '光电效应', '光的波粒二象性', '光谱'
+  ],
+  '近代物理': [
+    '原子结构', '原子核', '衰变', '核反应', '核能',
+    '波粒二象性', '量子力学基础', '相对论基础'
+  ],
+  '声学': [
+    '声波传播', '多普勒效应', '共振与共鸣', '声速'
+  ],
+  '机械振动与波': [
+    '简谐运动', '单摆', '弹簧振子', '波的传播', '波的干涉', '波的衍射'
+  ]
+};
 
 // 高考真题题库（2015-2024年）
 export const quizQuestions: Question[] = [
@@ -24,6 +58,7 @@ export const quizQuestions: Question[] = [
   {
     id: 'gaokao-2024-easy-1',
     category: '力学',
+    knowledgePoint: '牛顿运动定律',
     difficulty: 'easy',
     source: '2024年高考全国甲卷',
     year: 2024,
@@ -35,24 +70,28 @@ export const quizQuestions: Question[] = [
       '牛顿运动定律适用于微观粒子的运动'
     ],
     correctAnswer: 0,
+    isMultiple: false,
     explanation: '牛顿第一定律（惯性定律）正确描述了物体在不受外力或合外力为零时保持静止或匀速直线运动的状态。选项B错误，牛顿第二定律只适用于惯性参考系；选项C错误，作用力与反作用力分别作用在两个不同物体上；选项D错误，牛顿运动定律不适用于微观粒子。',
     relatedConcepts: ['牛顿运动定律', '惯性', '参考系']
   },
   {
     id: 'gaokao-2023-easy-1',
     category: '力学',
+    knowledgePoint: '匀变速直线运动',
     difficulty: 'easy',
     source: '2023年高考全国乙卷',
     year: 2023,
     question: '一个物体从静止开始做匀加速直线运动，经过t秒的速度为v，则它在t/2时刻的速度为',
     options: ['v/2', 'v/4', 'v/3', '无法确定'],
     correctAnswer: 0,
+    isMultiple: false,
     explanation: '匀加速直线运动中，速度随时间均匀增加，v = at。t/2时刻的速度 v\' = a(t/2) = (at)/2 = v/2。',
     relatedConcepts: ['匀变速直线运动', '速度公式', '加速度']
   },
   {
     id: 'gaokao-2022-easy-1',
     category: '电磁学',
+    knowledgePoint: '电场强度',
     difficulty: 'easy',
     source: '2022年高考全国甲卷',
     year: 2022,
@@ -64,10 +103,12 @@ export const quizQuestions: Question[] = [
       '点电荷电场中电势为零处场强一定为零'
     ],
     correctAnswer: 2,
+    isMultiple: false,
     explanation: '选项A错误，点电荷电场中各点电势不可能为零（除了无穷远处）；选项B错误，场强方向指向电势降低最快的方向，而不是电势降低方向；选项C正确，场强方向与电场线切线方向一致；选项D错误，电势为零处场强不一定为零。',
     relatedConcepts: ['点电荷电场', '电场强度', '电势']
   },
   {
+
     id: 'gaokao-2021-easy-1',
     category: '热学',
     difficulty: 'easy',
@@ -785,21 +826,228 @@ export const quizQuestions: Question[] = [
     correctAnswer: 1,
     explanation: '波长λ = v/f = 400/100 = 4 m\n\nA处于波峰时，B处于波谷，说明两波源的相位差为π（反相）。\n\nP点距A为13 m，距B为30-13=17 m。\n\n波程差Δr = |r_B - r_A| = |17 - 13| = 4 m = 1λ\n\n考虑相位差：两波源初始相位差为π，波程差为整数倍波长。\n\n相位差 = π + 2π(Δr/λ) = π + 2π = 3π = π（模2π）\n\n由于相位差为π（反相），所以P点振动减弱。\n\n或者用另一种方法：\n由于A、B反相，振动加强条件变为Δr = (n+1/2)λ\n振动减弱条件变为Δr = nλ\n\nΔr = 4 m = 1λ，满足减弱条件。\n\n所以选B：振动减弱。',
     relatedConcepts: ['波的干涉', '波程差', '相位差', '振动加强与减弱']
+  },
+  
+  // === 多选题 ===
+  {
+    id: 'gaokao-2024-multi-1',
+    category: '力学',
+    knowledgePoint: '牛顿运动定律',
+    difficulty: 'medium',
+    source: '2024年高考全国乙卷',
+    year: 2024,
+    question: '关于牛顿运动定律，下列说法正确的有',
+    options: [
+      '牛顿第一定律又称为惯性定律',
+      '牛顿第二定律只适用于惯性参考系',
+      '牛顿第三定律表明作用力与反作用力大小相等、方向相反、作用在同一直线上',
+      '牛顿运动定律适用于宏观低速物体的运动'
+    ],
+    correctAnswer: [0, 1, 2, 3],
+    isMultiple: true,
+    explanation: '牛顿第一定律即惯性定律（选项A正确）；牛顿第二定律只在惯性参考系中成立（选项B正确）；牛顿第三定律描述作用力与反作用力的关系，大小相等、方向相反、作用在同一直线上，但作用在两个不同物体上（选项C正确）；牛顿运动定律适用于宏观低速物体，不适用于微观粒子或高速运动（选项D正确）。四个选项全对。',
+    relatedConcepts: ['牛顿运动定律', '惯性', '参考系']
+  },
+  {
+    id: 'gaokao-2023-multi-1',
+    category: '力学',
+    knowledgePoint: '动量守恒',
+    difficulty: 'hard',
+    source: '2023年高考全国甲卷',
+    year: 2023,
+    question: '对于动量守恒定律，下列说法正确的有',
+    options: [
+      '系统所受合外力为零时，系统动量守恒',
+      '系统在某方向不受外力或合外力为零时，在该方向动量守恒',
+      '系统内力远大于外力时，可近似认为动量守恒',
+      '动量守恒定律只适用于宏观物体'
+    ],
+    correctAnswer: [0, 1, 2],
+    isMultiple: true,
+    explanation: '选项A正确：系统所受合外力为零是动量守恒的基本条件。选项B正确：如果系统在某方向不受外力或合外力为零，则该方向动量守恒。选项C正确：当内力远大于外力时（如碰撞、爆炸），可近似认为动量守恒。选项D错误：动量守恒定律既适用于宏观物体，也适用于微观粒子。',
+    relatedConcepts: ['动量守恒定律', '系统', '内力与外力']
+  },
+  {
+    id: 'gaokao-2022-multi-1',
+    category: '电磁学',
+    knowledgePoint: '电磁感应',
+    difficulty: 'hard',
+    source: '2022年高考全国乙卷',
+    year: 2022,
+    question: '关于电磁感应现象，下列说法正确的有',
+    options: [
+      '穿过闭合回路的磁通量发生变化时，回路中产生感应电动势',
+      '感应电流的磁场总是阻碍引起感应电流的磁通量的变化',
+      '导体棒切割磁感线运动时，一定产生感应电动势',
+      '感应电动势的大小与磁通量的变化率成正比'
+    ],
+    correctAnswer: [0, 1, 2, 3],
+    isMultiple: true,
+    explanation: '选项A正确：磁通量变化是产生感应电动势的条件。选项B正确：这是楞次定律的内容。选项C正确：导体棒切割磁感线时产生感应电动势E=BLv。选项D正确：这是法拉第电磁感应定律E=NΔΦ/Δt。四个选项全对。',
+    relatedConcepts: ['电磁感应', '法拉第定律', '楞次定律']
+  },
+  {
+    id: 'gaokao-2021-multi-1',
+    category: '力学',
+    knowledgePoint: '机械能守恒',
+    difficulty: 'medium',
+    source: '2021年高考全国甲卷',
+    year: 2021,
+    question: '关于机械能守恒定律，下列说法正确的有',
+    options: [
+      '只有重力做功时，机械能守恒',
+      '只有弹簧弹力做功时，机械能守恒',
+      '外力对物体做功为零时，机械能一定守恒',
+      '系统内只有保守力做功时，机械能守恒'
+    ],
+    correctAnswer: [0, 1, 3],
+    isMultiple: true,
+    explanation: '选项A正确：只有重力做功时，动能和势能相互转化，机械能守恒。选项B正确：只有弹簧弹力做功时，动能和弹性势能相互转化，机械能守恒。选项C错误：外力做功为零，不代表没有非保守力做功。选项D正确：只有保守力（重力、弹力）做功时，机械能守恒。',
+    relatedConcepts: ['机械能守恒', '保守力', '功']
+  },
+  {
+    id: 'gaokao-2020-multi-1',
+    category: '热学',
+    knowledgePoint: '理想气体',
+    difficulty: 'medium',
+    source: '2020年高考全国卷I',
+    year: 2020,
+    question: '关于理想气体，下列说法正确的有',
+    options: [
+      '理想气体分子间除碰撞外无相互作用力',
+      '理想气体的内能只与温度有关',
+      '理想气体等温膨胀过程中吸收的热量等于气体对外做的功',
+      '实际气体在温度不太低、压强不太大时可视为理想气体'
+    ],
+    correctAnswer: [0, 1, 2, 3],
+    isMultiple: true,
+    explanation: '选项A正确：理想气体分子间无相互作用力（除碰撞瞬间）。选项B正确：理想气体内能只与温度有关，与体积无关。选项C正确：等温过程中内能不变，由热力学第一定律ΔU=Q-W=0，得Q=W。选项D正确：这是理想气体模型适用的条件。四个选项全对。',
+    relatedConcepts: ['理想气体', '内能', '热力学定律']
+  },
+  {
+    id: 'gaokao-2019-multi-1',
+    category: '光学',
+    knowledgePoint: '光电效应',
+    difficulty: 'hard',
+    source: '2019年高考全国卷I',
+    year: 2019,
+    question: '关于光电效应，下列说法正确的有',
+    options: [
+      '入射光的频率必须大于金属的截止频率才能发生光电效应',
+      '光电子的最大初动能与入射光的强度无关',
+      '饱和光电流与入射光的强度成正比',
+      '光电效应证明了光具有粒子性'
+    ],
+    correctAnswer: [0, 1, 2, 3],
+    isMultiple: true,
+    explanation: '选项A正确：截止频率是发生光电效应的最小频率。选项B正确：由光电方程E_k=hν-W，最大初动能只与频率有关，与强度无关。选项C正确：光强越大，单位时间内入射光子数越多，产生的光电子越多，饱和光电流越大。选项D正确：光电效应用波动理论无法解释，必须用光子理论解释，证明了光的粒子性。',
+    relatedConcepts: ['光电效应', '截止频率', '光子']
+  },
+  {
+    id: 'gaokao-2018-multi-1',
+    category: '力学',
+    knowledgePoint: '圆周运动',
+    difficulty: 'medium',
+    source: '2018年高考全国卷I',
+    year: 2018,
+    question: '关于匀速圆周运动，下列说法正确的有',
+    options: [
+      '匀速圆周运动是变速运动',
+      '匀速圆周运动的加速度方向始终指向圆心',
+      '匀速圆周运动的线速度大小不变，方向时刻改变',
+      '匀速圆周运动的角速度恒定'
+    ],
+    correctAnswer: [0, 1, 2, 3],
+    isMultiple: true,
+    explanation: '选项A正确：匀速圆周运动速度方向时刻改变，是变速运动。选项B正确：向心加速度方向指向圆心。选项C正确：匀速圆周运动速率不变，速度方向改变。选项D正确：匀速圆周运动的角速度恒定。四个选项全对。',
+    relatedConcepts: ['匀速圆周运动', '向心加速度', '角速度']
+  },
+  {
+    id: 'gaokao-2017-multi-1',
+    category: '电磁学',
+    knowledgePoint: '磁场',
+    difficulty: 'hard',
+    source: '2017年高考全国卷I',
+    year: 2017,
+    question: '关于磁场对运动电荷的作用，下列说法正确的有',
+    options: [
+      '运动电荷在磁场中一定受洛伦兹力作用',
+      '洛伦兹力对运动电荷不做功',
+      '洛伦兹力方向总是垂直于速度方向',
+      '带电粒子在匀强磁场中做圆周运动时，周期与速度无关'
+    ],
+    correctAnswer: [1, 2, 3],
+    isMultiple: true,
+    explanation: '选项A错误：当速度方向与磁场方向平行时，不受洛伦兹力。选项B正确：洛伦兹力始终垂直于速度，不做功。选项C正确：洛伦兹力方向垂直于速度和磁场确定的平面。选项D正确：由T=2πm/(qB)，周期与速度无关。',
+    relatedConcepts: ['洛伦兹力', '圆周运动', '带电粒子']
+  },
+  {
+    id: 'gaokao-2016-multi-1',
+    category: '近代物理',
+    knowledgePoint: '原子核',
+    difficulty: 'medium',
+    source: '2016年高考全国卷I',
+    year: 2016,
+    question: '关于原子核的衰变，下列说法正确的有',
+    options: [
+      'α衰变放出α粒子，质量数减少4，电荷数减少2',
+      'β衰变放出电子，质量数不变，电荷数增加1',
+      'γ衰变伴随α衰变或β衰变发生',
+      '半衰期与放射性元素的物理状态有关'
+    ],
+    correctAnswer: [0, 1, 2],
+    isMultiple: true,
+    explanation: '选项A正确：α粒子是氦核，质量数4，电荷数2。选项B正确：β衰变中中子转化为质子放出电子。选项C正确：γ射线是激发态原子核跃迁时放出的光子。选项D错误：半衰期只与元素本身有关，与物理状态无关。',
+    relatedConcepts: ['衰变', 'α衰变', 'β衰变', '半衰期']
+  },
+  {
+    id: 'gaokao-2015-multi-1',
+    category: '力学',
+    knowledgePoint: '万有引力',
+    difficulty: 'hard',
+    source: '2015年高考全国卷I',
+    year: 2015,
+    question: '关于万有引力定律及其应用，下列说法正确的有',
+    options: [
+      '万有引力定律适用于任何两个物体之间的引力计算',
+      '两物体间的万有引力总是大小相等、方向相反',
+      '地球同步卫星的周期等于地球自转周期',
+      '卫星越高，线速度越大'
+    ],
+    correctAnswer: [0, 1, 2],
+    isMultiple: true,
+    explanation: '选项A正确：万有引力定律普遍适用。选项B正确：万有引力是一对作用力与反作用力。选项C正确：同步卫星相对地面静止，周期等于地球自转周期。选项D错误：由v=√(GM/r)，卫星越高，r越大，v越小。',
+    relatedConcepts: ['万有引力', '卫星', '同步卫星']
   }
 ];
 
 export default function QuizSection() {
   const [currentCategory, setCurrentCategory] = useState<string>('all');
+  const [currentKnowledgePoint, setCurrentKnowledgePoint] = useState<string>('all');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]); // 多选题选项
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
   const [quizStarted, setQuizStarted] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]); // 随机抽取的题目
   const [quizMode, setQuizMode] = useState<'practice' | 'exam'>('practice'); // 练习模式/考试模式
+  const [showKnowledgeSelector, setShowKnowledgeSelector] = useState(false); // 显示知识点选择器
 
-  const categories = ['all', '力学', '电磁学', '光学', '热学', '近代物理', '声学'];
+  const categories = ['all', '力学', '电磁学', '光学', '热学', '近代物理', '声学', '机械振动与波'];
+  
+  // 获取当前分类的知识点
+  const currentKnowledgePoints = useMemo(() => {
+    if (currentCategory === 'all') {
+      const allPoints: string[] = [];
+      Object.values(knowledgePoints).forEach(points => {
+        allPoints.push(...points);
+      });
+      return [...new Set(allPoints)];
+    }
+    return knowledgePoints[currentCategory] || [];
+  }, [currentCategory]);
 
   // Fisher-Yates 洗牌算法
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -813,9 +1061,21 @@ export default function QuizSection() {
 
   // 随机抽取30道题目（按难度梯度：10道简单 + 10道中等 + 10道困难）
   const generateExamQuestions = (): Question[] => {
-    const easyQuestions = quizQuestions.filter(q => q.difficulty === 'easy');
-    const mediumQuestions = quizQuestions.filter(q => q.difficulty === 'medium');
-    const hardQuestions = quizQuestions.filter(q => q.difficulty === 'hard');
+    let pool = quizQuestions;
+    
+    // 按知识点筛选
+    if (currentKnowledgePoint !== 'all') {
+      pool = pool.filter(q => q.knowledgePoint === currentKnowledgePoint);
+    }
+    
+    // 按分类筛选
+    if (currentCategory !== 'all') {
+      pool = pool.filter(q => q.category === currentCategory);
+    }
+    
+    const easyQuestions = pool.filter(q => q.difficulty === 'easy');
+    const mediumQuestions = pool.filter(q => q.difficulty === 'medium');
+    const hardQuestions = pool.filter(q => q.difficulty === 'hard');
 
     const shuffledEasy = shuffleArray(easyQuestions).slice(0, 10);
     const shuffledMedium = shuffleArray(mediumQuestions).slice(0, 10);
@@ -828,11 +1088,16 @@ export default function QuizSection() {
   // 开始考试模式
   const startExam = () => {
     const examQuestions = generateExamQuestions();
+    if (examQuestions.length === 0) {
+      alert('当前筛选条件下没有题目，请重新选择');
+      return;
+    }
     setSelectedQuestions(examQuestions);
     setQuizMode('exam');
     setQuizStarted(true);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
+    setSelectedAnswers([]);
     setShowExplanation(false);
     setScore(0);
     setAnsweredQuestions([]);
@@ -840,37 +1105,77 @@ export default function QuizSection() {
 
   // 开始练习模式（所有题目）
   const startPractice = () => {
-    setSelectedQuestions(quizQuestions);
+    let filtered = quizQuestions;
+    
+    // 按知识点筛选
+    if (currentKnowledgePoint !== 'all') {
+      filtered = filtered.filter(q => q.knowledgePoint === currentKnowledgePoint);
+    }
+    
+    // 按分类筛选
+    if (currentCategory !== 'all') {
+      filtered = filtered.filter(q => q.category === currentCategory);
+    }
+    
+    setSelectedQuestions(filtered);
     setQuizMode('practice');
     setQuizStarted(true);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
+    setSelectedAnswers([]);
     setShowExplanation(false);
     setScore(0);
     setAnsweredQuestions([]);
   };
 
   // 根据模式选择题目列表
-  const currentQuestions = quizMode === 'exam' ? selectedQuestions : quizQuestions;
+  const currentQuestions = selectedQuestions;
   
-  // 练习模式下可以按类别筛选
-  const filteredQuestions = quizMode === 'exam' 
-    ? selectedQuestions 
-    : (currentCategory === 'all' ? quizQuestions : quizQuestions.filter(q => q.category === currentCategory));
+  // 当前题目
+  const currentQuestion = currentQuestions[currentQuestionIndex];
 
-  const currentQuestion = filteredQuestions[currentQuestionIndex];
-
+  // 单选题答案选择
   const handleAnswerSelect = (index: number) => {
     if (showExplanation) return;
     setSelectedAnswer(index);
   };
 
+  // 多选题答案选择
+  const handleMultiAnswerSelect = (index: number) => {
+    if (showExplanation) return;
+    setSelectedAnswers(prev => {
+      if (prev.includes(index)) {
+        return prev.filter(i => i !== index);
+      } else {
+        return [...prev, index].sort((a, b) => a - b);
+      }
+    });
+  };
+
+  // 判断答案是否正确
+  const checkAnswer = (): boolean => {
+    if (!currentQuestion) return false;
+    
+    const isMulti = currentQuestion.isMultiple ?? false;
+    if (isMulti) {
+      const correctArr = currentQuestion.correctAnswer as number[];
+      return selectedAnswers.length === correctArr.length &&
+        selectedAnswers.every(ans => correctArr.includes(ans));
+    } else {
+      return selectedAnswer === currentQuestion.correctAnswer;
+    }
+  };
+
   const handleSubmit = () => {
-    if (selectedAnswer === null) return;
+    if (!currentQuestion) return;
+    
+    const isMulti = currentQuestion.isMultiple ?? false;
+    if (isMulti && selectedAnswers.length === 0) return;
+    if (!isMulti && selectedAnswer === null) return;
     
     setShowExplanation(true);
     
-    if (selectedAnswer === currentQuestion.correctAnswer) {
+    if (checkAnswer()) {
       setScore(prev => prev + 1);
     }
     
@@ -878,9 +1183,10 @@ export default function QuizSection() {
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < filteredQuestions.length - 1) {
+    if (currentQuestionIndex < currentQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
+      setSelectedAnswers([]);
       setShowExplanation(false);
     }
   };
@@ -889,6 +1195,7 @@ export default function QuizSection() {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
       setSelectedAnswer(null);
+      setSelectedAnswers([]);
       setShowExplanation(false);
     }
   };
@@ -896,13 +1203,16 @@ export default function QuizSection() {
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
+    setSelectedAnswers([]);
     setShowExplanation(false);
     setScore(0);
     setAnsweredQuestions([]);
     setQuizStarted(false);
   };
 
-  const progress = ((currentQuestionIndex + 1) / filteredQuestions.length) * 100;
+  const progress = currentQuestions.length > 0 
+    ? ((currentQuestionIndex + 1) / currentQuestions.length) * 100 
+    : 0;
 
   if (!quizStarted) {
     return (
@@ -931,6 +1241,92 @@ export default function QuizSection() {
               <p>涵盖2015-2024年高考，包含力学、电磁学、光学、热学、近代物理等主要领域</p>
             </div>
 
+            {/* 知识点筛选 */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-blue-300">🎯 筛选条件</h4>
+                <button
+                  onClick={() => {
+                    setCurrentCategory('all');
+                    setCurrentKnowledgePoint('all');
+                  }}
+                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  重置筛选
+                </button>
+              </div>
+              
+              {/* 分类选择 */}
+              <div className="mb-3">
+                <div className="text-sm text-blue-300/70 mb-2">选择分类：</div>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => {
+                    const count = cat === 'all' 
+                      ? quizQuestions.length 
+                      : quizQuestions.filter(q => q.category === cat).length;
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setCurrentCategory(cat);
+                          setCurrentKnowledgePoint('all');
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          currentCategory === cat
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white/10 hover:bg-white/20 text-blue-200'
+                        }`}
+                      >
+                        {cat === 'all' ? '全部分类' : cat} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* 知识点选择 */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm text-blue-300/70">选择知识点：</div>
+                  <button
+                    onClick={() => setShowKnowledgeSelector(!showKnowledgeSelector)}
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    {showKnowledgeSelector ? '收起' : '展开更多'}
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setCurrentKnowledgePoint('all')}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                      currentKnowledgePoint === 'all'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 hover:bg-white/20 text-blue-200'
+                    }`}
+                  >
+                    全部知识点
+                  </button>
+                  {(showKnowledgeSelector ? currentKnowledgePoints : currentKnowledgePoints.slice(0, 6)).map((point) => {
+                    const count = quizQuestions.filter(q => q.knowledgePoint === point).length;
+                    if (count === 0) return null;
+                    return (
+                      <button
+                        key={point}
+                        onClick={() => setCurrentKnowledgePoint(point)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          currentKnowledgePoint === point
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white/10 hover:bg-white/20 text-blue-200'
+                        }`}
+                      >
+                        {point} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-green-600/20 rounded-lg p-3 text-center border border-green-500/30">
                 <div className="text-2xl font-bold text-green-400">{quizQuestions.filter(q => q.difficulty === 'easy').length}</div>
@@ -946,16 +1342,25 @@ export default function QuizSection() {
               </div>
             </div>
 
-            <div className="space-y-3 mb-6">
-              {categories.slice(1).map((cat) => {
-                const count = quizQuestions.filter(q => q.category === cat).length;
-                return (
-                  <div key={cat} className="flex justify-between bg-black/30 rounded-lg p-3">
-                    <span className="text-blue-200">{cat}</span>
-                    <span className="text-blue-400">{count} 题</span>
-                  </div>
-                );
-              })}
+            {/* 当前筛选结果 */}
+            <div className="bg-black/30 rounded-lg p-3 mb-6 border border-white/10">
+              <div className="text-sm text-blue-300/80">
+                当前筛选：<span className="text-blue-200 font-semibold">
+                  {currentCategory === 'all' ? '全部分类' : currentCategory}
+                </span>
+                {currentKnowledgePoint !== 'all' && (
+                  <span> - <span className="text-purple-200 font-semibold">{currentKnowledgePoint}</span></span>
+                )}
+                <span className="ml-2">
+                  共 <span className="text-yellow-300 font-semibold">
+                    {currentKnowledgePoint === 'all' && currentCategory === 'all'
+                      ? quizQuestions.length
+                      : currentKnowledgePoint !== 'all'
+                      ? quizQuestions.filter(q => q.knowledgePoint === currentKnowledgePoint).length
+                      : quizQuestions.filter(q => q.category === currentCategory).length}
+                  </span> 题
+                </span>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -963,7 +1368,7 @@ export default function QuizSection() {
                 onClick={startPractice}
                 className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-semibold hover:shadow-lg hover:shadow-blue-600/30 transition-all"
               >
-                📚 练习模式（全部题目）
+                📚 练习模式（筛选后题目）
               </button>
               <button
                 onClick={startExam}
@@ -980,15 +1385,16 @@ export default function QuizSection() {
               <div>
                 <div className="font-semibold text-blue-300 mb-1">📚 练习模式</div>
                 <ul className="space-y-1 ml-4">
-                  <li>• 使用全部 {quizQuestions.length} 道题目</li>
-                  <li>• 可按类别筛选题目</li>
+                  <li>• 根据筛选条件使用题目</li>
+                  <li>• 可按分类和知识点筛选</li>
+                  <li>• 支持单选题和多选题</li>
                   <li>• 适合系统复习和查漏补缺</li>
                 </ul>
               </div>
               <div>
                 <div className="font-semibold text-blue-300 mb-1">🎯 考试模式</div>
                 <ul className="space-y-1 ml-4">
-                  <li>• 随机抽取30道题目</li>
+                  <li>• 从筛选条件中随机抽取30题</li>
                   <li>• 按难度梯度：10道简单 + 10道中等 + 10道困难</li>
                   <li>• 模拟真实高考体验</li>
                 </ul>
@@ -1071,38 +1477,79 @@ export default function QuizSection() {
               </div>
             </div>
 
-            <h3 className="text-xl font-semibold mb-6">{currentQuestion.question}</h3>
+            <h3 className="text-xl font-semibold mb-2">{currentQuestion.question}</h3>
+            
+            {/* 多选题提示 */}
+            {(currentQuestion.isMultiple ?? false) && (
+              <div className="mb-4 text-sm text-yellow-300/80 bg-yellow-600/10 rounded-lg px-3 py-2 border border-yellow-500/30">
+                💡 多选题：请选择所有正确的答案（两个或以上）
+              </div>
+            )}
+            
+            {/* 知识点标签 */}
+            {currentQuestion.knowledgePoint && (
+              <div className="mb-4 text-sm text-purple-300/80">
+                <span className="text-blue-300/60">知识点：</span>
+                <span className="px-2 py-0.5 bg-purple-600/20 rounded ml-1">{currentQuestion.knowledgePoint}</span>
+              </div>
+            )}
 
             <div className="space-y-3 mb-6">
               {currentQuestion.options.map((option, index) => {
+                const isMulti = currentQuestion.isMultiple ?? false;
                 let buttonClass = 'bg-white/5 hover:bg-white/10 border border-white/10';
+                let isSelected = false;
+                let isCorrect = false;
                 
-                if (showExplanation) {
-                  if (index === currentQuestion.correctAnswer) {
-                    buttonClass = 'bg-green-600/30 border-green-500/50';
-                  } else if (index === selectedAnswer && index !== currentQuestion.correctAnswer) {
-                    buttonClass = 'bg-red-600/30 border-red-500/50';
+                if (isMulti) {
+                  // 多选题逻辑
+                  isSelected = selectedAnswers.includes(index);
+                  const correctAnswers = currentQuestion.correctAnswer as number[];
+                  isCorrect = correctAnswers.includes(index);
+                  
+                  if (showExplanation) {
+                    if (isCorrect) {
+                      buttonClass = 'bg-green-600/30 border-green-500/50';
+                    } else if (isSelected && !isCorrect) {
+                      buttonClass = 'bg-red-600/30 border-red-500/50';
+                    }
+                  } else if (isSelected) {
+                    buttonClass = 'bg-blue-600/30 border-blue-500/50';
                   }
-                } else if (selectedAnswer === index) {
-                  buttonClass = 'bg-blue-600/30 border-blue-500/50';
+                } else {
+                  // 单选题逻辑
+                  isSelected = selectedAnswer === index;
+                  isCorrect = index === currentQuestion.correctAnswer;
+                  
+                  if (showExplanation) {
+                    if (isCorrect) {
+                      buttonClass = 'bg-green-600/30 border-green-500/50';
+                    } else if (isSelected && !isCorrect) {
+                      buttonClass = 'bg-red-600/30 border-red-500/50';
+                    }
+                  } else if (isSelected) {
+                    buttonClass = 'bg-blue-600/30 border-blue-500/50';
+                  }
                 }
 
                 return (
                   <button
                     key={index}
-                    onClick={() => handleAnswerSelect(index)}
+                    onClick={() => isMulti ? handleMultiAnswerSelect(index) : handleAnswerSelect(index)}
                     disabled={showExplanation}
                     className={`w-full p-4 rounded-lg text-left transition-all ${buttonClass}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                        showExplanation && index === currentQuestion.correctAnswer
+                        showExplanation && isCorrect
                           ? 'bg-green-500'
-                          : showExplanation && index === selectedAnswer && index !== currentQuestion.correctAnswer
+                          : showExplanation && isSelected && !isCorrect
                           ? 'bg-red-500'
+                          : isSelected
+                          ? 'bg-blue-500'
                           : 'bg-blue-600/30'
                       }`}>
-                        {String.fromCharCode(65 + index)}
+                        {isMulti && isSelected ? '✓' : String.fromCharCode(65 + index)}
                       </div>
                       <span className="text-blue-100">{option}</span>
                     </div>
@@ -1114,10 +1561,15 @@ export default function QuizSection() {
             {showExplanation && (
               <div className="bg-black/30 rounded-xl p-5 mb-6 border border-white/10">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-2xl">{selectedAnswer === currentQuestion.correctAnswer ? '✓' : '✗'}</span>
+                  <span className="text-2xl">{checkAnswer() ? '✓' : '✗'}</span>
                   <span className="font-semibold text-blue-300">
-                    {selectedAnswer === currentQuestion.correctAnswer ? '回答正确！' : '回答错误'}
+                    {checkAnswer() ? '回答正确！' : '回答错误'}
                   </span>
+                  {(currentQuestion.isMultiple ?? false) && (
+                    <span className="text-sm text-blue-300/60 ml-2">
+                      正确答案：{(currentQuestion.correctAnswer as number[]).map(a => String.fromCharCode(65 + a)).join('、')}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-blue-100/80 mb-4">{currentQuestion.explanation}</p>
                 <div>
@@ -1149,9 +1601,9 @@ export default function QuizSection() {
               {!showExplanation ? (
                 <button
                   onClick={handleSubmit}
-                  disabled={selectedAnswer === null}
+                  disabled={(currentQuestion.isMultiple ?? false) ? selectedAnswers.length === 0 : selectedAnswer === null}
                   className={`px-6 py-2 rounded-lg transition-all ${
-                    selectedAnswer === null
+                    ((currentQuestion.isMultiple ?? false) ? selectedAnswers.length === 0 : selectedAnswer === null)
                       ? 'bg-white/10 cursor-not-allowed'
                       : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-600/30'
                   }`}
@@ -1159,7 +1611,7 @@ export default function QuizSection() {
                   提交答案
                 </button>
               ) : (
-                currentQuestionIndex < filteredQuestions.length - 1 ? (
+                currentQuestionIndex < currentQuestions.length - 1 ? (
                   <button
                     onClick={handleNext}
                     className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-600/30 transition-all"
@@ -1185,7 +1637,7 @@ export default function QuizSection() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-blue-300/70">已完成</span>
-                <span className="text-blue-200">{answeredQuestions.length} / {filteredQuestions.length}</span>
+                <span className="text-blue-200">{answeredQuestions.length} / {currentQuestions.length}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-blue-300/70">正确数</span>
@@ -1205,10 +1657,8 @@ export default function QuizSection() {
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-4">
             <h4 className="font-semibold mb-3 text-blue-300">题目导航</h4>
             <div className="grid grid-cols-5 gap-2">
-              {filteredQuestions.map((_, index) => {
+              {currentQuestions.map((_, index) => {
                 const isAnswered = answeredQuestions.includes(index);
-                const isCorrect = isAnswered && 
-                  quizQuestions.findIndex(q => q.id === filteredQuestions[index].id) !== -1;
                 
                 let bgColor = 'bg-white/10';
                 if (isAnswered) {
@@ -1224,6 +1674,7 @@ export default function QuizSection() {
                     onClick={() => {
                       setCurrentQuestionIndex(index);
                       setSelectedAnswer(null);
+                      setSelectedAnswers([]);
                       setShowExplanation(answeredQuestions.includes(index));
                     }}
                     className={`w-10 h-10 rounded-lg ${bgColor} hover:opacity-80 transition-all flex items-center justify-center text-sm font-semibold relative overflow-hidden group`}

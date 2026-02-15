@@ -836,7 +836,7 @@ export default function ProblemSolver() {
         <div className="text-4xl animate-float">💡</div>
         <div>
           <h2 className="text-2xl font-bold">问题求解辅助器</h2>
-          <p className="text-sm text-blue-300/80">解题步骤向导、单位转换、常数查询</p>
+          <p className="text-sm text-blue-300/80">解题步骤向导 · 单位转换 · 常数查询 · 物理量</p>
         </div>
       </div>
 

@@ -187,7 +187,10 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
                 {/* 选项 */}
                 <div className="print:ml-6 print:mb-4 mb-4 ml-8 space-y-2">
                   {question.options.map((option, optIndex) => {
-                    const isCorrect = showAnswers && optIndex === question.correctAnswer;
+                    const correctAnswers = Array.isArray(question.correctAnswer) 
+                      ? question.correctAnswer 
+                      : [question.correctAnswer];
+                    const isCorrect = showAnswers && correctAnswers.includes(optIndex);
                     const optionLetter = ['A', 'B', 'C', 'D', 'E', 'F'][optIndex];
                     
                     return (
@@ -217,7 +220,9 @@ export default function QuizPrintView({ onClose }: QuizPrintViewProps) {
                         正确答案：
                       </span>
                       <span className="print:text-sm print:font-semibold print:text-green-700 ml-2 text-sm font-semibold text-green-700">
-                        {['A', 'B', 'C', 'D', 'E', 'F'][question.correctAnswer]}
+                        {Array.isArray(question.correctAnswer)
+                          ? question.correctAnswer.map(a => ['A', 'B', 'C', 'D', 'E', 'F'][a]).join('、')
+                          : ['A', 'B', 'C', 'D', 'E', 'F'][question.correctAnswer]}
                       </span>
                     </div>
                     

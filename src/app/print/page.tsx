@@ -72,7 +72,10 @@ export default function PrintPage() {
                 <div className="ml-8 mb-4 space-y-2">
                   {question.options.map((option, optIndex) => {
                     const optionLetter = ['A', 'B', 'C', 'D', 'E', 'F'][optIndex];
-                    const isCorrect = optIndex === question.correctAnswer;
+                    const correctAnswers = Array.isArray(question.correctAnswer) 
+                      ? question.correctAnswer 
+                      : [question.correctAnswer];
+                    const isCorrect = correctAnswers.includes(optIndex);
                     
                     return (
                       <div 
@@ -100,7 +103,9 @@ export default function PrintPage() {
                       正确答案：
                     </span>
                     <span className="ml-2 text-sm font-semibold text-green-700">
-                      {['A', 'B', 'C', 'D', 'E', 'F'][question.correctAnswer]}
+                      {Array.isArray(question.correctAnswer)
+                        ? question.correctAnswer.map(a => ['A', 'B', 'C', 'D', 'E', 'F'][a]).join('、')
+                        : ['A', 'B', 'C', 'D', 'E', 'F'][question.correctAnswer]}
                     </span>
                   </div>
                   
