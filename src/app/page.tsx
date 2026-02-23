@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 // 优化的加载占位组件 - 减少重绘
 const LoadingPlaceholder = () => (
@@ -315,6 +316,15 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* 优化总结入口 */}
+              <Link
+                href="/summary"
+                className="px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600/30 to-purple-600/30 hover:from-blue-600/50 hover:to-purple-600/50 transition-all flex items-center gap-2 border border-white/10"
+              >
+                <span>📝</span>
+                <span className="text-sm">优化总结</span>
+              </Link>
+
               {/* 反馈渠道 */}
               <div className="text-sm text-white/80 hover:text-white transition-colors cursor-pointer flex items-center gap-2">
                 <span className="text-lg">📧</span>
