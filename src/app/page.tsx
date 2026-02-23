@@ -324,15 +324,6 @@ export default function Home() {
               {/* 目标用户标签 */}
               <div className="text-sm text-white/80">高中 · 大学低年级</div>
 
-              {/* 项目总结链接 */}
-              <a
-                href="/summary"
-                className="px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600/50 to-purple-600/50 hover:from-blue-600 hover:to-purple-600 transition-all flex items-center gap-2"
-              >
-                <span>📝</span>
-                <span className="text-sm">项目总结</span>
-              </a>
-
               {/* 主题按钮 */}
               <button
                 onClick={() => setShowThemePanel(!showThemePanel)}
