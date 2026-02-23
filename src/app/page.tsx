@@ -47,6 +47,11 @@ const QuizSection = dynamic(() => import('@/components/QuizSection'), {
   loading: LoadingPlaceholder
 });
 
+const Acknowledgments = dynamic(() => import('@/components/Acknowledgments'), {
+  ssr: false,
+  loading: LoadingPlaceholder
+});
+
 // 新增物理模拟组件
 const IdealGasSimulator = dynamic(() => import('@/components/IdealGasSimulator'), {
   ssr: false,
@@ -260,6 +265,7 @@ export default function Home() {
     { id: 'simulation', label: '物理模拟', icon: '🎯' },
     { id: 'solver', label: '问题求解', icon: '💡' },
     { id: 'quiz', label: '自测挑战', icon: '📝' },
+    { id: 'acknowledgments', label: '特别鸣谢', icon: '💝' },
   ];
 
   // 应用自定义颜色
@@ -678,6 +684,7 @@ export default function Home() {
             )}
             {activeTab === 'solver' && <ProblemSolver />}
             {activeTab === 'quiz' && <QuizSection />}
+            {activeTab === 'acknowledgments' && <Acknowledgments />}
           </div>
         </div>
       </main>
