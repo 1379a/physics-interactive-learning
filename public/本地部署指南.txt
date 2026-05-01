@@ -1,0 +1,118 @@
+# 物理学交互式学习平台 - 本地部署指南
+
+## 方法一：直接打开静态文件（最简单）
+
+1. 下载 `physics-website-static.tar.gz` 并解压
+2. 进入解压后的文件夹
+3. 双击 `index.html` 即可在浏览器中打开
+
+**注意：** 部分浏览器安全限制可能导致某些功能无法正常使用。
+
+---
+
+## 方法二：使用 Python 本地服务器（推荐）
+
+### Windows 系统
+
+1. 下载并安装 Python（官网：https://www.python.org/downloads/）
+2. 下载网站源码，解压到任意文件夹
+3. 打开命令提示符（Win+R，输入 cmd）
+4. 进入网站文件夹：
+   ```
+   cd 你解压的文件夹路径
+   ```
+5. 启动服务器：
+   ```
+   python -m http.server 8080
+   ```
+6. 打开浏览器访问：`http://localhost:8080`
+
+### Mac 系统
+
+1. 下载网站源码，解压到任意文件夹
+2. 打开终端（Command+空格，搜索"终端"）
+3. 进入网站文件夹：
+   ```
+   cd 你解压的文件夹路径
+   ```
+4. 启动服务器：
+   ```
+   python3 -m http.server 8080
+   ```
+5. 打开浏览器访问：`http://localhost:8080`
+
+### Linux 系统
+
+1. 下载网站源码，解压到任意文件夹
+2. 打开终端
+3. 进入网站文件夹：
+   ```
+   cd 你解压的文件夹路径
+   ```
+4. 启动服务器：
+   ```
+   python3 -m http.server 8080
+   ```
+5. 打开浏览器访问：`http://localhost:8080`
+
+---
+
+## 方法三：使用 Node.js 本地服务器
+
+### 步骤
+
+1. 下载并安装 Node.js（官网：https://nodejs.org/）
+2. 下载网站源码，解压到任意文件夹
+3. 打开命令提示符/终端
+4. 进入网站文件夹
+5. 安装 http-server：
+   ```
+   npm install -g http-server
+   ```
+6. 启动服务器：
+   ```
+   http-server -p 8080
+   ```
+7. 打开浏览器访问：`http://localhost:8080`
+
+---
+
+## 方法四：使用 VS Code 的 Live Server 插件
+
+1. 安装 VS Code（官网：https://code.visualstudio.com/）
+2. 下载网站源码，用 VS Code 打开
+3. 安装 "Live Server" 插件
+4. 右键点击 `index.html`，选择 "Open with Live Server"
+
+---
+
+## 常见问题
+
+### Q: 为什么打开页面后样式不对？
+A: 请确保通过服务器访问（如 http://localhost:8080），而不是直接双击文件打开。
+
+### Q: 端口被占用怎么办？
+A: 把 8080 改成其他端口，如 3000、5000、8888 等。
+
+### Q: 如何让其他人也能访问？
+A: 在同一局域网内，其他人可以通过你的电脑IP访问：
+   - Windows: 命令提示符输入 `ipconfig`，查看 IPv4 地址
+   - Mac/Linux: 终端输入 `ifconfig`，查看 inet 地址
+   - 其他人在浏览器中访问 `http://你的IP地址:8080`
+
+### Q: 如何停止服务器？
+A: 在命令提示符/终端中按 `Ctrl+C`
+
+---
+
+## 文件夹结构
+
+```
+physics-website/
+├── index.html          # 首页
+├── summary.html        # 优化总结页面
+├── print.html          # 打印页面
+├── physics-website-static.tar.gz  # 压缩包
+├── README.txt          # 本说明文件
+└── (其他静态资源文件)
+```
